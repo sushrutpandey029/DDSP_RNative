@@ -1,49 +1,74 @@
-import { StyleSheet, Text, View, SafeAreaView, StatusBar } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  SafeAreaView,
+  StatusBar,
+  Platform,
+} from "react-native";
 import { DefaultTheme, NavigationContainer } from "@react-navigation/native";
 import RootNavigation from "./src/navigations/RootNavigation";
 import { Colors } from "react-native/Libraries/NewAppScreen";
-import * as Font from 'expo-font' 
+import * as Font from "expo-font";
 import { useEffect, useState } from "react";
-
+import { Provider } from "react-redux";
+import { store } from "./src/components/redux/Store";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+// import { useSelector, useDispatch } from "react-redux";
+// import { setUser } from "./src/components/redux/slices/AuthSlice";
 
 const myTheme = {
   ...DefaultTheme,
-  colors : {
+  colors: {
     ...DefaultTheme.colors,
-    background: '#fff'
-  }
-}
+    background: "#fff",
+  },
+};
 
 export default function App() {
-
   const [fontLoaded, setFontLoaded] = useState(false);
-   const loadFonts = async() => {
+  // const dispatch = useDispatch();
+  const loadFonts = async () => {
     await Font.loadAsync({
-     'Poppins-Regular': require('./assets/fonts/Poppins-Regular.ttf'),
-     'Poppins-Bold': require('./assets/fonts/Poppins-Bold.ttf'),
+      "Poppins-Regular": require("./assets/fonts/Poppins-Regular.ttf"),
+      "Poppins-Bold": require("./assets/fonts/Poppins-Bold.ttf"),
+      "Poppins-Medium": require("./assets/fonts/Poppins-Medium.ttf"),
+      "Poppins-SemiBold": require("./assets/fonts/Poppins-SemiBold.ttf")
     });
     setFontLoaded(true);
-  }
+  };
 
   useEffect(() => {
     loadFonts();
-  },[])
+  }, []);
+
+  // useEffect(() => {
+  //   const loadUserData = async () => {
+  //     const userData = await AsyncStorage.getItem("userData");
+  //     if(userData) {
+  //       dispatch(setUser(JSON.stringify(userData)))
+  //     }
+  //   };
+  //   loadUserData();
+  // },[])
 
   return (
-    <NavigationContainer theme={myTheme}>
-      <SafeAreaView style={styles.container}>
-        <StatusBar backgroundColor={"white"} barStyle={"dark-content"} />
-        <RootNavigation />
-        {/* <Text>welcome to ddsp</Text> */}
-      </SafeAreaView>
-    </NavigationContainer>
+    <Provider store={store}>
+      <NavigationContainer theme={myTheme}>
+        <SafeAreaView style={styles.container}>
+          <StatusBar backgroundColor={"white"} barStyle={"dark-content"} />
+          <RootNavigation />
+        </SafeAreaView>
+      </NavigationContainer>
+    </Provider>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingLeft : '3%',
-    paddingRight : '3%'
+    // paddingLeft: "3%",
+    // paddingRight: "3%",
+    // paddingHorizontal: Platform.OS === "ios" ? "4%" : "3%",
   },
 });

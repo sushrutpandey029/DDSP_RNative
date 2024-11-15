@@ -56,7 +56,7 @@ const LogoScreen = ({ navigation }) => {
       return () =>{
         clearTimeout(timer);
       } 
-    },[navigation, scaleAnim, rotateAnim, opacityAnim])
+    },[  scaleAnim, rotateAnim, opacityAnim])
   );
 
 

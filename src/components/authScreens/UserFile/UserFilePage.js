@@ -1,12 +1,11 @@
-import { View, Text, SafeAreaView } from 'react-native'
+import { View, Text, SafeAreaView, Image } from 'react-native'
 import React from 'react'
-import Header from '../Header/Header'
-
+import HomeFarmerImage from '../commons/HomeFarmerImage'
+import ButtonTabSlider from '../commons/ButtonTabSlider'
 const UserFilePage = () => {
   return (
     <SafeAreaView>
-     {/* <Header /> */}
-     <Text>userpage</Text>
+      <Text>user file page</Text>
     </SafeAreaView>
   )
 }

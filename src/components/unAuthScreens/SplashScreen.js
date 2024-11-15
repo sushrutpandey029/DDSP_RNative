@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import React, { useState } from "react";
 import splash_img from "../../../assets/images/splash_screen.png";
+import {globalContainer} from "../../globals/style"
 
 const SplashScreen = ({navigation}) => {
 
@@ -17,7 +18,7 @@ const SplashScreen = ({navigation}) => {
     }
    
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={globalContainer}>
       <View style={styles.textContainer}>
         <View style={styles.textContainerIn}>
             <View>
@@ -51,7 +52,8 @@ export default SplashScreen;
 
 const styles = StyleSheet.create({
     container : {
-        flex : 1
+        flex : 1,
+        paddingHorizontal : '3%'
     },
     textContainer : {
         flex : 1,

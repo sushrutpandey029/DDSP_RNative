@@ -33,21 +33,21 @@ const HomeBottomTab = ({ navigation }) => {
    });
 
   return (
-    <Tab.Navigator screenOptions={screenOptions}>
-      <Tab.Screen
-        name="UserFile"
-        component={UserFilePage}
-        options={{ headerShown: true, header: () => <Header   /> }}
-      />
-      <Tab.Screen
+    <Tab.Navigator screenOptions={screenOptions} initialRouteName="Home">
+       <Tab.Screen
         name="Home"
         component={HomePage}
         options={{ headerShown: true, header: () => <Header  /> }}
       />
       <Tab.Screen
+        name="UserFile"
+        component={UserFilePage}
+        options={{ headerShown: false}}
+      />
+      <Tab.Screen
         name="Profile"
         component={ProfilePage}
-        options={{ headerShown: true, header: () => <Header  /> }}
+        options={{ headerShown: false }}
       />
     </Tab.Navigator>
   );
