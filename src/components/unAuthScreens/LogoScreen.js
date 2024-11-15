@@ -1,6 +1,8 @@
 import {SafeAreaView, Animated, StyleSheet } from "react-native";
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useCallback } from "react";
 import logo from "../../../assets/logos/welcome_logo.jpg";
+import { useFocusEffect } from "@react-navigation/native";
+
 
 const LogoScreen = ({ navigation }) => {
   const scaleAnim = useRef(new Animated.Value(0)).current;
@@ -17,34 +19,46 @@ const LogoScreen = ({ navigation }) => {
     outputRange: ["250deg", "360deg"],
   });
 
-  useEffect(() => {
-    Animated.parallel([
-      Animated.timing(scaleAnim, {
-        toValue: 1,
-        duration: 3000,
-        useNativeDriver: true,
-      }),
-      Animated.timing(rotateAnim, {
-        toValue: 1,
-        duration: 3000,
-        useNativeDriver: true,
-      }),
-      Animated.timing(opacityAnim, {
-        toValue: 1,
-        duration: 3000,
-        useNativeDriver: true,
-      }),
-    ]).start();
+  useFocusEffect(
+    useCallback(() => {
 
-    const timer = setTimeout(() => {
-      if(navigation) {
-        navigation.navigate('Splash')
-      }
-    }, 6000);
+      //reset animation values
+      scaleAnim.setValue(0);
+      rotateAnim.setValue(0);
+      opacityAnim.setValue(0);
 
-    return () => clearTimeout(timer);
+      //start the animation
 
-  }, [scaleAnim, rotateAnim, opacityAnim, navigation]);
+      Animated.parallel([
+        Animated.timing(scaleAnim, {
+          toValue: 1,
+          duration: 3000,
+          useNativeDriver: true,
+        }),
+        Animated.timing(rotateAnim, {
+          toValue: 1,
+          duration: 3000,
+          useNativeDriver: true,
+        }),
+        Animated.timing(opacityAnim, {
+          toValue: 1,
+          duration: 3000,
+          useNativeDriver: true,
+        }),
+      ]).start();
+
+      const timer = setTimeout(() => {
+        if(navigation) {
+          navigation.navigate('Splash')
+        }
+      }, 5000);
+  
+      return () =>{
+        clearTimeout(timer);
+      } 
+    },[navigation, scaleAnim, rotateAnim, opacityAnim])
+  );
+
 
   return (
     <SafeAreaView style={styles.container}>
