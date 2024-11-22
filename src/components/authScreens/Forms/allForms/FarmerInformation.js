@@ -26,6 +26,15 @@ const FarmerInformation = () => {
   const [currentMicroIrrigation, setCurrentMicroIrrigation] = useState("");
   const [currentSourceIrrigation, setCurrentSourceIrrigation] = useState("");
 
+  const [season, setSeason] = useState(""); // "Kharif" or "Rabi"
+  const [irrigationType, setIrrigationType] = useState(""); // "natural_irrigated", "chemical_irrigated", etc.
+  const [selectedCrops, setSelectedCrops] = useState([]); // Array of selected crops
+
+  const [selectedSeason, setSelectedSeason] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedCrop, setSelectedCrop] = useState("");
+
+
   const [loginValue, setLoginValue] = useState({
     name: "",
     mobileNumber: "",
@@ -35,7 +44,20 @@ const FarmerInformation = () => {
     district: "",
     cultivatedLand: "",
     typeOfLand: "",
-    cropsSown: "",
+    cropsSown: {
+      kharif: {
+        chemical_irrigated: [],
+        chemical_unirrigated: [],
+        natural_irrigated: [],
+        natural_unirrigated: [],
+      },
+      rabi: {
+        chemical_irrigated: [],
+        chemical_unirrigated: [],
+        natural_irrigated: [],
+        natural_unirrigated: [],
+      },
+    },
     desiBreeds: "",
     irrigationSource: "",
     soilConservationMeasures: "",
@@ -55,127 +77,65 @@ const FarmerInformation = () => {
   ]);
 
   const [microIrrigationItems, setMicroIrrigationItems] = useState([
-    { label: "Drip ", value: "drip" },
-    { label: "Sprinklers", value: "sprinklers" },
+    { label: "Drip ", value: "Drip" },
+    { label: "Sprinklers", value: "Sprinklers" },
   ]);
 
   const [sourceIrrigationItems, setSourceIrrigationItems] = useState([
-    { label: "Well", value: "well" },
-    { label: "Canal", value: "canal" },
+    { label: "Well", value: "Well" },
+    { label: "Canal", value: "Canal" },
   ]);
 
   const [talukaItems, setTalukaItems] = useState([
-    { label: "Taluka1", value: "taluka1" },
-    { label: "Taluka2", value: "taluka2" },
-    { label: "Taluka3", value: "taluka3" },
+    { label: "Taluka1", value: "Taluka1" },
+    { label: "Taluka2", value: "Taluka2" },
+    { label: "Taluka3", value: "Taluka3" },
   ]);
 
   const [districtItems, setDistrictItems] = useState([
-    { label: "Yavatmal", value: "yavatmal" },
-    { label: "Washim", value: "washim" },
+    { label: "Yavatmal", value: "Yavatmal" },
+    { label: "Washim", value: "Washim" },
   ]);
 
-  const [cropSownItems, setCropSownItems] = useState([
-    {
-      label: "Kharif Chemical irrigated crop 1",
-      value: "Kharif Chemical irrigated crop 1",
-    },
-    {
-      label: "Kharif Chemical irrigated crop 2",
-      value: "Kharif Chemical irrigated crop 2",
-    },
-    {
-      label: "Kharif Chemical irrigated crop 3",
-      value: "Kharif Chemical irrigated crop 3",
-    },
-    {
-      label: "Kharif Chemical unirrigated crop 1",
-      value: "Kharif Chemical unirrigated crop 1",
-    },
-    {
-      label: "Kharif Chemical unirrigated crop 2",
-      value: "Kharif Chemical unirrigated crop 2",
-    },
-    {
-      label: "Kharif Chemical unirrigated crop 3",
-      value: "Kharif Chemical unirrigated crop 3",
-    },
-    {
-      label: "Kharif Natural irrigated crop 1",
-      value: "Kharif Natural irrigated crop 1",
-    },
-    {
-      label: "Kharif Natural irrigated crop 2",
-      value: "Kharif Natural irrigated crop 2",
-    },
-    {
-      label: "Kharif Natural irrigated crop 3",
-      value: "Kharif Natural irrigated crop 3",
-    },
-    {
-      label: "Kharif Natural unirrigated crop 1",
-      value: "Kharif Natural unirrigated crop 1",
-    },
-    {
-      label: "Kharif Natural unirrigated crop 2",
-      value: "Kharif Natural unirrigated crop 2",
-    },
-    {
-      label: "Kharif Natural unirrigated crop 3",
-      value: "Kharif Natural unirrigated crop 3",
-    },
-    {
-      label: "Rabi Chemical irrigated crop 1",
-      value: "Rabi Chemical irrigated crop 1",
-    },
-    {
-      label: "Rabi Chemical irrigated crop 2",
-      value: "Rabi Chemical irrigated crop 2",
-    },
-    {
-      label: "Rabi Chemical irrigated crop 3",
-      value: "Rabi Chemical irrigated crop 3",
-    },
-    {
-      label: "Rabi Chemical unirrigated crop 1",
-      value: "Rabi Chemical unirrigated crop 1",
-    },
-    {
-      label: "Rabi Chemical unirrigated crop 2",
-      value: "Rabi Chemical unirrigated crop 2",
-    },
-    {
-      label: "Rabi Chemical unirrigated crop 3",
-      value: "Rabi Chemical unirrigated crop 3",
-    },
-    {
-      label: "Rabi Natural irrigated crop 1",
-      value: "Rabi Natural irrigated crop 1",
-    },
-    {
-      label: "Rabi Natural irrigated crop 2",
-      value: "Rabi Natural irrigated crop 2",
-    },
-    {
-      label: "Rabi Natural unirrigated crop 3",
-      value: "Rabi Natural unirrigated crop 3",
-    },
-    {
-      label: "Rabi Natural unirrigated crop 1",
-      value: "Rabi Natural unirrigated crop 1",
-    },
-    {
-      label: "Rabi Natural unirrigated crop 2",
-      value: "Rabi Natural unirrigated crop 2",
-    },
-    {
-      label: "⁸Rabi Natural unirrigated crop 3",
-      value: "⁸Rabi Natural unirrigated crop 3",
-    },
+ const [seasonItems] = useState([
+    { label: "Kharif", value: "kharif" },
+    { label: "Rabi", value: "rabi" },
   ]);
+
+  const [categoryItems] = useState([
+    { label: "Chemical Irrigated", value: "chemical_irrigated" },
+    { label: "Chemical Unirrigated", value: "chemical_unirrigated" },
+    { label: "Natural Irrigated", value: "natural_irrigated" },
+    { label: "Natural Unirrigated", value: "natural_unirrigated" },
+  ]);
+
+  const [cropItems] = useState([
+    { label: "Crop 1", value: "crop1" },
+    { label: "Crop 2", value: "crop2" },
+    { label: "Crop 3", value: "crop3" },
+  ]);
+
+  const handleCropSelection = () => {
+    if (selectedSeason && selectedCategory && selectedCrop) {
+      setLoginValue((prevState) => {
+        const updatedCropsSown = { ...prevState.cropsSown };
+        updatedCropsSown[selectedSeason][selectedCategory].push(selectedCrop);
+
+        return {
+          ...prevState,
+          cropsSown: updatedCropsSown,
+        };
+      });
+    } else {
+      Alert.alert("Please select all fields before adding a crop.");
+    }
+  };
+
+     
 
   const handleSumbit = async () => {
     console.warn("log-val", loginValue);
+    handleCropSelection();
     try {
       const response = await addFarmerInfo(loginValue);
       console.warn("addfarm-resp", response);
@@ -185,6 +145,11 @@ const FarmerInformation = () => {
       console.warn("addfarm-err", error);
     }
   };
+
+  // useState(() => {
+  //   handleCropSelection();
+  // },[selectedCrop])
+  
 
   return (
     <SafeAreaView style={globalContainer}>
@@ -239,13 +204,13 @@ const FarmerInformation = () => {
                 />
               </View>
               <View style={styles.inField}>
-                <Text style={styles.label}>Name of Cluster</Text>
-                <TextInput
-                  style={styles.input}
-                  // onChangeText={(text) =>
-                  //   setLoginValue({ ...loginValue, name: text })
-                  // }
-                />
+              <Text style={styles.label}>Cultivated Land</Text>
+              <TextInput
+                style={styles.input}
+                onChangeText={(text) =>
+                  setLoginValue({ ...loginValue, cultivatedLand: text })
+                }
+              />
               </View>
             </View>
 
@@ -255,8 +220,7 @@ const FarmerInformation = () => {
                 data={talukaItems}
                 labelField="label"
                 valueField="value"
-                placeholder="select an item"
-                value={loginValue.taluka}
+                 value={loginValue.taluka}
                 onChange={(item) =>
                   setLoginValue({ ...loginValue, taluka: item.value })
                 }
@@ -265,6 +229,7 @@ const FarmerInformation = () => {
                 placeholderStyle={styles.placeholderStyle}
                 selectedTextStyle={styles.selectedTextStyle}
                 iconStyle={styles.iconStyle}
+                // containerStyle={{backgroundColor: '#b2dcec'}}
                 renderLeftIcon={() => (
                   <AntDesign
                     style={styles.icon}
@@ -281,8 +246,7 @@ const FarmerInformation = () => {
                 data={districtItems}
                 labelField="label"
                 valueField="value"
-                placeholder="select an item"
-                value={loginValue.district}
+                 value={loginValue.district}
                 onChange={(item) =>
                   setLoginValue({ ...loginValue, district: item.value })
                 }
@@ -306,7 +270,7 @@ const FarmerInformation = () => {
                 <Text style={styles.label}>Date of Registration</Text>
                 <TextInput style={styles.input} />
               </View> */}
-            <View>
+            {/* <View>
               <Text style={styles.label}>Cultivated Land</Text>
               <TextInput
                 style={styles.input}
@@ -314,7 +278,7 @@ const FarmerInformation = () => {
                   setLoginValue({ ...loginValue, cultivatedLand: text })
                 }
               />
-            </View>
+            </View> */}
             {/* </View> */}
 
             <View>
@@ -323,8 +287,7 @@ const FarmerInformation = () => {
                 data={landItems}
                 labelField="label"
                 valueField="value"
-                placeholder="select an item"
-                value={loginValue.typeOfLand}
+                 value={loginValue.typeOfLand}
                 onChange={(item) =>
                   setLoginValue({ ...loginValue, typeOfLand: item.value })
                 }
@@ -344,32 +307,9 @@ const FarmerInformation = () => {
               />
             </View>
 
-            <View>
-              <Text style={styles.label}>Crops sown</Text>
-              <Dropdown
-                data={cropSownItems}
-                labelField="label"
-                valueField="value"
-                placeholder="select an item"
-                value={loginValue.cropsSown}
-                onChange={(item) =>
-                  setLoginValue({ ...loginValue, cropsSown: item.value })
-                }
-                maxHeight={200}
-                style={styles.input}
-                placeholderStyle={styles.placeholderStyle}
-                selectedTextStyle={styles.selectedTextStyle}
-                iconStyle={styles.iconStyle}
-                renderLeftIcon={() => (
-                  <AntDesign
-                    style={styles.icon}
-                    color="black"
-                    name="Safety"
-                    size={20}
-                  />
-                )}
-              />
-            </View>
+            
+
+             
 
             <View>
               <Text style={styles.label}>
@@ -379,8 +319,7 @@ const FarmerInformation = () => {
                 data={conservationMeasureItems}
                 labelField="label"
                 valueField="value"
-                placeholder="select an item"
-                value={loginValue.soilConservationMeasures}
+                 value={loginValue.soilConservationMeasures}
                 onChange={(item) =>
                   setLoginValue({
                     ...loginValue,
@@ -409,8 +348,7 @@ const FarmerInformation = () => {
                 data={sourceIrrigationItems}
                 labelField="label"
                 valueField="value"
-                placeholder="select an item"
-                value={loginValue.irrigationSource}
+                 value={loginValue.irrigationSource}
                 onChange={(item) =>
                   setLoginValue({ ...loginValue, irrigationSource: item.value })
                 }
@@ -446,8 +384,7 @@ const FarmerInformation = () => {
                 data={microIrrigationItems}
                 labelField="label"
                 valueField="value"
-                placeholder="select an item"
-                value={loginValue.microIrrigation}
+                 value={loginValue.microIrrigation}
                 onChange={(item) =>
                   setLoginValue({ ...loginValue, microIrrigation: item.value })
                 }
@@ -467,7 +404,68 @@ const FarmerInformation = () => {
               />
             </View>
 
+           {/* // adding crops sown fields */}
+
+
+           <View>
+              <Text style={styles.label}>Season</Text>
+              <Dropdown
+                data={seasonItems}
+                labelField="label"
+                valueField="value"
+                 value={selectedSeason}
+                onChange={(item) => setSelectedSeason(item.value)}
+                maxHeight={200}
+                style={styles.input}
+              />
+            </View>
+
             <View>
+              <Text style={styles.label}>Irrigation Type</Text>
+              <Dropdown
+                data={categoryItems}
+                labelField="label"
+                valueField="value"
+                 value={selectedCategory}
+                onChange={(item) => setSelectedCategory(item.value)}
+                maxHeight={200}
+                style={styles.input}
+              />
+            </View>
+
+            <View>
+              <Text style={styles.label}>Crop</Text>
+              <Dropdown
+                data={cropItems}
+                labelField="label"
+                valueField="value"
+                 value={selectedCrop}
+                onChange={(item) => setSelectedCrop(item.value)}
+                maxHeight={200}
+                style={styles.input}
+                // placeholder="select an item"
+                // placeholderStyle={styles.placeholderStyle}
+              />
+            </View>
+
+            {/* Display selected crops for the season */}
+            <View style={styles.selectedCropsContainer}>
+              {selectedSeason && selectedCategory && selectedCrop && (
+                <Text style={styles.selectedCropsText}>
+                  {`${selectedSeason} - ${selectedCategory}: ${selectedCrop}`}
+                </Text>
+              )}
+            </View>
+
+           {/* //ending crops sown fields */}
+
+            
+
+            
+
+           
+
+            {/* <View>
               <Text style={styles.label}>Total Cultivated Natural Farming</Text>
               <TextInput
                 style={styles.input}
@@ -487,7 +485,7 @@ const FarmerInformation = () => {
                 //   setLoginValue({ ...loginValue, desiBreeds: text })
                 // }
               />
-            </View>
+            </View> */} 
 
             <View style={styles.btnContainer}>
               <TouchableOpacity style={submitBtn} onPress={handleSumbit}>
@@ -511,7 +509,7 @@ const styles = StyleSheet.create({
     marginBottom: 30,
   },
   label: {
-    fontFamily: "Poppins-Regular",
+    fontFamily: "Poppins-Medium",
     fontSize: 16,
     marginVertical: 9,
   },
@@ -520,7 +518,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#CBD5E1",
     borderRadius: 15,
-    fontSize: 18,
+    fontSize: 14,
     fontFamily: "Poppins-Regular",
     backgroundColor: "#F8FAFC",
     paddingHorizontal: 15,
@@ -530,7 +528,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#CBD5E1",
     borderRadius: 15,
-    fontSize: 18,
+    fontSize: 14,
     fontFamily: "Poppins-Regular",
     backgroundColor: "#F8FAFC",
     paddingHorizontal: 10,
@@ -539,7 +537,7 @@ const styles = StyleSheet.create({
     marginRight: 5,
   },
   placeholderStyle: {
-    fontSize: 16,
+    fontSize: 14,
   },
   selectedTextStyle: {
     fontSize: 16,

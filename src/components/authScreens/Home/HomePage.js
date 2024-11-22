@@ -6,6 +6,7 @@ import ButtonTabSlider from "../commons/ButtonTabSlider";
 import FormContentHome from "../Forms/FormContentHome";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { useSelector, useDispatch } from "react-redux";
+import FarmerList from "./tabContainers/FarmerList";
 
 const HomePage = ({ navigation }) => {
   const [tabValue, setTabValue] = useState("home");
@@ -30,7 +31,7 @@ const HomePage = ({ navigation }) => {
                 content="Lorem ipsum dolor sit amet consectetur. Massa vestibulum neque integer nunc massa vitae duis."
               />
             </TouchableOpacity>
-            <TouchableOpacity
+            {/* <TouchableOpacity
               onPress={() => navigation.navigate("DetailOfCultivation")}
             >
               <FormContentHome
@@ -45,7 +46,7 @@ const HomePage = ({ navigation }) => {
                 title="Detail Of Production"
                 content="Lorem ipsum dolor sit amet consectetur. Massa vestibulum neque integer nunc massa vitae duis."
               />
-            </TouchableOpacity>
+            </TouchableOpacity> */}
             <TouchableOpacity onPress={() => navigation.navigate("FieldWork")}>
               <FormContentHome
                 title="Field Worker Details"
@@ -62,6 +63,12 @@ const HomePage = ({ navigation }) => {
             </TouchableOpacity>
           </View>
         )}
+
+        {
+          tabValue === "farmer" && (
+            <FarmerList />
+          )
+        }
       </View>
     </ScrollView>
   );

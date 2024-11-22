@@ -27,8 +27,8 @@ const CustomDrawerContent = (props) => {
           <Image source={ {uri : `${BaseUrl}/profile-images/1731496967029-996013307.png`}} style={styles.profileImage} />
         </View>
         <View style={styles.nameContainer}>
-          <Text style={styles.customText}>{userName}</Text>
-          <Text style={[styles.customText,{fontSize : 10}]}>{userRole}</Text>
+          <Text style={styles.nameText}>{userData.user.fullname}</Text>
+          <Text style={[styles.customText,{fontSize : 12, fontFamily : 'Poppins-SemiBold'}]}>{userData.user.role}</Text>
         </View>
       </View>
 
@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
   },
   imgContainer: {},
   nameContainer: {
-    paddingLeft: 10,
+    paddingLeft: 6,
   },
   customText: {
     fontFamily: "Poppins-Regular",
@@ -112,6 +112,11 @@ const styles = StyleSheet.create({
     paddingLeft: 8,
     // fontWeight: "bold",
     // color: "#333",
+  },
+  nameText: {
+    fontFamily: "Poppins-Bold",
+    fontSize: 16,
+    paddingLeft: 8,
   },
   profileImage: {
     height: 60,

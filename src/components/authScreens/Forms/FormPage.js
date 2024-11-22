@@ -20,16 +20,16 @@ const FormPage = ({ navigation }) => {
         >
           <FormCard title={"Farmer Information"} />
         </TouchableOpacity>
-        <TouchableOpacity
+        {/* <TouchableOpacity
           onPress={() => navigation.navigate("DetailOfCultivation")}
         >
           <FormCard title={"Detail Of Cultivation"} />
-        </TouchableOpacity>
-        <TouchableOpacity
+        </TouchableOpacity> */}
+        {/* <TouchableOpacity
           onPress={() => navigation.navigate("DetailOfProduction")}
         >
           <FormCard title={"Detail Of Production"} />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
         <TouchableOpacity onPress={() => navigation.navigate("FieldWork")}>
           <FormCard title={"Fields Worker Details"} />
         </TouchableOpacity>

@@ -25,7 +25,7 @@ export default FormHeader;
 const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
-    padding: 8,
+    paddingVertical: 8,
   },
   txt: {
     fontFamily: "Poppins-SemiBold",

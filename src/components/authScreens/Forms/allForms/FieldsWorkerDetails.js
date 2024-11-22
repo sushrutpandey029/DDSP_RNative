@@ -16,24 +16,36 @@ import FormHeader from "../FormHeader";
 import DatePicker from "react-native-ui-datepicker";
 import dayjs from "dayjs";
 // import DatePicker from "react-native-date-picker";
-import {globalContainer} from "../../../../globals/style"
-
+import { globalContainer } from "../../../../globals/style";
 
 const FieldsWorkerDetails = () => {
   const [open, setOpen] = useState(false);
   const [date, setDate] = useState(new Date());
 
-  const handleOpen = async () => {
-    setOpen(!open);
+  // Format the date as dd-mm-yyyy
+  const formatDate = (selectedDate) => {
+    if (!selectedDate) return ""; // If the selectedDate is null or undefined
+    const day = selectedDate.getDate().toString().padStart(2, "0");
+    const month = (selectedDate.getMonth() + 1).toString().padStart(2, "0");
+    const year = selectedDate.getFullYear();
+    return `${day}-${month}-${year}`;
   };
 
-  // const handleDateChange = async (propDate) => {
-  //   if (propDate) {
-  //     setDate(dayjs(propDate) );
-  //     setOpen(false);
-  //
-  //   }
+  // const handleOpen = async () => {
+  //   setOpen(!open);
   // };
+
+  const handleDateChange = (selectedDate) => {
+    if (selectedDate) {
+      const dateObj = new Date(selectedDate); // Ensure it's a Date object
+      if (!isNaN(dateObj)) {
+        setDate(dateObj); // Set the valid date
+      }
+      setOpen(false); // Close the modal after selection
+    }
+  };
+
+   
 
   return (
     <SafeAreaView style={globalContainer}>
@@ -85,34 +97,39 @@ const FieldsWorkerDetails = () => {
             </View>
             <View style={styles.inField}>
               <Text style={styles.smLabel}>Date</Text>
-              <TouchableOpacity style={styles.input} onPress={handleOpen}>
-                <Text>{"date"}</Text>
-              </TouchableOpacity>
-              {/* <TextInput
+              <TouchableOpacity
                 style={styles.input}
-                onPress={handleOpen}
-                placeholder="DD/MM/YYYY"
-              /> */}
+                onPress={() => setOpen(true)}
+              >
+                <Text>{date ? formatDate(date) : "Select a date"}</Text>
+              </TouchableOpacity>
             </View>
           </View>
 
           {/* // calendra modal */}
-          <Modal animationType="slide"   transparent={true} visible={open} >
+          <Modal animationType="slide" transparent={true} visible={open}>
             <View style={styles.centeredView}>
-              <View style={styles.modalView}>
+              <View style={[styles.modalView, { backgroundColor: "#9ac6ca" }]}>
                 <DatePicker
                   modal
+                  mode="single"
                   open={open}
-                  date={date}
-                  onChange={(params) => setDate(params.date)}
+                  selectedItemColor="#637e76"
+                  date={date} // Ensure this is a valid Date object
+                  onChange={(event) => handleDateChange(event.date)} // Handle date change
+                  placeholder="Select a date"
+                  monthContainerStyle={styles.monthStyle}
+                  yearContainerStyle={styles.monthStyle}
+                  dayContainerStyle={styles.monthStyle}
                 />
 
-                <TouchableOpacity onPress={handleOpen}>
-                  <Text>Close</Text>
+                {/* Close Button */}
+                <TouchableOpacity
+                  onPress={() => setOpen(false)}
+                  style={styles.closeButton}
+                >
+                  <Text style={{ fontSize: 19, fontWeight: "bold", color: 'red' }}>Close</Text>
                 </TouchableOpacity>
-                {/* <TouchableOpacity onPress={handleOpen}>
-                  <Text>Set</Text>
-                </TouchableOpacity> */}
               </View>
             </View>
           </Modal>
@@ -247,5 +264,15 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5,
+  },
+  closeButton: {
+    marginTop: 6,
+    padding: 10,
+    // backgroundColor: "#ddd",
+    // borderRadius: 10,
+  },
+  monthStyle: {
+    backgroundColor: "#cde1e3",
+    borderColor: "#fff",
   },
 });

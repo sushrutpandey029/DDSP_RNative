@@ -9,9 +9,7 @@ import {
   Alert,
 } from "react-native";
 import React, { useState } from "react";
-import HomeFarmerImage from "../commons/HomeFarmerImage";
-import ButtonTabSlider from "../commons/ButtonTabSlider";
-import ProfileImage from "../../../../assets/images/profilePage.png";
+import FormHeader from "../Forms/FormHeader";
 import { TextInput } from "react-native-gesture-handler";
 import { submitBtn, customMargin } from "../../../globals/style";
 import { useSelector, useDispatch } from "react-redux";
@@ -22,39 +20,40 @@ import { updateUser } from "../../redux/slices/AuthSlice";
 const ProfilePage = ({ navigation }) => {
   const dispatch = useDispatch();
   const userData = useSelector((state) => state.auth.user.user);
-  const userName = userData.fullname;
-  const emailId = userData.emailid;
   const userId = userData.id;
-  const phone = userData.phonenumber;
-  const address = userData.address;
-  const userDob = userData.dob;
-  const userQualification = userData.qualification;
- 
+
   const [inputValue, setInputValue] = useState({
-    fullname: userName,
-    emailid: emailId,
-    phonenumber: phone,
-    address: address,
-    dob: userDob,
-    qualification: userQualification,
+    fullname: userData.fullname,
+    emailid: userData.emailid,
+    phonenumber: userData.phonenumber,
+    address: userData.address,
+    dob: userData.dob,
+    qualification: userData.qualification,
   });
 
   const handleSumbit = async () => {
-    console.warn('inp-val',inputValue)
-    try{
-      const response = await adminUserUpdate( userId,inputValue);
-      // console.log("user-detail", userData);
-      // console.warn('pr-resp',response);
-      updateUser(response.user);
-      // console.log("user-detail", userData);
-      Alert.alert(response.message);
-    }catch(error) {
-      console.warn('pr-err', error)
+    console.warn("inp-val", inputValue);
+    try {
+      const response = await adminUserUpdate(userId, inputValue);
+      console.warn("profile-resp", response.user);
+
+      // Check if the response contains user data
+      if (response?.user) {
+        dispatch(updateUser(response.user)); // Update Redux state
+        console.log("User updated:", response.user);
+        Alert.alert(response.message);
+      } else {
+        console.log("User data is missing in the response:", response);
+        Alert.alert("Error", "Failed to update user data.");
+      }
+    } catch (error) {
+      console.log("pr-err", error);
     }
-  }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
+      {/* <FormHeader title="Profile"/> */}
       <ScrollView>
         <View style={styles.bgContianer}></View>
         <View style={styles.imgContainer}>
@@ -64,8 +63,8 @@ const ProfilePage = ({ navigation }) => {
             }}
             style={styles.img}
           />
-          <Text>{userName}</Text>
-          <Text>{emailId}</Text>
+          <Text style={styles.dText}>{userData.fullname}</Text>
+          <Text>{userData.emailid}</Text>
         </View>
         <View style={styles.fieldContainer}>
           <View>
@@ -101,8 +100,10 @@ const ProfilePage = ({ navigation }) => {
             </View>
             <View style={styles.inBtn}>
               <Text style={styles.label}>Role</Text>
-              <TextInput style={styles.input} 
-              
+              <TextInput
+                style={styles.input}
+                value={userData.role}
+                editable={false}
               />
             </View>
           </View>
@@ -137,10 +138,10 @@ const ProfilePage = ({ navigation }) => {
               }
             />
           </View>
-          <View>
+          {/* <View>
             <Text style={styles.label}>Password</Text>
             <TextInput style={styles.input} />
-          </View>
+          </View> */}
           <View style={styles.btnContainer}>
             <TouchableOpacity style={submitBtn} onPress={handleSumbit}>
               <Text style={styles.inpText}>Submit</Text>
@@ -180,16 +181,21 @@ const styles = StyleSheet.create({
     width: 130,
   },
   label: {
-    fontFamily: "Poppins-Regular",
+    fontFamily: "Poppins-Medium",
     fontSize: 16,
     marginTop: 9,
+  },
+  dText: {
+    fontFamily: "Poppins-SemiBold",
+    fontSize: 18,
+    // marginTop: 9,
   },
   input: {
     height: 49,
     borderWidth: 1,
     borderColor: "#CBD5E1",
     borderRadius: 15,
-    fontSize: 18,
+    fontSize: 14,
     fontFamily: "Poppins-Regular",
     backgroundColor: "#F8FAFC",
     paddingHorizontal: 15,
@@ -199,13 +205,13 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#CBD5E1",
     borderRadius: 15,
-    fontSize: 18,
+    fontSize: 14,
     fontFamily: "Poppins-Regular",
     backgroundColor: "#F8FAFC",
     paddingHorizontal: 10,
   },
   fieldContainer: {
-    marginTop: "60%",
+    marginTop: "70%",
     marginBottom: "6%",
     marginHorizontal: "3%",
   },

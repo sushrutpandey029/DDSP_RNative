@@ -4,60 +4,161 @@ import {
   StyleSheet,
   ScrollView,
   SafeAreaView,
-  Image,
   TextInput,
   TouchableOpacity,
 } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { submitBtn } from "../../../../globals/style";
 import FormHeader from "../FormHeader";
-import {globalContainer} from "../../../../globals/style"
+import { globalContainer } from "../../../../globals/style";
+import { addCultivationCostDetails, addProductionDetails } from "../../../services/ApiFile";
 
+const DetailOfProduction = ({ route }) => {
+  const farmerId = route.params.farmerId;
+  const [data, setData] = useState(null);
 
-const DetailOfProduction = () => {
+  const costFields = ["totalYield", "totalSaleValue", "surplus"];
+
+  const getCostDetails = async () => {
+    try {
+      const response = await addCultivationCostDetails(farmerId);
+      const updatedData = { ...response };
+
+      // Initialize costs for each crop
+      Object.entries(updatedData.crops).forEach(([season, categories]) => {
+        Object.entries(categories).forEach(([category, crops]) => {
+          updatedData.crops[season][category] = crops.map((crop) => ({
+            cropName: crop,
+            costs: costFields.reduce((acc, field) => {
+              acc[field] = "0"; // Initialize each cost field with "0"
+              return acc;
+            }, {}),
+            totalCost: 0, // Initialize total cost
+          }));
+        });
+      });
+
+      setData(updatedData);
+      console.log("addcostcul-resp-updtd", updatedData);
+    } catch (error) {
+      console.warn("addcostcul-err", error);
+    }
+  };
+
+  const handleCostChange = (season, category, cropIndex, costType, value) => {
+    const updatedData = { ...data };
+    const crop = updatedData.crops[season][category][cropIndex];
+    crop.costs[costType.trim()] = parseFloat(value) || 0;
+
+    // Recalculate total cost for the crop
+    crop.totalCost = Object.values(crop.costs).reduce(
+      (total, cost) => total + (parseFloat(cost) || 0),
+      0
+    );
+
+    setData(updatedData);
+  };
+
+  const handleSubmit = async () => {
+    const submissionData = {
+      farmerID: data.farmerID,
+      cropName: Object.entries(data.crops).flatMap(([season, categories]) =>
+        Object.entries(categories).map(([irrigationType, crops]) => ({
+          season,
+          irrigationType,
+          crops: crops.map((crop) => ({
+            name: crop.cropName,
+            totalYield: crop.costs["totalYield"] || 0,
+            totalSaleValue: crop.costs["totalSaleValue"] || 0,
+            surplus: crop.costs["surplus"] || 0,
+          })),
+        }))
+      ),
+    };
+
+    try {
+      // Log submission data to check correctness
+      console.log("Submission Data:", JSON.stringify(submissionData, null, 2));
+
+      // Uncomment this to make the actual API request
+      const response = await addProductionDetails(farmerId, submissionData);
+      console.log("addProCostPost-resp", response);
+
+    } catch (error) {
+      console.warn("addProCostPost-err", error);
+    }
+  };
+
+  useEffect(() => {
+    getCostDetails();
+  }, []);
+
+  if (!data) {
+    return <Text>Loading...</Text>; // Loading state
+  }
+
   return (
     <SafeAreaView style={globalContainer}>
       <FormHeader title={"DETAIL OF PRODUCTION"} />
       <ScrollView>
         <View style={styles.formContainer}>
-          <View style={styles.twoField}>
-            <View style={styles.inField}>
-              <Text style={styles.label}>Farmer id</Text>
-              <TextInput style={styles.input} />
-            </View>
-            <View style={styles.inField}>
-              <Text style={styles.label}>Cultivated crops</Text>
-              <TextInput style={styles.input} />
-            </View>
+          <View>
+            <Text style={styles.label}>Farmer id </Text>
+            <TextInput
+              style={styles.input}
+              value={data.farmerID}
+              editable={false}
+            />
           </View>
 
-          <Text style={styles.label}>Crop 1</Text>
-          <View style={styles.twoField}>
-            <View style={styles.inField}>
-              <Text style={styles.smLabel}>Total yield (in quintals)</Text>
-              <TextInput style={styles.input2} />
+          {/* Loop through seasons (rabi, kharif) */}
+          {Object.entries(data.crops).map(([season, categories]) => (
+            <View key={season} style={styles.seasonContainer}>
+              <Text style={styles.seasonTitle}>{season.toUpperCase()}</Text>
+              {/* Loop through crop categories */}
+              {Object.entries(categories).map(([category, crops]) => (
+                <View key={category} style={styles.categoryContainer}>
+                  <Text style={styles.categoryTitle}>
+                    {category.replace("_", " ").toUpperCase()}
+                  </Text>
+                  {/* Loop through crops */}
+                  {crops.map((crop, cropIndex) => (
+                    <View key={cropIndex} style={styles.cropContainer}>
+                      <Text style={styles.cropTitle}>{crop.cropName}</Text>
+                      {/* Render cost fields */}
+                      {costFields.map((costField, index) => (
+                        <View key={index}>
+                          <Text style={styles.label}>{costField.toUpperCase()}</Text>
+                          <TextInput
+                            style={styles.input}
+                            value={crop.costs[costField]?.toString()} // Ensure value is a string
+                            keyboardType="numeric"
+                            onChangeText={(value) =>
+                              handleCostChange(
+                                season,
+                                category,
+                                cropIndex,
+                                costField,
+                                value
+                              )
+                            }
+                          />
+                        </View>
+                      ))}
+                      {/* Display total cost */}
+                      <Text style={styles.totalCost}>
+                        Total Cost: {crop.totalCost}
+                      </Text>
+                    </View>
+                  ))}
+                </View>
+              ))}
             </View>
-            <View style={styles.inField}>
-              <Text style={styles.smLabel}>Total sale value (in Rs)</Text>
-              <TextInput style={styles.input} />
-            </View>
-          </View>
+          ))}
 
-          <View>
-            <Text style={styles.label}>Sale value per quintal in Rs</Text>
-            <TextInput style={styles.input} />
-          </View>
-          <View>
-            <Text style={styles.label}>Surplus with Farmer</Text>
-            <TextInput style={styles.input} />
-          </View>
-          <View>
-            <Text style={styles.label}>Crop 2</Text>
-            <TextInput style={styles.input} />
-          </View>
-
+          {/* Submit Button */}
           <View style={styles.btnContainer}>
-            <TouchableOpacity style={submitBtn}>
+            <TouchableOpacity style={submitBtn} onPress={handleSubmit}>
               <Text style={styles.inpText}>Submit</Text>
             </TouchableOpacity>
           </View>
@@ -72,39 +173,13 @@ export default DetailOfProduction;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // paddingHorizontal : '3%'
-  },
-  bgContianer: {
-    width: "100%",
-    height: "18%",
-    backgroundColor: "#5B8A39",
-    // borderRadius : '100%'
-    borderBottomEndRadius: 800,
-    borderBottomStartRadius: 800,
-    top: 0,
-    position: "absolute",
-  },
-  imgContainer: {
-    position: "absolute",
-    top: "9%",
-    alignItems: "center",
-    width: "100%",
   },
   formContainer: {
     marginBottom: 20,
   },
-  img: {
-    height: 130,
-    width: 130,
-  },
   label: {
     fontFamily: "Poppins-Regular",
     fontSize: 16,
-    marginTop: 9,
-  },
-  smLabel:{
-    fontFamily: "Poppins-Regular",
-    fontSize: 14,
     marginTop: 9,
   },
   input: {
@@ -117,40 +192,42 @@ const styles = StyleSheet.create({
     backgroundColor: "#F8FAFC",
     paddingHorizontal: 15,
   },
-  input2: {
-    height: 49,
-    borderWidth: 1,
-    borderColor: "#CBD5E1",
-    borderRadius: 15,
-    fontSize: 18,
-    fontFamily: "Poppins-Regular",
-    backgroundColor: "#F8FAFC",
-    paddingHorizontal: 10,
-  },
-  fieldContainer: {
-    marginTop: "60%",
-    marginBottom: "6%",
-    marginHorizontal: "3%",
-  },
-  subBtn: {
-    width: "70%",
+  btnContainer: {
+    alignItems: "center",
   },
   inpText: {
     color: "#fff",
     fontSize: 18,
   },
-  btnContainer: {
-    alignItems: "center",
+  seasonContainer: {
+    marginVertical: 20,
   },
-  twoField: {
-    flexDirection: "row",
-    flex: 1,
-    width: "100%",
-    alignItems: "center",
-    justifyContent: "space-between",
+  seasonTitle: {
+    fontFamily: "Poppins-Bold",
+    fontSize: 20,
+    marginBottom: 10,
   },
-  inField: {
-    flex: 1,
-    marginHorizontal: 4,
+  categoryContainer: {
+    marginBottom: 16,
+  },
+  categoryTitle: {
+    fontFamily: "Poppins-SemiBold",
+    fontSize: 16,
+    fontWeight: "600",
+    marginBottom: 8,
+  },
+  cropContainer: {
+    marginBottom: 16,
+  },
+  cropTitle: {
+    fontFamily: "Poppins-Medium",
+    fontSize: 18,
+    marginBottom: 8,
+  },
+  totalCost: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#4CAF50",
+    marginTop: 10,
   },
 });

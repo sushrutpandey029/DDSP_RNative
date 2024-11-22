@@ -27,10 +27,27 @@ const LoginScreen = ({ navigation }) => {
   const dispatch = useDispatch();
   const authState = useSelector((state) => state.auth);
   const error = authState.error;
+  const [customError, setCustomError] = useState('');
   // const {isLoggedIn, user, error, loading} = useSelector((state) => state.auth)
 
   const handleLogin = async () => {
-    dispatch(loginUser(loginValue));
+
+    // if(!loginValue.emailid && !loginValue.password) {
+    //   setCustomError("All fields are required");
+    // }
+    // else if(!loginValue.emailid){
+    //   setCustomError("Email is required");
+    //   return
+    // }
+    // else if(!loginValue.password){
+    //   setCustomError("Password is required")
+    //   return
+    // }else{
+    //   setCustomError("");
+      dispatch(loginUser(loginValue));
+
+    // }
+
    };
 
   useEffect(() => {
@@ -50,6 +67,9 @@ const LoginScreen = ({ navigation }) => {
         </View>
         <View style={styles.fieldContainer}>
           <View>
+          {/* {customError && (
+              <Text style={[styles.label, { color: "red" }]}>{customError}</Text>
+            )} */}
             {error && (
               <Text style={[styles.label, { color: "red" }]}>{error}</Text>
             )}

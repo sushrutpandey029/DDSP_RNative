@@ -8,14 +8,25 @@ export const loginUser = createAsyncThunk(
   async (credentials, { rejectWithValue }) => {
     try {
       const userData = await authLogin(credentials);
+      // console.log('login-user-data',userData);
       await AsyncStorage.setItem("userData", JSON.stringify(userData));
        return userData;
     } catch (error) {
-      const errorMessage =
-        error.response?.data?.errormessage || "User not found. Please try again";
-        console.warn('er', error);
-       console.warn('emsg',errorMessage)
-      return rejectWithValue(errorMessage);
+      // console.warn("login-ups",error);
+      // const errorMessage =
+      //   error.response?.data?.errormessage || "User not found. Please try again--";
+      //   // console.warn('emsg',errorMessage)
+      // return rejectWithValue(errorMessage);
+      console.warn("Error Details:", {
+        message: error.message,
+        response: error.response?.data,
+        stack: error.stack,
+    });
+    const errorMessage =
+      error.response?.data?.errors?.[0]?.errormessage || 
+      "User not found. Please try again.";
+    return rejectWithValue(errorMessage);
+
     }
   }
 );
@@ -43,7 +54,10 @@ const authSlice = createSlice({
       state.user = action.payload
     },
     updateUser: (state, action) => {
-      state.user = action.payload
+      state.user.user = {
+        ...state.user.user, // Keep existing fields
+        ...action.payload, // Overwrite or add updated fields
+      };
     },
   },
   extraReducers: (builder) => {

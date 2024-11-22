@@ -54,6 +54,14 @@ const ButtonTabSlider = ({setTabValue}) => {
             <Text style={[activeButton === 3 && styles.btnText]}>Submit</Text>
           </TouchableOpacity>
         </View>
+        <View style={styles.btnContainer}>
+          <TouchableOpacity
+            style={[btn2, activeButton === 4 && styles.activeButton]}
+            onPress={() => handleButtonPress(4, 'farmer')}
+          >
+            <Text style={[activeButton === 4 && styles.btnText]}>Farmers</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </ScrollView>
   );
@@ -64,7 +72,8 @@ export default ButtonTabSlider;
 const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
-    marginVertical: "6%",
+    marginTop: "4%",
+    marginBottom : '2%',
     marginHorizontal: 10,
   },
   btnContainer: {
