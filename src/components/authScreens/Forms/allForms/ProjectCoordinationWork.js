@@ -328,8 +328,8 @@ const ProjectCoordinationWork = () => {
           </TouchableOpacity>
 
           <View style={styles.btnContainer}>
-         <TouchableOpacity style={submitBtn} onPress={handleSubmit}>
-            <Text style={styles.submitText}>Submit</Text>
+            <TouchableOpacity style={submitBtn} onPress={handleSubmit}>
+              <Text style={styles.submitText}>Submit</Text>
             </TouchableOpacity>
           </View>
           {/* <TouchableOpacity
@@ -375,7 +375,6 @@ const ProjectCoordinationWork = () => {
           </View>
         </View>
       </Modal>
-      
     </SafeAreaView>
   );
 };
@@ -383,11 +382,11 @@ const ProjectCoordinationWork = () => {
 const styles = StyleSheet.create({
   formContainer: {
     // padding: 10,
-    marginBottom: 40
+    marginBottom: 40,
   },
   title: {
     fontSize: 18,
-    fontWeight: "bold",
+    fontFamily: "Poppins-SemiBold",
     marginBottom: 10,
   },
   fieldSet: {
@@ -395,7 +394,8 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 14,
-    fontWeight: "bold",
+    fontFamily: "Poppins-Medium",
+    // fontWeight: "bold",
     marginBottom: 5,
   },
   input: {
@@ -414,19 +414,21 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   removeButton: {
-    backgroundColor: "red",
+    backgroundColor: "#ea8c8c",
     padding: 10,
-    borderRadius: 5,
+    borderRadius: 10,
+    width: "30%",
   },
   removeButtonText: {
     color: "white",
     textAlign: "center",
   },
   addButton: {
-    backgroundColor: "#28a745",
+    backgroundColor: "#70ccb2",
     padding: 10,
-    borderRadius: 5,
+    borderRadius: 10,
     marginBottom: 20,
+    width: "30%",
   },
   addButtonText: {
     color: "white",
@@ -462,6 +464,15 @@ const styles = StyleSheet.create({
     padding: 10,
     // backgroundColor: "#ddd",
     // borderRadius: 10,
+  },
+  btnContainer: {
+    marginTop: 30,
+    alignItems: "center",
+  },
+  submitText: {
+    color: "#fff",
+    fontSize: 16,
+    textAlign: "center",
   },
 });
 

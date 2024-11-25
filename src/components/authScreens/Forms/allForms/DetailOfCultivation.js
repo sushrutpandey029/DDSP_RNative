@@ -7,6 +7,7 @@ import {
   SafeAreaView,
   TextInput,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 import { submitBtn } from "../../../../globals/style";
 import FormHeader from "../FormHeader";
@@ -85,6 +86,9 @@ const DetailOfCultivation = ({ route }) => {
     try{
       const response = await addCultivationCostDetailsPost(farmerId, submissionData);
       console.warn('addCulCostPost-resp',response)
+      if(response.success == true){
+        Alert.alert(response.message);
+      }
     }catch(error){
       console.warn('addCulCostPost-err',error)
     }

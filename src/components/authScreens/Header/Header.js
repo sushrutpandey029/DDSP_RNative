@@ -9,7 +9,7 @@ import {
 import React from "react";
 import Icon from "react-native-vector-icons/Ionicons";
 // import headerLogo from "../../../../assets/logos/header_logo.png";
-import headerLogo from "../../../../assets/logos/headerLogo.jpg";
+import headerLogo from "../../../../assets/logos/logoHeader.png";
 import { useNavigation } from "@react-navigation/native";
 
 const Header = ({}) => {

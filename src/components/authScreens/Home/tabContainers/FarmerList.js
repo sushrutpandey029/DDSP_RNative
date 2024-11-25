@@ -67,9 +67,9 @@ const FarmerList = () => {
         <View style={styles.centerdView}>
           <View style={styles.modalView}>
 
-          <TouchableOpacity onPress={() => handlePress('DetailOfCultivation')}>
+          {/* <TouchableOpacity onPress={() => handlePress('DetailOfCultivation')}>
               <Text style={styles.txt}> Detail of Farmer</Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
 
             <TouchableOpacity onPress={() => handlePress('DetailOfCultivation')}>
               <Text style={styles.txt}> Detail of Cultivation</Text>

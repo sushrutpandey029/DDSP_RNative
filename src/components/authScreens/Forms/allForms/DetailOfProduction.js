@@ -6,6 +6,7 @@ import {
   SafeAreaView,
   TextInput,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { submitBtn } from "../../../../globals/style";
@@ -83,6 +84,8 @@ const DetailOfProduction = ({ route }) => {
       // Uncomment this to make the actual API request
       const response = await addProductionDetails(farmerId, submissionData);
       console.log("addProCostPost-resp", response);
+      console.log("addProCostPost-resp", response.message);
+      Alert.alert(response.message);
 
     } catch (error) {
       console.warn("addProCostPost-err", error);
@@ -100,7 +103,7 @@ const DetailOfProduction = ({ route }) => {
   return (
     <SafeAreaView style={globalContainer}>
       <FormHeader title={"DETAIL OF PRODUCTION"} />
-      <ScrollView>
+      <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.formContainer}>
           <View>
             <Text style={styles.label}>Farmer id </Text>

@@ -7,7 +7,9 @@ import {
   addCultivationCostDetailsPostApi,
   getProductionDetailsApi,
   addProductionDetailsApi,
-  addWorkDetailsApi
+  addWorkDetailsApi,
+  getFarmerByIdApi,
+  addFieldOfficerWorkDetailApi
 } from "../api/Api";
 import axios from "axios";
 
@@ -90,6 +92,26 @@ export const addProductionDetails = async (id, request) => {
 // project coordination work api to submit data to add work details
 export const addworkdetails = async (id, request) => {
   const api = `${BaseUrl}/${addWorkDetailsApi}/${id}`;
+  try{
+    const response = await axios.post(api,request);
+    return response.data;
+  }catch(error) {
+    throw error;
+  }
+}
+
+// export const getFarmerById = async (id, request) => {
+//   const api = `${BaseUrl}/${getFarmerByIdApi}/${id}`;
+//   try{
+//     const response = await axios.get(api);
+//     return response.data;
+//   }catch(error){
+//     throw error;
+//   }
+// }
+
+export const addFieldOfficerWorkDetail = async (id, request) => {
+  const api = `${BaseUrl}/${addFieldOfficerWorkDetailApi}/${id}`;
   try{
     const response = await axios.post(api,request);
     return response.data;

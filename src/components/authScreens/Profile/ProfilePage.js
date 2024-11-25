@@ -7,6 +7,7 @@ import {
   ScrollView,
   TouchableOpacity,
   Alert,
+  Modal
 } from "react-native";
 import React, { useState } from "react";
 import FormHeader from "../Forms/FormHeader";
@@ -16,11 +17,18 @@ import { useSelector, useDispatch } from "react-redux";
 import { BaseUrl } from "../../api/Api";
 import { adminUserUpdate } from "../../services/ApiFile";
 import { updateUser } from "../../redux/slices/AuthSlice";
+// import DatePicker from "react-native-ui-datepicker";
+import DatePicker from "react-native-ui-datepicker"
+
 
 const ProfilePage = ({ navigation }) => {
   const dispatch = useDispatch();
   const userData = useSelector((state) => state.auth.user.user);
   const userId = userData.id;
+
+
+  const [open, setOpen] = useState(false);
+  const [date, setDate] = useState(new Date());
 
   const [inputValue, setInputValue] = useState({
     fullname: userData.fullname,
@@ -30,6 +38,25 @@ const ProfilePage = ({ navigation }) => {
     dob: userData.dob,
     qualification: userData.qualification,
   });
+
+  const formatDate = (selectedDate) => {
+    if (!selectedDate) return ""; // If the selectedDate is null or undefined
+    const day = selectedDate.getDate().toString().padStart(2, "0");
+    const month = (selectedDate.getMonth() + 1).toString().padStart(2, "0");
+    const year = selectedDate.getFullYear();
+    return `${day}-${month}-${year}`;
+  };
+
+  const handleDateChange = (selectedDate) => {
+    if (selectedDate) {
+      const dateObj = new Date(selectedDate); // Ensure it's a Date object
+      if (!isNaN(dateObj)) {
+        setDate(dateObj); // Set the valid date
+        setInputValue((prev) => ({ ...prev, dob: formatDate(dateObj) }));
+      }
+      setOpen(false); // Close the modal after selection
+    }
+  };
 
   const handleSumbit = async () => {
     console.warn("inp-val", inputValue);
@@ -59,7 +86,7 @@ const ProfilePage = ({ navigation }) => {
         <View style={styles.imgContainer}>
           <Image
             source={{
-              uri: `${BaseUrl}/profile-images/1731496967029-996013307.png`,
+              uri: `${BaseUrl}/profile-images/${userData.profileimage}`,
             }}
             style={styles.img}
           />
@@ -120,14 +147,53 @@ const ProfilePage = ({ navigation }) => {
           </View>
           <View>
             <Text style={styles.label}>DOB</Text>
-            <TextInput
+            {/* <TextInput
               style={styles.input}
               value={inputValue.dob}
               onChangeText={(text) =>
                 setInputValue({ ...inputValue, dob: text })
               }
-            />
+            /> */}
+             <TouchableOpacity
+                style={[styles.input,{justifyContent : 'center'}]}
+                onPress={() => setOpen(true)}
+              >
+                <Text>{date ? formatDate(date) : "Select a date"}</Text>
+              </TouchableOpacity>
           </View>
+
+             {/* // calendra modal */}
+          <Modal animationType="slide" transparent={true} visible={open}>
+            <View style={styles.centeredView}>
+              <View style={[styles.modalView, { backgroundColor: "#9ac6ca" }]}>
+                <DatePicker
+                  modal
+                  mode="single"
+                  open={open}
+                  selectedItemColor="#637e76"
+                  date={inputValue.dob} // Ensure this is a valid Date object
+                  onChange={(event) => handleDateChange(event.date)} // Handle date change
+                  placeholder="Select a date"
+                  monthContainerStyle={styles.monthStyle}
+                  yearContainerStyle={styles.monthStyle}
+                  dayContainerStyle={styles.monthStyle}
+                />
+
+                {/* Close Button */}
+                <TouchableOpacity
+                  onPress={() => setOpen(false)}
+                  style={styles.closeButton}
+                >
+                  <Text
+                    style={{ fontSize: 19, fontWeight: "bold", color: "red" }}
+                  >
+                    Close
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </Modal>
+
           <View>
             <Text style={styles.label}>Qualification</Text>
             <TextInput
@@ -175,10 +241,12 @@ const styles = StyleSheet.create({
     top: "9%",
     alignItems: "center",
     width: "100%",
+   
   },
   img: {
     height: 130,
     width: 130,
+     borderRadius : 100
   },
   label: {
     fontFamily: "Poppins-Medium",
@@ -235,5 +303,27 @@ const styles = StyleSheet.create({
   inBtn: {
     flex: 1,
     marginHorizontal: 4,
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 22,
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: "white",
+    borderRadius: 20,
+    width: "90%",
+    padding: 35,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
   },
 });

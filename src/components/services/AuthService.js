@@ -1,4 +1,4 @@
-import { BaseUrl, loginApi } from "../api/Api";
+import { BaseUrl, loginApi, logoutApi } from "../api/Api";
 import axios from "axios";
 
 // user login api
@@ -11,6 +11,16 @@ export const authLogin = async (request) => {
     return response.data;
   } catch (error) {
     // console.warn('srv-er',error)
+    throw error;
+  }
+};
+
+export const authLogout = async (request) => {
+  const api = `${BaseUrl}/${logoutApi}`;
+  try {
+    const response = await axios.get(api);
+    return response.data;
+  } catch (error) {
     throw error;
   }
 };

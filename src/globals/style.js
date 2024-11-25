@@ -20,8 +20,8 @@ module.exports = {
         borderColor:  '#CBD5E1',
         backgroundColor : '#fff',
         alignItems : 'center',
-        justifyContent : 'center'
-        
+        justifyContent : 'center',
+        padding : 1
     },
     submitBtn: {
         height: 49,

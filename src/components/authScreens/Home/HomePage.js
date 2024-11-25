@@ -1,4 +1,11 @@
-import { View, Text, SafeAreaView, StyleSheet, Dimensions, ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  SafeAreaView,
+  StyleSheet,
+  Dimensions,
+  ScrollView,
+} from "react-native";
 import React, { useState } from "react";
 import Header from "../Header/Header";
 import HomeFarmerImage from "../commons/HomeFarmerImage";
@@ -13,14 +20,20 @@ const HomePage = ({ navigation }) => {
   // const dispatch = useDispatch();
   // const user = useSelector((state) => state.auth);
   // console.log('h-user',user);
-  
- 
+
   return (
     <ScrollView>
       <HomeFarmerImage />
       <ButtonTabSlider setTabValue={setTabValue} />
       <View style={styles.container}>
-        
+        {/* if home button is clicked */}
+        {tabValue === "home" && (
+          <View style={styles.nullData}>
+            <Text>Contents unavailable</Text>
+          </View>
+        )}
+
+        {/* if form button is clicked */}
         {tabValue === "form" && (
           <View>
             <TouchableOpacity
@@ -64,11 +77,22 @@ const HomePage = ({ navigation }) => {
           </View>
         )}
 
-        {
-          tabValue === "farmer" && (
-            <FarmerList />
-          )
-        }
+        {/* if Latest Task button is clicked */}
+        {tabValue === "latesTask" && (
+          <View style={styles.nullData}>
+            <Text>Contents unavailable</Text>
+          </View>
+        )}
+
+        {/* if Submit is clicked */}
+        {tabValue === "submit" && (
+          <View style={styles.nullData}>
+            <Text>Contents unavailable</Text>
+          </View>
+        )}
+
+        {/* if farmer button is clicked */}
+        {tabValue === "farmer" && <FarmerList />}
       </View>
     </ScrollView>
   );
@@ -79,5 +103,9 @@ export default HomePage;
 const styles = StyleSheet.create({
   container: {
     marginHorizontal: Dimensions.get("window").width * 0.03,
+  },
+  nullData: {
+     alignItems: "center",
+    marginTop : '50%'
   },
 });

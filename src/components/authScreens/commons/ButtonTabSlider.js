@@ -24,7 +24,7 @@ const ButtonTabSlider = ({setTabValue}) => {
             style={[btn2, activeButton === 0 && styles.activeButton]}
             onPress={() => handleButtonPress(0,'home')}
           >
-            <Text style={[activeButton === 0 && styles.btnText]}>Home</Text>
+            <Text style={[styles.btnText ,activeButton === 0 && styles.acBtnText]}>Home</Text>
           </TouchableOpacity>
         </View>
 
@@ -33,7 +33,7 @@ const ButtonTabSlider = ({setTabValue}) => {
             style={[btn2, activeButton === 1 && styles.activeButton]}
             onPress={() => handleButtonPress(1, 'form')}
           >
-            <Text style={[activeButton === 1 && styles.btnText]}>Form</Text>
+            <Text style={[styles.btnText ,activeButton === 1 && styles.acBtnText]}>Form</Text>
           </TouchableOpacity>
         </View>
 
@@ -42,7 +42,7 @@ const ButtonTabSlider = ({setTabValue}) => {
             style={[btn2, activeButton === 2 && styles.activeButton]}
             onPress={() => handleButtonPress(2,'latesTask')}
           >
-            <Text style={[activeButton === 2 && styles.btnText]}>Latest Task</Text>
+            <Text style={[styles.btnText ,activeButton === 2 && styles.acBtnText]}>Latest Task</Text>
           </TouchableOpacity>
         </View>
 
@@ -51,7 +51,7 @@ const ButtonTabSlider = ({setTabValue}) => {
             style={[btn2, activeButton === 3 && styles.activeButton]}
             onPress={() => handleButtonPress(3, 'submit')}
           >
-            <Text style={[activeButton === 3 && styles.btnText]}>Submit</Text>
+            <Text style={[styles.btnText ,activeButton === 3 && styles.acBtnText]}>Submit</Text>
           </TouchableOpacity>
         </View>
         <View style={styles.btnContainer}>
@@ -59,7 +59,7 @@ const ButtonTabSlider = ({setTabValue}) => {
             style={[btn2, activeButton === 4 && styles.activeButton]}
             onPress={() => handleButtonPress(4, 'farmer')}
           >
-            <Text style={[activeButton === 4 && styles.btnText]}>Farmers</Text>
+            <Text style={[styles.btnText , activeButton === 4 && styles.acBtnText]}>Farmers</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -77,13 +77,19 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
   },
   btnContainer: {
-    marginHorizontal: 5,
+    marginHorizontal: 3,
   },
   activeButton: {
     backgroundColor: "#5B8A39",
   },
-  btnText: {
+  acBtnText: {
     color : '#fff',
-    fontWeight : '600'
+    fontFamily : 'Poppins-SemiBold',
+    // fontWeight : '600',
+    // fontSize : 14
+  },
+  btnText : {
+    fontSize : 14,
+    fontFamily : 'Poppins-Regular',
   }
 });

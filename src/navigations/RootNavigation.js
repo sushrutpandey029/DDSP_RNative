@@ -1,7 +1,7 @@
 import { View, Text } from "react-native";
-import React from "react";
+import React, { useDebugValue, useEffect } from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import LogoScreen from "../components/unAuthScreens/LogoScreen";
 import SplashScreen from "../components/unAuthScreens/SplashScreen";
 import LoginScreen from "../components/unAuthScreens/Login/LoginScreen";
@@ -16,11 +16,18 @@ import FieldsWorkerDetails from "../components/authScreens/Forms/allForms/Fields
 import ProjectCoordinationWork from "../components/authScreens/Forms/allForms/ProjectCoordinationWork";
 import { defineAnimation } from "react-native-reanimated";
 import FormHeader from "../components/authScreens/Forms/FormHeader";
+import { initializeUser } from "../components/redux/slices/AuthSlice";
 
 const Stack = createNativeStackNavigator();
 
 const RootNavigation = () => {
-  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
+  
+  const dispatch = useDispatch();
+  const {isLoggedIn} = useSelector((state) => state.auth);
+
+  useEffect(() => {
+    dispatch(initializeUser());
+  },[dispatch])
 
   return (
     <Stack.Navigator>
