@@ -3,33 +3,44 @@ import React from "react";
 import { DrawerContentScrollView } from "@react-navigation/drawer";
 import userIcon from "../../../../assets/images/userIcon1.png";
 import Icon from "react-native-vector-icons/Ionicons";
+import FIcon from "react-native-vector-icons/FontAwesome";
 import { useSelector, useDispatch } from "react-redux";
 import { BaseUrl } from "../../api/Api";
 import { logoutUser } from "../../redux/slices/AuthSlice";
 
 const CustomDrawerContent = (props) => {
-
   const dispatch = useDispatch();
   const navigation = props.navigation;
   const userData = useSelector((state) => state.auth.user);
   console.warn("userdetail", userData.user);
-  
 
- 
-
-  const handleLogout  =async () => {
+  const handleLogout = async () => {
     dispatch(logoutUser());
-  }
+  };
 
   return (
     <DrawerContentScrollView style={styles.customTextContainer}>
       <View style={styles.infoContainer}>
         <View style={styles.imgContainer}>
-          <Image source={ {uri : `${BaseUrl}/profile-images/${userData.user.profileimage}`}} style={styles.profileImage} />
+          <Image
+            source={{
+              uri: `${BaseUrl}/profile-images/${userData.user.profileimage}`,
+            }}
+            style={styles.profileImage}
+          />
         </View>
         <View style={styles.nameContainer}>
-          <Text style={styles.nameText}>{userData.user.fullname}</Text>
-          <Text style={[styles.customText,{fontSize : 12, fontFamily : 'Poppins-SemiBold'}]}>{userData.user.role}</Text>
+          <TouchableOpacity  onPress={() => navigation.navigate("Profile")}>
+            <Text style={styles.nameText}>{userData.user.fullname}</Text>
+            <Text
+              style={[
+                styles.customText,
+                { fontSize: 12, fontFamily: "Poppins-SemiBold" },
+              ]}
+            >
+              {userData.user.role}
+            </Text>
+          </TouchableOpacity>
         </View>
       </View>
 
@@ -40,6 +51,16 @@ const CustomDrawerContent = (props) => {
         >
           <Icon name="person-outline" size={20} />
           <Text style={styles.customText}>View profile</Text>
+        </TouchableOpacity>
+      </View>
+
+      <View>
+        <TouchableOpacity
+          style={styles.box}
+          onPress={() => navigation.navigate("ChangePassword")}
+        >
+          <Icon name="compass-outline" size={20} />
+          <Text style={styles.customText}>Change password</Text>
         </TouchableOpacity>
       </View>
 
@@ -122,11 +143,11 @@ const styles = StyleSheet.create({
   profileImage: {
     height: 60,
     width: 60,
-    borderRadius : 100
+    borderRadius: 100,
   },
   box: {
     flexDirection: "row",
     // paddingTop: 15,
-    marginTop : 30
+    marginTop: 30,
   },
 });

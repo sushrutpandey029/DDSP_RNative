@@ -5,6 +5,8 @@ import {
   TouchableOpacity,
   Modal,
   Button,
+  ActivityIndicator,
+  SafeAreaView
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { getFarmerDetails } from "../../../services/ApiFile";
@@ -21,7 +23,7 @@ const FarmerList = () => {
   const getFarmerList = async () => {
     try {
       const response = await getFarmerDetails();
-      //   console.warn("frmlst-resp", response);
+        console.warn("frmlst-resp", response);
       setFarmerDetails(response.farmers);
     } catch (error) {
       console.warn("frmlst-err", error);
@@ -47,6 +49,14 @@ const FarmerList = () => {
     getFarmerList();
   }, []);
 
+  if(!farmerDetails) {
+    return(
+      <SafeAreaView style={styles.loadingContainer}>
+        <ActivityIndicator />
+      </SafeAreaView>
+    )
+  }
+
   return (
     <View>
       {farmerDetails.map((item) => (
@@ -67,16 +77,16 @@ const FarmerList = () => {
         <View style={styles.centerdView}>
           <View style={styles.modalView}>
 
-          {/* <TouchableOpacity onPress={() => handlePress('DetailOfCultivation')}>
-              <Text style={styles.txt}> Detail of Farmer</Text>
-            </TouchableOpacity> */}
+          <TouchableOpacity onPress={() => handlePress('CropDetail')}>
+              <Text style={styles.txt}> Crop Details</Text>
+            </TouchableOpacity>
 
             <TouchableOpacity onPress={() => handlePress('DetailOfCultivation')}>
-              <Text style={styles.txt}> Detail of Cultivation</Text>
+              <Text style={styles.txt}> Add Cultivation</Text>
             </TouchableOpacity>
 
             <TouchableOpacity onPress={() => handlePress('DetailOfProduction')}>
-              <Text style={styles.txt}>Detail of Production</Text>
+              <Text style={styles.txt}>Add Production</Text>
             </TouchableOpacity>
 
             <TouchableOpacity onPress={closeModal}>
@@ -101,6 +111,12 @@ const styles = StyleSheet.create({
     margin : 4,
     borderRadius : 7,
     backgroundColor : '#e8efed'
+  },
+  loadingContainer : {
+    flex : 1,
+    alignItems : 'center',
+    justifyContent : 'center',
+    backgroundColor : '#fff'
   },
   centerdView: {
     flex: 1,

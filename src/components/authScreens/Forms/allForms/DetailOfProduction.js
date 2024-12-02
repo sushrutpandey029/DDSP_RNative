@@ -72,6 +72,7 @@ const DetailOfProduction = ({ route }) => {
             totalYield: crop.costs["totalYield"] || 0,
             totalSaleValue: crop.costs["totalSaleValue"] || 0,
             surplus: crop.costs["surplus"] || 0,
+            totalCost : crop.totalCost  
           })),
         }))
       ),
@@ -88,7 +89,7 @@ const DetailOfProduction = ({ route }) => {
       Alert.alert(response.message);
 
     } catch (error) {
-      console.warn("addProCostPost-err", error);
+      console.warn("addProCostPost-err", error.response);
     }
   };
 
@@ -136,6 +137,7 @@ const DetailOfProduction = ({ route }) => {
                             style={styles.input}
                             value={crop.costs[costField]?.toString()} // Ensure value is a string
                             keyboardType="numeric"
+                            // placeholder="rs"
                             onChangeText={(value) =>
                               handleCostChange(
                                 season,

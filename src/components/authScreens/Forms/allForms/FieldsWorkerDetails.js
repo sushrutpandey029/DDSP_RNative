@@ -8,6 +8,7 @@ import {
   TextInput,
   TouchableOpacity,
   Modal,
+  Alert,
 } from "react-native";
 import React, { useState } from "react";
 import { submitBtn } from "../../../../globals/style";
@@ -24,6 +25,7 @@ const FieldsWorkerDetails = () => {
   const { user } = useSelector((state) => state.auth.user);
 
   console.log("FWorkDetls", user.id);
+
   const [open, setOpen] = useState(false);
   const [date, setDate] = useState(new Date());
   const [villagesVisited, setVillagesVisited] = useState("");
@@ -38,6 +40,8 @@ const FieldsWorkerDetails = () => {
   const [consultancyTelephone, setConsultancyTelephone] = useState("");
   const [consultancyWhatsApp, setConsultancyWhatsApp] = useState("");
 
+  const [errors, setErrors] = useState({});
+
   const [inputSupplied, setInputSupplied] = useState([
     { name: "", quantity: "" },
   ]);
@@ -48,7 +52,9 @@ const FieldsWorkerDetails = () => {
     const day = selectedDate.getDate().toString().padStart(2, "0");
     const month = (selectedDate.getMonth() + 1).toString().padStart(2, "0");
     const year = selectedDate.getFullYear();
-    return `${day}-${month}-${year}`;
+    // return `${day}-${month}-${year}`;
+    return `${year}-${month}-${day}`;
+
   };
 
   const handleDateChange = (selectedDate) => {
@@ -76,37 +82,76 @@ const FieldsWorkerDetails = () => {
     setInputSupplied(updatedInputs);
   };
 
+  const validateFields = () => {
+
+    let validateErrors = {};
+
+    if(!villagesVisited) validateErrors.villagesVisited = 'Village is required';
+    if(!ownLandCultivated) validateErrors.ownLandCultivated = 'Own Land Cultivated is required';
+    if(!clusterID) validateErrors.clusterID = 'Cluster is required';
+    if(!travelInKms) validateErrors.travelInKms = 'Distance is required';
+    if(!farmersContacted) validateErrors.farmersContacted = 'No. of farmers is required';
+    if(!groupMeetings) validateErrors.groupMeetings = 'Group meeting is required';
+    if(!farmersInGroup) validateErrors.farmersInGroup = 'Farmers in group is required';
+    if(!trainingPlace) validateErrors.trainingPlace = 'Training place is required';
+    if(!farmersInTraining) validateErrors.farmersInTraining = 'Farmers in training is required';
+    if(!consultancyTelephone) validateErrors.consultancyTelephone = 'Telephone is required';
+    if(!consultancyWhatsApp) validateErrors.consultancyWhatsApp = 'Whatsapp is required';
+
+    // inputSupplied.forEach((input, index) => {
+    //   if (!input.name) {
+    //     validateErrors[`inputSuppliedName${index}`] = "Name is required";
+    //   }
+    //   if (!input.quantity) {
+    //     validateErrors[`inputSuppliedQuantity${index}`] = "Quantity is required";
+    //   }
+    // });
+
+    setErrors(validateErrors);
+
+    return Object.keys(validateErrors).length === 0;
+  }
+
   const handleSubmit = async () => {
-    const requestData = {
-      userid: user.id,
-      name: user.fullname,
-      address: user.address,
-      qualifications: user.qualification,
-      mobileNumber: user.phonenumber,
-      emailID: user.emailid,
-      ownLandCultivatedUnderNaturalFarming: ownLandCultivated,
-      clusterID,
-      workDate: formatDate(date),
-      villagesVisited,
-      travelInKms: parseInt(travelInKms),
-      farmersContactedIndividually: parseInt(farmersContacted),
-      groupMeetingsConducted: parseInt(groupMeetings),
-      farmersContactedInGroupMeetings: parseInt(farmersInGroup),
-      clusterTrainingPlace: trainingPlace,
-      farmersAttendedTraining: parseInt(farmersInTraining),
-      inputSupplied,
-      consultancyTelephone: parseInt(consultancyTelephone),
-      consultancyWhatsApp: parseInt(consultancyWhatsApp),
-    };
 
-    console.log('requested-data',requestData);
-
-    try {
-      const response = await addFieldOfficerWorkDetail(user.id,requestData);
-      console.log("fldWrkDetls-Submitted response:", response);
-    } catch (error) {
-      console.log("fldWrkDetls-Error submitting form:", error);
+    console.log('validateErrors',validateFields());
+    console.log('errors-resp',errors);
+    if(validateFields()) {
+      const requestData = {
+        userid: user.id,
+        name: user.fullname,
+        address: user.address,
+        qualifications: user.qualification,
+        mobileNumber: user.phonenumber,
+        emailID: user.emailid,
+        ownLandCultivatedUnderNaturalFarming: ownLandCultivated,
+        clusterID,
+        workDate: formatDate(date),
+        villagesVisited,
+        travelInKms: parseInt(travelInKms),
+        farmersContactedIndividually: parseInt(farmersContacted),
+        groupMeetingsConducted: parseInt(groupMeetings),
+        farmersContactedInGroupMeetings: parseInt(farmersInGroup),
+        clusterTrainingPlace: trainingPlace,
+        farmersAttendedTraining: parseInt(farmersInTraining),
+        inputSupplied,
+        consultancyTelephone: parseInt(consultancyTelephone),
+        consultancyWhatsApp: parseInt(consultancyWhatsApp),
+      };
+  
+      console.log('requested-data',requestData);
+  
+      try {
+        const response = await addFieldOfficerWorkDetail(user.id,requestData);
+        console.log("fldWrkDetls-Submitted response:", response);
+        Alert.alert('Data submitted successfully');
+      } catch (error) {
+        console.log("fldWrkDetls-Error submitting form:", error);
+      }
     }
+
+   
+
   };
 
   return (
@@ -168,6 +213,7 @@ const FieldsWorkerDetails = () => {
               value={ownLandCultivated}
               onChangeText={setOwnLandCultivated}
             />
+            {errors.ownLandCultivated && <Text style={{color:'red'}}>{errors.ownLandCultivated}</Text>}
           </View>
           <View style={styles.field}>
             <Text style={styles.label}>Cluster ID</Text>
@@ -176,23 +222,25 @@ const FieldsWorkerDetails = () => {
               value={clusterID}
               onChangeText={setClusterID}
             />
+            {errors.clusterID && <Text style={{color:'red'}}>{errors.clusterID}</Text>}
           </View>
 
           <Text style={[styles.label, { marginTop: 20 }]}>Work Details</Text>
 
           <View style={styles.twoField}>
             <View style={styles.inField}>
-              <Text style={styles.smLabel}>Villages Visited</Text>
+              <Text style={styles.smLabel}>Visited village name</Text>
               <TextInput
                 style={styles.input}
                 value={villagesVisited}
                 onChangeText={setVillagesVisited}
               />
+              {errors.villagesVisited && <Text style={{color:'red'}}>{errors.villagesVisited}</Text>}
             </View>
             <View style={styles.inField}>
               <Text style={styles.smLabel}>Work Date</Text>
               <TouchableOpacity
-                style={styles.input}
+                style={[styles.input,{justifyContent : 'center'}]}
                 onPress={() => setOpen(true)}
               >
                 <Text>{date ? formatDate(date) : "Select a date"}</Text>
@@ -239,18 +287,20 @@ const FieldsWorkerDetails = () => {
                 style={styles.input}
                 value={travelInKms}
                 onChangeText={setTravelInKms}
-                keyboardType="numeric"
+                // keyboardType="numeric"
               />
+              {errors.travelInKms && <Text style={{color:'red'}}>{errors.travelInKms}</Text>}
             </View>
 
             <View style={styles.inField}>
-              <Text style={styles.smLabel}>No. of farmers Contacted</Text>
+              <Text style={styles.smLabel}> farmers Contacted</Text>
               <TextInput
                 style={styles.input}
                 value={farmersContacted}
                 onChangeText={setFarmersContacted}
-                keyboardType="numeric"
+                // keyboardType="numeric"
               />
+              {errors.farmersContacted && <Text style={{color:'red'}}>{errors.farmersContacted}</Text>}
             </View>
           </View>
 
@@ -260,8 +310,9 @@ const FieldsWorkerDetails = () => {
               style={styles.input}
               value={groupMeetings}
               onChangeText={setGroupMeetings}
-              keyboardType="numeric"
+              // keyboardType="numeric"
             />
+            {errors.groupMeetings && <Text style={{color:'red'}}>{errors.groupMeetings}</Text>}
           </View>
 
           <View style={styles.field}>
@@ -270,8 +321,9 @@ const FieldsWorkerDetails = () => {
               style={styles.input}
               value={farmersInGroup}
               onChangeText={setFarmersInGroup}
-              keyboardType="numeric"
+              // keyboardType="numeric"
             />
+            {errors.farmersInGroup && <Text style={{color:'red'}}>{errors.farmersInGroup}</Text>}
           </View>
 
           <View style={styles.field}>
@@ -281,6 +333,7 @@ const FieldsWorkerDetails = () => {
               value={trainingPlace}
               onChangeText={setTrainingPlace}
              />
+             {errors.trainingPlace && <Text style={{color:'red'}}>{errors.trainingPlace}</Text>}
           </View>
 
           <View style={styles.field}>
@@ -289,8 +342,9 @@ const FieldsWorkerDetails = () => {
               style={styles.input}
               value={farmersInTraining}
               onChangeText={setFarmersInTraining}
-              keyboardType="numeric"
+              // keyboardType="numeric"
             />
+            {errors.farmersInTraining && <Text style={{color:'red'}}>{errors.farmersInTraining}</Text>}
           </View>
 
           <View style={styles.field}>
@@ -299,8 +353,9 @@ const FieldsWorkerDetails = () => {
               style={styles.input}
               value={consultancyTelephone}
               onChangeText={setConsultancyTelephone}
-              keyboardType="numeric"
+              // keyboardType="numeric"
             />
+            {errors.consultancyTelephone && <Text style={{color:'red'}}>{errors.consultancyTelephone}</Text>}
           </View>
 
           <View style={styles.field}>
@@ -309,8 +364,9 @@ const FieldsWorkerDetails = () => {
               style={styles.input}
               value={consultancyWhatsApp}
               onChangeText={setConsultancyWhatsApp}
-              keyboardType="numeric"
+              // keyboardType="numeric"
             />
+            {errors.consultancyWhatsApp && <Text style={{color:'red'}}>{errors.consultancyWhatsApp}</Text>}
           </View>
 
           <View style={styles.field}>
@@ -324,6 +380,7 @@ const FieldsWorkerDetails = () => {
                   onChangeText={(value) =>
                     handleInputSuppliedChange(index, "name", value)
                   }
+                  
                 />
                 <TextInput
                   style={[styles.input, { flex: 1 }]}

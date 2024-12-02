@@ -1,6 +1,6 @@
 import {SafeAreaView, Animated, StyleSheet } from "react-native";
 import React, { useRef, useEffect, useCallback } from "react";
-import logo from "../../../assets/logos/welcome_logo.jpg";
+import logo from "../../../assets/logos/welcome_logo1.png";
 import { useFocusEffect } from "@react-navigation/native";
 
 

@@ -17,17 +17,18 @@ import ProjectCoordinationWork from "../components/authScreens/Forms/allForms/Pr
 import { defineAnimation } from "react-native-reanimated";
 import FormHeader from "../components/authScreens/Forms/FormHeader";
 import { initializeUser } from "../components/redux/slices/AuthSlice";
+import ChangePassword from "../components/authScreens/Forms/ChangePassword";
+import CropDetail from "../components/authScreens/Home/tabContainers/CropDetail";
 
 const Stack = createNativeStackNavigator();
 
 const RootNavigation = () => {
-  
   const dispatch = useDispatch();
-  const {isLoggedIn} = useSelector((state) => state.auth);
+  const { isLoggedIn } = useSelector((state) => state.auth);
 
   useEffect(() => {
     dispatch(initializeUser());
-  },[dispatch])
+  }, [dispatch]);
 
   return (
     <Stack.Navigator>
@@ -80,6 +81,15 @@ const RootNavigation = () => {
             component={ProjectCoordinationWork}
             options={{ headerShown: false }}
           />
+          <Stack.Screen
+            name="ChangePassword"
+            component={ChangePassword}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen 
+          name="CropDetail"
+          component={CropDetail}
+          options={{headerShown : false}}/>
         </>
       ) : (
         // UnauthStack screen

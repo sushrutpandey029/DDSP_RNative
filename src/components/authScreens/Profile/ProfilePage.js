@@ -59,7 +59,7 @@ const ProfilePage = ({ navigation }) => {
   };
 
   const handleSumbit = async () => {
-    console.warn("inp-val", inputValue);
+    // console.warn("inp-val", inputValue);
     try {
       const response = await adminUserUpdate(userId, inputValue);
       console.warn("profile-resp", response.user);

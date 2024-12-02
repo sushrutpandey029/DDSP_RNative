@@ -7,6 +7,7 @@ import {
   TextInput,
   TouchableOpacity,
   Modal,
+  Alert
 } from "react-native";
 import React, { useState } from "react";
 import { submitBtn } from "../../../../globals/style";
@@ -17,6 +18,7 @@ import DatePicker from "react-native-ui-datepicker";
 import { addworkdetails } from "../../../services/ApiFile";
 
 const ProjectCoordinationWork = () => {
+  
   const userDetails = useSelector((state) => state.auth.user.user);
 
   // State for each section
@@ -91,7 +93,7 @@ const ProjectCoordinationWork = () => {
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async() => {
     const formData = {
       trainingProgrammes,
       reviewMeetings,
@@ -102,8 +104,9 @@ const ProjectCoordinationWork = () => {
     console.log("Form Submitted: ", formData);
 
     try {
-      const response = addworkdetails(userDetails.id, formData);
+      const response =await addworkdetails(userDetails.id, formData);
       console.log("addWork-resp", response);
+      Alert.alert('Data submitted successfully');
     } catch (error) {
       console.log("addWork-err", error);
     }
@@ -232,7 +235,7 @@ const ProjectCoordinationWork = () => {
               >
                 <Text>{visit.date || "Select Date"}</Text>
               </TouchableOpacity>
-              <Text style={styles.label}>Cluster</Text>
+              <Text style={styles.label}>Cluster / Village</Text>
               <TextInput
                 style={styles.input}
                 value={visit.cluster}
@@ -244,7 +247,7 @@ const ProjectCoordinationWork = () => {
                   )
                 }
               />
-              <Text style={styles.label}>Observations</Text>
+              <Text style={styles.label}>Observations in brief</Text>
               <TextInput
                 style={styles.input}
                 value={visit.observations}
@@ -284,14 +287,14 @@ const ProjectCoordinationWork = () => {
           <Text style={styles.title}>Reports Submitted</Text>
           {reports.map((report, index) => (
             <View key={index} style={styles.fieldSet}>
-              <Text style={styles.label}>Submission Date</Text>
+              <Text style={styles.label}>Date</Text>
               <TouchableOpacity
                 style={styles.dateInput}
                 onPress={() => openDatePicker("reports", index)}
               >
                 <Text>{report.report.submittedDate || "Select Date"}</Text>
               </TouchableOpacity>
-              <Text style={styles.label}>Details</Text>
+              <Text style={styles.label}>Report Details</Text>
               <TextInput
                 style={styles.input}
                 value={report.report.details}

@@ -1,3 +1,4 @@
+import { ThemeProvider } from "@react-navigation/native";
 import {
   BaseUrl,
   addFarmerInfoApi,
@@ -9,7 +10,9 @@ import {
   addProductionDetailsApi,
   addWorkDetailsApi,
   getFarmerByIdApi,
-  addFieldOfficerWorkDetailApi
+  addFieldOfficerWorkDetailApi,
+  changePasswordApi,
+  detailofproductionandcultivationApi
 } from "../api/Api";
 import axios from "axios";
 
@@ -83,6 +86,7 @@ export const addProductionDetails = async (id, request) => {
   const api = `${BaseUrl}/${addProductionDetailsApi}/${id}`;
   try{
     const response = await axios.post(api, request);
+    // console.log('addProd-resp-api',response);
     return response.data;
   }catch(error) {
     throw error;
@@ -114,6 +118,26 @@ export const addFieldOfficerWorkDetail = async (id, request) => {
   const api = `${BaseUrl}/${addFieldOfficerWorkDetailApi}/${id}`;
   try{
     const response = await axios.post(api,request);
+    return response.data;
+  }catch(error) {
+    throw error;
+  }
+}
+
+export const changePassword =async (id, request) => {
+  const api = `${BaseUrl}/${changePasswordApi}/${id}`;
+  try{
+    const response = await axios.put(api, request);
+    return response.data;
+  }catch(error) {
+    throw error;
+  }
+}
+
+export const detailOfProductionandCultivation = async (id, request) => {
+  const api = `${BaseUrl}/${detailofproductionandcultivationApi}/${id}`;
+  try{
+    const response = await axios.post(api, request);
     return response.data;
   }catch(error) {
     throw error;

@@ -18,22 +18,13 @@ import { addFarmerInfo } from "../../../services/ApiFile";
 import { Dropdown } from "react-native-element-dropdown";
 import AntDesign from "@expo/vector-icons/AntDesign";
 
-const FarmerInformation = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [currentTypeLand, setCurrentTypeLand] = useState("");
-  const [currentConservationMeasure, setCurrentConservationMeasure] =
-    useState("");
-  const [currentMicroIrrigation, setCurrentMicroIrrigation] = useState("");
-  const [currentSourceIrrigation, setCurrentSourceIrrigation] = useState("");
+const FarmerInformation = ({navigation}) => {
+  const [errors, setErrors] = useState({});
 
-  const [season, setSeason] = useState(""); // "Kharif" or "Rabi"
-  const [irrigationType, setIrrigationType] = useState(""); // "natural_irrigated", "chemical_irrigated", etc.
-  const [selectedCrops, setSelectedCrops] = useState([]); // Array of selected crops
-
-  const [selectedSeason, setSelectedSeason] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("");
-  const [selectedCrop, setSelectedCrop] = useState("");
-
+  // const [selectedSeason, setSelectedSeason] = useState("");
+  // const [selectedCategory, setSelectedCategory] = useState("");
+  // const [selectedCrop, setSelectedCrop] = useState("");
+  // const [cropLand, setCropLand] = useState("");
 
   const [loginValue, setLoginValue] = useState({
     name: "",
@@ -42,7 +33,7 @@ const FarmerInformation = () => {
     villageName: "",
     taluka: "",
     district: "",
-    cultivatedLand: "",
+    cultivatedLand: "", //value of total land
     typeOfLand: "",
     cropsSown: {
       kharif: {
@@ -86,6 +77,12 @@ const FarmerInformation = () => {
     { label: "Canal", value: "Canal" },
   ]);
 
+  const [villageItems, setVillageItems] = useState([
+    { label: "Village 1", value: "Village 1" },
+    { label: "Village 2", value: "Village 2" },
+    { label: "Village 3", value: "Village 3" },
+  ]);
+
   const [talukaItems, setTalukaItems] = useState([
     { label: "Taluka1", value: "Taluka1" },
     { label: "Taluka2", value: "Taluka2" },
@@ -97,7 +94,7 @@ const FarmerInformation = () => {
     { label: "Washim", value: "Washim" },
   ]);
 
- const [seasonItems] = useState([
+  const [seasonItems] = useState([
     { label: "Kharif", value: "kharif" },
     { label: "Rabi", value: "rabi" },
   ]);
@@ -115,41 +112,148 @@ const FarmerInformation = () => {
     { label: "Crop 3", value: "crop3" },
   ]);
 
-  const handleCropSelection = () => {
-    if (selectedSeason && selectedCategory && selectedCrop) {
-      setLoginValue((prevState) => {
-        const updatedCropsSown = { ...prevState.cropsSown };
-        updatedCropsSown[selectedSeason][selectedCategory].push(selectedCrop);
+  const [cropSown, setCropSown] = useState([
+    { season: "", category: "", crop: "", land: "" },
+  ]);
 
-        return {
-          ...prevState,
-          cropsSown: updatedCropsSown,
-        };
-      });
-    } else {
-      Alert.alert("Please select all fields before adding a crop.");
-    }
+  //previous full funcitonalbe function
+  // const handleCropSelection = () => {
+  //   if (selectedSeason && selectedCategory && selectedCrop) {
+  //     setLoginValue((prevState) => {
+  //       const updatedCropsSown = { ...prevState.cropsSown };
+  //       updatedCropsSown[selectedSeason][selectedCategory].push(selectedCrop);
+
+  //       return {
+  //         ...prevState,
+  //         cropsSown: updatedCropsSown,
+  //       };
+  //     });
+  //   } else {
+  //     Alert.alert("Please select all fields before adding a crop.");
+  //   }
+  // };
+
+  // to add more functionality
+
+ 
+  // const handleCropSelection = () => {
+  //   cropSown.forEach((entry) => {
+  //     const { season, category, crop, land } = entry;
+  //     if (season && category && crop && land) {
+  //       setLoginValue((prevState) => {
+  //         const updatedCropsSown = { ...prevState.cropsSown };
+  //         updatedCropsSown[season][category].push({ crop, cropLand: land });
+
+  //         console.log('updatedCropsown-handle',JSON.stringify(updatedCropsSown,null,2))
+  //         return {
+  //           ...prevState,
+  //           cropsSown: updatedCropsSown,
+  //         };
+  //       });
+  //     }
+  //   });
+  // };
+
+
+  const handleCropSelection = () => {
+    let updatedCropsSown = { ...loginValue.cropsSown };
+  
+    cropSown.forEach((entry) => {
+      const { season, category, crop, land } = entry;
+  
+      // Check if the required fields are available
+      if (season && category && crop && land) {
+        // Initialize season and category if they don't exist
+        if (!updatedCropsSown[season]) {
+          updatedCropsSown[season] = {
+            chemical_irrigated: [],
+            chemical_unirrigated: [],
+            natural_irrigated: [],
+            natural_unirrigated: [],
+          };
+        }
+  
+        if (!updatedCropsSown[season][category]) {
+          updatedCropsSown[season][category] = [];
+        }
+  
+        // Push the new crop and land data to the appropriate category
+        updatedCropsSown[season][category].push({ crop, cropLand: land });
+      }
+    });
+  
+    // Now update the loginValue state with the updated cropsSown in one go
+    setLoginValue((prevState) => ({
+      ...prevState,
+      cropsSown: updatedCropsSown,
+    }));
+  
+    console.log('Updated loginValue after handleCropSelection:', JSON.stringify(updatedCropsSown, null, 2));
+  };
+  
+  
+
+  const handleAddCropRow = () => {
+    setCropSown([
+      ...cropSown,
+      { season: "", category: "", crop: "", land: "" },
+    ]);
   };
 
-     
+  const handleRemoveCropRow = (index) => {
+    setCropSown(cropSown.filter((_, idx) => idx !== index));
+  };
+
+  // validating errors
+  const validateFields = () => {
+    let validateErrors = {};
+
+    if (!loginValue.name) validateErrors.name = "Name is required";
+    if (!loginValue.mobileNumber)
+      validateErrors.mobileNumber = "Mobile is required";
+    if (!loginValue.emailID) validateErrors.emailID = "Email ID is required";
+    else if (!/\S+@\S+\.\S+/.test(loginValue.emailID))
+      validateErrors.emailID = "Email ID is invalid";
+    if (!loginValue.villageName)
+      validateErrors.villageName = "Village Name is required";
+    if (!loginValue.taluka) validateErrors.taluka = "Taluka is required";
+    if (!loginValue.district) validateErrors.district = "District is requierd";
+    if (!loginValue.cultivatedLand)
+      validateErrors.cultivatedLand = "Cultivated Land is required";
+    if (!loginValue.typeOfLand)
+      validateErrors.typeOfLand = "Type of Land is required";
+    if (!loginValue.desiBreeds)
+      validateErrors.desiBreeds = "Desi breeds is requierd";
+    if (!loginValue.irrigationSource)
+      validateErrors.irrigationSource = "Irrigation source is required";
+    if (!loginValue.soilConservationMeasures)
+      validateErrors.soilConservationMeasures =
+        "Soil Conservation measures is required";
+    if (!loginValue.microIrrigation)
+      validateErrors.microIrrigation = "MicroIrrigation is required";
+
+
+    setErrors(validateErrors);
+
+    return Object.keys(validateErrors).length === 0;
+  };
 
   const handleSumbit = async () => {
-    console.warn("log-val", loginValue);
+    // console.log("Before handleCropSelection:", JSON.stringify(cropSown, null, 2));
     handleCropSelection();
-    try {
-      const response = await addFarmerInfo(loginValue);
-      console.warn("addfarm-resp", response);
-      console.warn("addfarm-resp-msg", response.message);
-      Alert.alert(response.message);
-    } catch (error) {
-      console.warn("addfarm-err", error);
+    // console.log("Final loginValue after update:", JSON.stringify(loginValue, null, 2));
+    if (validateFields()) {
+      try {
+        const response = await addFarmerInfo(loginValue);
+        console.warn("addfarm-resp", response);
+        Alert.alert(response.message);
+        navigation.navigate('Home');
+      } catch (error) {
+        console.warn("addfarm-err", error.response.data);
+        Alert.alert('Error adding farmer information');
+      }
     }
   };
-
-  // useState(() => {
-  //   handleCropSelection();
-  // },[selectedCrop])
-  
 
   return (
     <SafeAreaView style={globalContainer}>
@@ -165,13 +269,16 @@ const FarmerInformation = () => {
           <View style={styles.formContainer}>
             <View style={styles.twoField}>
               <View style={styles.inField}>
-                <Text style={styles.label}>Name of the farmer</Text>
+                <Text style={styles.label}>Full Name</Text>
                 <TextInput
                   style={styles.input}
                   onChangeText={(text) =>
                     setLoginValue({ ...loginValue, name: text })
                   }
                 />
+                {errors.name && (
+                  <Text style={{ color: "red" }}>{errors.name}</Text>
+                )}
               </View>
               <View style={styles.inField}>
                 <Text style={styles.label}>Mobile No</Text>
@@ -181,6 +288,9 @@ const FarmerInformation = () => {
                     setLoginValue({ ...loginValue, mobileNumber: text })
                   }
                 />
+                {errors.mobileNumber && (
+                  <Text style={{ color: "red" }}>{errors.mobileNumber}</Text>
+                )}
               </View>
             </View>
 
@@ -192,25 +302,56 @@ const FarmerInformation = () => {
                   setLoginValue({ ...loginValue, emailID: text })
                 }
               />
+              {errors.emailID && (
+                <Text style={{ color: "red" }}>{errors.emailID}</Text>
+              )}
             </View>
             <View style={styles.twoField}>
               <View style={styles.inField}>
                 <Text style={styles.label}>Name of Village</Text>
+                <Dropdown
+                  data={villageItems}
+                  labelField={"label"}
+                  valueField={"value"}
+                  value={loginValue.villageName}
+                  onChange={(item) =>
+                    setLoginValue({ ...loginValue, villageName: item.value })
+                  }
+                  maxHeight={200}
+                  style={styles.input}
+                  placeholderStyle={styles.placeholderStyle}
+                  selectedTextStyle={styles.selectedTextStyle}
+                  iconStyle={styles.iconStyle}
+                  renderLeftIcon={() => (
+                    <AntDesign
+                      style={styles.icon}
+                      color={"black"}
+                      name="Safety"
+                      size={20}
+                    />
+                  )}
+                />
+                {errors.villageName && (
+                  <Text style={{ color: "red" }}>{errors.villageName}</Text>
+                )}
+              </View>
+              <View style={styles.inField}>
+                <Text style={styles.label}>
+                  Total Land <Text style={{ fontSize: 12 }}>(in ac.)</Text>{" "}
+                </Text>
                 <TextInput
                   style={styles.input}
                   onChangeText={(text) =>
-                    setLoginValue({ ...loginValue, villageName: text })
+                    setLoginValue({
+                      ...loginValue,
+                      cultivatedLand: `${text} Acre`,
+                    })
                   }
+                  keyboardType="numeric"
                 />
-              </View>
-              <View style={styles.inField}>
-              <Text style={styles.label}>Cultivated Land</Text>
-              <TextInput
-                style={styles.input}
-                onChangeText={(text) =>
-                  setLoginValue({ ...loginValue, cultivatedLand: text })
-                }
-              />
+                {errors.cultivatedLand && (
+                  <Text style={{ color: "red" }}>{errors.cultivatedLand}</Text>
+                )}
               </View>
             </View>
 
@@ -220,7 +361,7 @@ const FarmerInformation = () => {
                 data={talukaItems}
                 labelField="label"
                 valueField="value"
-                 value={loginValue.taluka}
+                value={loginValue.taluka}
                 onChange={(item) =>
                   setLoginValue({ ...loginValue, taluka: item.value })
                 }
@@ -239,6 +380,9 @@ const FarmerInformation = () => {
                   />
                 )}
               />
+              {errors.taluka && (
+                <Text style={{ color: "red" }}>{errors.taluka}</Text>
+              )}
             </View>
             <View>
               <Text style={styles.label}>District</Text>
@@ -246,7 +390,7 @@ const FarmerInformation = () => {
                 data={districtItems}
                 labelField="label"
                 valueField="value"
-                 value={loginValue.district}
+                value={loginValue.district}
                 onChange={(item) =>
                   setLoginValue({ ...loginValue, district: item.value })
                 }
@@ -264,22 +408,10 @@ const FarmerInformation = () => {
                   />
                 )}
               />
+              {errors.district && (
+                <Text style={{ color: "red" }}>{errors.district}</Text>
+              )}
             </View>
-            {/* <View style={styles.twoField}> */}
-            {/* <View style={styles.inField}>
-                <Text style={styles.label}>Date of Registration</Text>
-                <TextInput style={styles.input} />
-              </View> */}
-            {/* <View>
-              <Text style={styles.label}>Cultivated Land</Text>
-              <TextInput
-                style={styles.input}
-                onChangeText={(text) =>
-                  setLoginValue({ ...loginValue, cultivatedLand: text })
-                }
-              />
-            </View> */}
-            {/* </View> */}
 
             <View>
               <Text style={styles.label}>Type of land</Text>
@@ -287,7 +419,7 @@ const FarmerInformation = () => {
                 data={landItems}
                 labelField="label"
                 valueField="value"
-                 value={loginValue.typeOfLand}
+                value={loginValue.typeOfLand}
                 onChange={(item) =>
                   setLoginValue({ ...loginValue, typeOfLand: item.value })
                 }
@@ -305,11 +437,10 @@ const FarmerInformation = () => {
                   />
                 )}
               />
+              {errors.typeOfLand && (
+                <Text style={{ color: "red" }}>{errors.typeOfLand}</Text>
+              )}
             </View>
-
-            
-
-             
 
             <View>
               <Text style={styles.label}>
@@ -319,7 +450,7 @@ const FarmerInformation = () => {
                 data={conservationMeasureItems}
                 labelField="label"
                 valueField="value"
-                 value={loginValue.soilConservationMeasures}
+                value={loginValue.soilConservationMeasures}
                 onChange={(item) =>
                   setLoginValue({
                     ...loginValue,
@@ -340,6 +471,11 @@ const FarmerInformation = () => {
                   />
                 )}
               />
+              {errors.soilConservationMeasures && (
+                <Text style={{ color: "red" }}>
+                  {errors.soilConservationMeasures}
+                </Text>
+              )}
             </View>
 
             <View>
@@ -348,7 +484,7 @@ const FarmerInformation = () => {
                 data={sourceIrrigationItems}
                 labelField="label"
                 valueField="value"
-                 value={loginValue.irrigationSource}
+                value={loginValue.irrigationSource}
                 onChange={(item) =>
                   setLoginValue({ ...loginValue, irrigationSource: item.value })
                 }
@@ -366,16 +502,23 @@ const FarmerInformation = () => {
                   />
                 )}
               />
+              {errors.irrigationSource && (
+                <Text style={{ color: "red" }}>{errors.irrigationSource}</Text>
+              )}
             </View>
 
             <View>
-              <Text style={styles.label}>Number of Desi Breed</Text>
+              <Text style={styles.label}>No. of Desi Breed <Text style={{fontSize: 12}}>(cow/bullock)</Text></Text>
               <TextInput
                 style={styles.input}
                 onChangeText={(text) =>
                   setLoginValue({ ...loginValue, desiBreeds: text })
                 }
+                keyboardType="numeric"
               />
+              {errors.desiBreeds && (
+                <Text style={{ color: "red" }}>{errors.desiBreeds}</Text>
+              )}
             </View>
 
             <View>
@@ -384,7 +527,7 @@ const FarmerInformation = () => {
                 data={microIrrigationItems}
                 labelField="label"
                 valueField="value"
-                 value={loginValue.microIrrigation}
+                value={loginValue.microIrrigation}
                 onChange={(item) =>
                   setLoginValue({ ...loginValue, microIrrigation: item.value })
                 }
@@ -402,35 +545,151 @@ const FarmerInformation = () => {
                   />
                 )}
               />
+              {errors.microIrrigation && (
+                <Text style={{ color: "red" }}>{errors.microIrrigation}</Text>
+              )}
             </View>
 
-           {/* // adding crops sown fields */}
+            {/* // adding crops sown fields */}
+            <Text style={styles.cropsSown}>Crops Sown</Text>
 
+            {cropSown.map((entry, index) => (
+              <View key={index} style={{ marginBottom: 20 }}>
+                <View  style={styles.cropEntry}>
+                <Text>Crop entry {index + 1}</Text>
+                </View>
+                
 
-           <View>
+                {/* season dropdown */}
+                <View>
+                  <Text style={styles.label}>Season</Text>
+                  <Dropdown
+                    data={seasonItems}
+                    labelField={"label"}
+                    valueField={"value"}
+                    value={entry.season}
+                    onChange={(item) =>
+                      setCropSown((prev) =>
+                        prev.map((row, idx) =>
+                          idx === index ? { ...row, season: item.value } : row
+                        )
+                      )
+                    }
+                    style={styles.input}
+                    maxHeight={200}
+                  />
+                </View>
+
+                {/* category dropdown */}
+                <View>
+                  <Text style={styles.label}>Category</Text>
+                  <Dropdown
+                    data={categoryItems}
+                    labelField={"label"}
+                    valueField={"value"}
+                    value={entry.category}
+                    onChange={(item) =>
+                      setCropSown((prev) =>
+                        prev.map((row, idx) =>
+                          idx === index ? { ...row, category: item.value } : row
+                        )
+                      )
+                    }
+                    style={styles.input}
+                    maxHeight={200}
+                  />
+                </View>
+
+                {/* crop drowdown */}
+                <View>
+                  <Text style={styles.label}>Crop</Text>
+                  <Dropdown
+                    data={cropItems}
+                    labelField={"label"}
+                    valueField={"value"}
+                    value={entry.crop}
+                    onChange={(item) =>
+                      setCropSown((prev) =>
+                        prev.map((row, idx) =>
+                          idx === index ? { ...row, crop: item.value } : row
+                        )
+                      )
+                    }
+                    style={styles.input}
+                    maxHeight={200}
+                  />
+                </View>
+
+                {/* cultivated land for the crop */}
+                <View>
+                  <Text style={styles.label}>
+                    Land <Text style={{ fontSize: 12 }}>(in ac.)</Text>
+                  </Text>
+                  <TextInput
+                    value={entry.land}
+                    keyboardType="numeric"
+                    onChangeText={(text) =>
+                      setCropSown((prev) =>
+                        prev.map((row, idx) =>
+                          idx === index ? { ...row, land: text } : row
+                        )
+                      )
+                    }
+                    style={styles.input}
+                  />
+                </View>
+
+                {/* remove button */}
+                {cropSown.length > 1 && (
+                  <View style={styles.removeButton}>
+                    <TouchableOpacity
+                      onPress={() => handleRemoveCropRow(index)}
+                    >
+                      <Text style={styles.removeButtonText}>Remove</Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
+              </View>
+            ))}
+
+            {/* Add row button */}
+
+            <View style={styles.addButton}>
+              <TouchableOpacity onPress={handleAddCropRow}>
+                <Text style={styles.addButtonText}>Add more</Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* <View>
               <Text style={styles.label}>Season</Text>
               <Dropdown
                 data={seasonItems}
                 labelField="label"
                 valueField="value"
-                 value={selectedSeason}
+                value={selectedSeason}
                 onChange={(item) => setSelectedSeason(item.value)}
                 maxHeight={200}
                 style={styles.input}
               />
+              {errors.season && (
+                <Text style={{ color: "red" }}>{errors.season}</Text>
+              )}
             </View>
 
             <View>
-              <Text style={styles.label}>Irrigation Type</Text>
+              <Text style={styles.label}>Category</Text>
               <Dropdown
                 data={categoryItems}
                 labelField="label"
                 valueField="value"
-                 value={selectedCategory}
+                value={selectedCategory}
                 onChange={(item) => setSelectedCategory(item.value)}
                 maxHeight={200}
                 style={styles.input}
               />
+              {errors.irrigationType && (
+                <Text style={{ color: "red" }}>{errors.irrigationType}</Text>
+              )}
             </View>
 
             <View>
@@ -439,53 +698,28 @@ const FarmerInformation = () => {
                 data={cropItems}
                 labelField="label"
                 valueField="value"
-                 value={selectedCrop}
+                value={selectedCrop}
                 onChange={(item) => setSelectedCrop(item.value)}
                 maxHeight={200}
                 style={styles.input}
-                // placeholder="select an item"
-                // placeholderStyle={styles.placeholderStyle}
               />
-            </View>
-
-            {/* Display selected crops for the season */}
-            <View style={styles.selectedCropsContainer}>
-              {selectedSeason && selectedCategory && selectedCrop && (
-                <Text style={styles.selectedCropsText}>
-                  {`${selectedSeason} - ${selectedCategory}: ${selectedCrop}`}
-                </Text>
+              {errors.crop && (
+                <Text style={{ color: "red" }}>{errors.crop}</Text>
               )}
-            </View>
-
-           {/* //ending crops sown fields */}
-
-            
-
-            
-
-           
-
-            {/* <View>
-              <Text style={styles.label}>Total Cultivated Natural Farming</Text>
-              <TextInput
-                style={styles.input}
-                // onChangeText={(text) =>
-                //   setLoginValue({ ...loginValue, desiBreeds: text })
-                // }
-              />
             </View>
 
             <View>
               <Text style={styles.label}>
-                Total Cultivated Chemical Farming
+                Cultivated Land <Text style={{ fontSize: 12 }}>(acre)</Text>
               </Text>
               <TextInput
                 style={styles.input}
-                // onChangeText={(text) =>
-                //   setLoginValue({ ...loginValue, desiBreeds: text })
-                // }
+                onChangeText={(text) => setCropLand(text)}
               />
-            </View> */} 
+            </View> */}
+
+
+            {/* //ending crops sown fields */}
 
             <View style={styles.btnContainer}>
               <TouchableOpacity style={submitBtn} onPress={handleSumbit}>
@@ -511,7 +745,7 @@ const styles = StyleSheet.create({
   label: {
     fontFamily: "Poppins-Medium",
     fontSize: 16,
-    marginVertical: 9,
+    marginTop: 20,
   },
   input: {
     height: 49,
@@ -593,4 +827,53 @@ const styles = StyleSheet.create({
     flex: 1,
     marginHorizontal: 4,
   },
+  cropsSown: {
+    marginTop: 15,
+    fontFamily: "Poppins-SemiBold",
+    fontSize: 18,
+  },
+  fieldSet: {
+    marginBottom: 15,
+    padding: 10,
+    borderWidth: 1,
+    borderRadius: 5,
+  },
+
+  dropdown: {
+    padding: 10,
+    borderWidth: 1,
+    borderRadius: 5,
+    marginBottom: 10,
+  },
+  title: {
+    fontSize: 20,
+    marginBottom: 20,
+  },
+  removeButton: {
+    backgroundColor: "#ea8c8c",
+    padding: 10,
+    borderRadius: 10,
+    width: "30%",
+    marginTop: 20
+  },
+  removeButtonText: {
+    color: "white",
+    textAlign: "center",
+  },
+  addButton: {
+    backgroundColor: "#70ccb2",
+    padding: 10,
+    borderRadius: 10,
+    marginBottom: 20,
+    width: "30%",
+  },
+  addButtonText: {
+    color: "white",
+    textAlign: "center",
+  },
+  cropEntry: {
+    alignSelf: 'flex-end',
+    borderBottomWidth: 1,
+    padding: 6
+   }
 });

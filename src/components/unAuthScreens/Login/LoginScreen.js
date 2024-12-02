@@ -52,7 +52,7 @@ const LoginScreen = ({ navigation }) => {
 
   useEffect(() => {
     if (authState.isLoggedIn) {
-      console.warn("user-login", authState.user);
+      // console.warn("user-login", authState.user);
       navigation.navigate("Drawer");
     }  
   }, [authState.isLoggedIn]);

@@ -9,7 +9,7 @@ export const loginUser = createAsyncThunk(
     try {
       const userData = await authLogin(credentials);
       console.log("login-user-data", userData);
-      console.log("login-user-data-sttus", userData.status);
+      // console.log("login-user-data-sttus", userData.status);
       if (userData.status === true) {
         await AsyncStorage.setItem("userData", JSON.stringify(userData));
         return userData;
