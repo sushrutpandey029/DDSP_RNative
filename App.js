@@ -33,7 +33,7 @@ export default function App() {
       "Poppins-Regular": require("./assets/fonts/Poppins-Regular.ttf"),
       "Poppins-Bold": require("./assets/fonts/Poppins-Bold.ttf"),
       "Poppins-Medium": require("./assets/fonts/Poppins-Medium.ttf"),
-      "Poppins-SemiBold": require("./assets/fonts/Poppins-SemiBold.ttf")
+      "Poppins-SemiBold": require("./assets/fonts/Poppins-SemiBold.ttf"),
     });
     setFontLoaded(true);
   };
@@ -42,15 +42,15 @@ export default function App() {
     loadFonts();
   }, []);
 
-  // useEffect(() => {
-  //   const loadUserData = async () => {
-  //     const userData = await AsyncStorage.getItem("userData");
-  //     if(userData) {
-  //       dispatch(setUser(JSON.stringify(userData)))
-  //     }
-  //   };
-  //   loadUserData();
-  // },[])
+  if (!fontLoaded) {
+    // Show a loading screen while fonts are loading
+    return (
+      <SafeAreaView style={styles.loadingContainer}>
+        <StatusBar backgroundColor={"white"} barStyle={"dark-content"} />
+        <Text style={{ fontSize: 18 }}>Loading...</Text>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <Provider store={store}>
@@ -70,5 +70,11 @@ const styles = StyleSheet.create({
     // paddingLeft: "3%",
     // paddingRight: "3%",
     // paddingHorizontal: Platform.OS === "ios" ? "4%" : "3%",
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#fff",
   },
 });
