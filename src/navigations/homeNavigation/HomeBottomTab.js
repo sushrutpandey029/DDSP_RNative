@@ -3,9 +3,9 @@ import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import HomePage from "../../components/authScreens/Home/HomePage";
 import ProfilePage from "../../components/authScreens/Profile/ProfilePage";
-import UserFilePage from "../../components/authScreens/UserFile/UserFilePage";
 import Icon from "react-native-vector-icons/Ionicons";
 import Header from "../../components/authScreens/Header/Header";
+import UserReport from "../../components/authScreens/UserFile/UserReport";
 
 const Tab = createBottomTabNavigator();
 
@@ -15,7 +15,7 @@ const HomeBottomTab = ({ navigation }) => {
 
     if (route.name == "Home") {
       iconName = focused ? "home" : "home-outline";
-    } else if (route.name == "UserFile") {
+    } else if (route.name == "UserReport") {
       iconName = focused ? "document" : "document-outline";
     } else if ((route.name = "Profile")) {
       iconName = focused ? "person" : "person-outline";
@@ -40,8 +40,8 @@ const HomeBottomTab = ({ navigation }) => {
         options={{ headerShown: true, header: () => <Header  /> }}
       />
       <Tab.Screen
-        name="UserFile"
-        component={UserFilePage}
+        name="UserReport"
+        component={UserReport}
         options={{ headerShown: false}}
       />
       <Tab.Screen

@@ -10,20 +10,20 @@ import {
   Modal,
   Alert,
 } from "react-native";
-import React, { useState } from "react";
-import { submitBtn } from "../../../../globals/style";
-import FormHeader from "../FormHeader";
-// import DatePicker from "react-native-modern-datepicker";
+import React, { useEffect, useState } from "react";
+import FormHeader from "../../Forms/FormHeader";
+import { globalContainer, submitBtn } from "../../../../globals/style";
+import { getWorkDetailById,updateWorkDetailsById } from "../../../services/ApiFile";
 import DatePicker from "react-native-ui-datepicker";
-// import DatePicker from "react-native-date-picker";
-import { globalContainer } from "../../../../globals/style";
 import { useDispatch, useSelector } from "react-redux";
-import { addFieldOfficerWorkDetail } from "../../../services/ApiFile";
 import { Dropdown } from "react-native-element-dropdown";
 import AntDesign from "@expo/vector-icons/AntDesign";
-import { villageItems } from "../data/Constant";
+import { villageItems } from "../../Forms/data/Constant";
 
-const FieldsWorkerDetails = ({ navigation }) => {
+const FieldWorkerDetailUpdate = ({ route }) => {
+  const id = route.params.id;
+  console.log('fwdu-id',id)
+
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth.user);
 
@@ -44,6 +44,7 @@ const FieldsWorkerDetails = ({ navigation }) => {
   const [consultancyWhatsApp, setConsultancyWhatsApp] = useState("");
 
   const [errors, setErrors] = useState({});
+  const [apiWorkData, setApiWorkData] = useState([]);
 
   const [inputSupplied, setInputSupplied] = useState([
     { name: "", quantity: "" },
@@ -113,15 +114,6 @@ const FieldsWorkerDetails = ({ navigation }) => {
     if (!consultancyWhatsApp)
       validateErrors.consultancyWhatsApp = "Whatsapp is required";
 
-    // inputSupplied.forEach((input, index) => {
-    //   if (!input.name) {
-    //     validateErrors[`inputSuppliedName${index}`] = "Name is required";
-    //   }
-    //   if (!input.quantity) {
-    //     validateErrors[`inputSuppliedQuantity${index}`] = "Quantity is required";
-    //   }
-    // });
-
     setErrors(validateErrors);
 
     return Object.keys(validateErrors).length === 0;
@@ -148,28 +140,83 @@ const FieldsWorkerDetails = ({ navigation }) => {
         farmersContactedInGroupMeetings: parseInt(farmersInGroup),
         clusterTrainingPlace: trainingPlace,
         farmersAttendedTraining: parseInt(farmersInTraining),
-        inputSupplied,
+        inputSupplied: inputSupplied.filter((item) => item.name.trim() !== "" && item.quantity.trim() !== ""),
         consultancyTelephone: parseInt(consultancyTelephone),
         consultancyWhatsApp: parseInt(consultancyWhatsApp),
+        totatotalConsultancy: parseInt(consultancyTelephone) + parseInt(consultancyWhatsApp)
       };
 
       console.log("requested-data", requestData);
 
       try {
-        const response = await addFieldOfficerWorkDetail(user.id, requestData);
-        console.log("fldWrkDetls-Submitted response:", response);
+        const response = await updateWorkDetailsById(id, requestData);
+        console.log("updateWorkDetail-resp:", response);
         Alert.alert("Data submitted successfully");
-        navigation.navigate('Home')
+        // navigation.navigate("Home");
       } catch (error) {
-        console.log("fldWrkDetls-Error submitting form:", error.response.data);
+        console.log("updateWorkDetail-resp-err:", error.response.data);
         Alert.alert(error.response.data.message);
       }
     }
   };
 
+  const getWorkDetail = async () => {
+    try {
+      const response = await getWorkDetailById(id);
+      if(response.success === true) {
+        console.log("getWorkDetail-resp", JSON.stringify(response, null, 2));
+        setApiWorkData(response.data);
+      }
+      
+    } catch (error) {
+      console.log("getWorkDetail-err", error);
+    }
+  };
+
+  useEffect(() => {
+    getWorkDetail();
+  }, []);
+
+  useEffect(() => {
+    if(apiWorkData) {
+      setOwnLandCultivated(apiWorkData.ownLandCultivatedUnderNaturalFarming);
+      setClusterID(apiWorkData.clusterID);
+      setVillagesVisited(apiWorkData.villagesVisited);
+      setTravelInKms(apiWorkData.travelInKms?.toString());
+      setFarmersContacted(apiWorkData.farmersContactedIndividually?.toString());
+      setGroupMeetings(apiWorkData.groupMeetingsConducted?.toString());
+      setFarmersInGroup(apiWorkData.farmersContactedInGroupMeetings?.toString());
+      setTrainingPlace(apiWorkData.clusterTrainingPlace);
+      setFarmersInTraining(apiWorkData.farmersAttendedTraining?.toString());
+      setConsultancyTelephone(apiWorkData.consultancyTelephone?.toString());
+      setConsultancyWhatsApp(apiWorkData.consultancyWhatsApp?.toString());
+      // setDate(apiWorkData.workDate)
+      if (apiWorkData.inputSupplied) {
+        try {
+          const parsedInputSupplied = JSON.parse(apiWorkData.inputSupplied);
+          if (Array.isArray(parsedInputSupplied)) {
+            setInputSupplied(
+              parsedInputSupplied.map((item) => ({
+                name: item.name || "",
+                quantity: item.quantity || "",
+              }))
+            );
+          } else {
+            setInputSupplied([{ name: "", quantity: "" }]); // Default to an empty entry if parsing fails
+          }
+        } catch (error) {
+          console.error("Error parsing inputSupplied:", error);
+          setInputSupplied([{ name: "", quantity: "" }]); // Default fallback
+        }
+      } else {
+        setInputSupplied([{ name: "", quantity: "" }]); // Default to one empty entry if no data
+      }
+    }
+  },[apiWorkData])
+
   return (
     <SafeAreaView style={globalContainer}>
-      <FormHeader title={"FIELDS WORKER DETAILS"} />
+      <FormHeader title="FIELD WORKER DETAIL UPDATE" />
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.formContainer}>
           <View style={styles.twoField}>
@@ -266,27 +313,22 @@ const FieldsWorkerDetails = ({ navigation }) => {
 
           <View style={styles.field}>
             <Text style={styles.label}>Visited village name</Text>
-            <Dropdown 
+            <Dropdown
               data={villageItems}
-              labelField={'label'}
-              valueField={'value'}
+              labelField={"label"}
+              valueField={"value"}
               value={villagesVisited}
               onChange={(item) => setVillagesVisited(item.value)}
               style={styles.input}
               renderLeftIcon={() => (
-                <AntDesign 
-                name="Safety"
-                style={styles.icon}
-                size={20}
-                color={'black'}
+                <AntDesign
+                  name="Safety"
+                  style={styles.icon}
+                  size={20}
+                  color={"black"}
                 />
               )}
             />
-            {/* <TextInput
-              style={styles.input}
-              value={villagesVisited}
-              onChangeText={setVillagesVisited}
-            /> */}
             {errors.villagesVisited && (
               <Text style={{ color: "red" }}>{errors.villagesVisited}</Text>
             )}
@@ -511,7 +553,7 @@ const FieldsWorkerDetails = ({ navigation }) => {
   );
 };
 
-export default FieldsWorkerDetails;
+export default FieldWorkerDetailUpdate;
 
 const styles = StyleSheet.create({
   container: {

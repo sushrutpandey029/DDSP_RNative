@@ -14,12 +14,10 @@ import FormContentHome from "../Forms/FormContentHome";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { useSelector, useDispatch } from "react-redux";
 import FarmerList from "./tabContainers/FarmerList";
+import HomeTab from "./tabContainers/HomeTab";
 
 const HomePage = ({ navigation }) => {
   const [tabValue, setTabValue] = useState("home");
-  // const dispatch = useDispatch();
-  // const user = useSelector((state) => state.auth);
-  // console.log('h-user',user);
 
   return (
     <ScrollView>
@@ -27,11 +25,7 @@ const HomePage = ({ navigation }) => {
       <ButtonTabSlider setTabValue={setTabValue} />
       <View style={styles.container}>
         {/* if home button is clicked */}
-        {tabValue === "home" && (
-          <View style={styles.nullData}>
-            <Text>Contents unavailable</Text>
-          </View>
-        )}
+        {tabValue === "home" && <HomeTab />}
 
         {/* if form button is clicked */}
         {tabValue === "form" && (
@@ -44,22 +38,7 @@ const HomePage = ({ navigation }) => {
                 content="Lorem ipsum dolor sit amet consectetur. Massa vestibulum neque integer nunc massa vitae duis."
               />
             </TouchableOpacity>
-            {/* <TouchableOpacity
-              onPress={() => navigation.navigate("DetailOfCultivation")}
-            >
-              <FormContentHome
-                title="Detail Of Cultivation Cost"
-                content="Lorem ipsum dolor sit amet consectetur. Massa vestibulum neque integer nunc massa vitae duis."
-              />
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => navigation.navigate("DetailOfProduction")}
-            >
-              <FormContentHome
-                title="Detail Of Production"
-                content="Lorem ipsum dolor sit amet consectetur. Massa vestibulum neque integer nunc massa vitae duis."
-              />
-            </TouchableOpacity> */}
+            
             <TouchableOpacity onPress={() => navigation.navigate("FieldWork")}>
               <FormContentHome
                 title="Field Worker Details"

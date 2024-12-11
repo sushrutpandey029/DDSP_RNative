@@ -9,17 +9,29 @@ import {
   KeyboardAvoidingView,
   Platform,
   Alert,
+  ActivityIndicator,
 } from "react-native";
-import React, { useState, useEffect } from "react";
-import { submitBtn } from "../../../../globals/style";
-import FormHeader from "../FormHeader";
-import { globalContainer } from "../../../../globals/style";
-import { addFarmerInfo } from "../../../services/ApiFile";
+import React, { useEffect, useState } from "react";
+import {
+  getFarmerById,
+  updateFarmerDetailsById,
+} from "../../../services/ApiFile";
+import { submitBtn, globalContainer } from "../../../../globals/style";
+import FormHeader from "../../Forms/FormHeader";
 import { Dropdown } from "react-native-element-dropdown";
 import AntDesign from "@expo/vector-icons/AntDesign";
-import { villageItems, talukaItems, clusterItems } from "../data/Constant";
+import {
+  villageItems,
+  talukaItems,
+  clusterItems,
+} from "../../Forms/data/Constant";
 
-const FarmerInformation = ({ navigation }) => {
+const FarmerDetail = ({ route }) => {
+  const id = route.params.farmerId;
+  const [farmerData, setFarmerData] = useState([]);
+  console.log("farmer-name", farmerData.name);
+  console.log("farmer-id", id);
+
   const [errors, setErrors] = useState({});
   const [isCropsSownUpdated, setIsCropsSownUpdated] = useState(false);
 
@@ -75,7 +87,6 @@ const FarmerInformation = ({ navigation }) => {
     { label: "Canal", value: "Canal" },
   ]);
 
-
   const [districtItems, setDistrictItems] = useState([
     { label: "Yavatmal", value: "Yavatmal" },
     { label: "Washim", value: "Washim" },
@@ -104,30 +115,64 @@ const FarmerInformation = ({ navigation }) => {
     { season: "", category: "", crop: "", land: "" },
   ]);
 
+  // const handleCropSelection = () => {
+  //   let updatedCropsSown = { ...loginValue.cropsSown };
+
+  //   cropSown.forEach((entry) => {
+  //     const { season, category, crop, land } = entry;
+
+  //     if (season && category && crop && land) {
+  //       if (!updatedCropsSown[season]) {
+  //         updatedCropsSown[season] = {
+  //           chemical_irrigated: [],
+  //           chemical_unirrigated: [],
+  //           natural_irrigated: [],
+  //           natural_unirrigated: [],
+  //         };
+  //       }
+
+  //       if (!updatedCropsSown[season][category]) {
+  //         updatedCropsSown[season][category] = [];
+  //       }
+
+  //       updatedCropsSown[season][category].push({ crop, cropLand: land });
+  //     }
+  //   });
+
+  //   setLoginValue((prevState) => ({
+  //     ...prevState,
+  //     cropsSown: updatedCropsSown,
+  //   }));
+
+  //   setIsCropsSownUpdated(true); // Flag to indicate update
+  // };
+
   const handleCropSelection = () => {
-    let updatedCropsSown = { ...loginValue.cropsSown };
+    let updatedCropsSown = {};
 
     cropSown.forEach((entry) => {
       const { season, category, crop, land } = entry;
 
       if (season && category && crop && land) {
+        // Ensure the structure for the given season exists
         if (!updatedCropsSown[season]) {
           updatedCropsSown[season] = {
-            chemical_irrigated: [],
-            chemical_unirrigated: [],
             natural_irrigated: [],
             natural_unirrigated: [],
+            chemical_irrigated: [],
+            chemical_unirrigated: [],
           };
         }
 
-        if (!updatedCropsSown[season][category]) {
-          updatedCropsSown[season][category] = [];
-        }
-
-        updatedCropsSown[season][category].push({ crop, cropLand: land });
+        // Push the crop data to the appropriate category
+        updatedCropsSown[season][category].push({
+          crop,
+          cropLand: parseFloat(land),
+        });
       }
     });
 
+    // Update the state for cropsSown
     setLoginValue((prevState) => ({
       ...prevState,
       cropsSown: updatedCropsSown,
@@ -180,19 +225,78 @@ const FarmerInformation = ({ navigation }) => {
     return Object.keys(validateErrors).length === 0;
   };
 
+  const prepareApiPayload = () => {
+    const payload = {
+      farmerID: farmerData?.farmerID,
+      newname: loginValue.name,
+      mobileNumber: loginValue.mobileNumber,
+      emailID: loginValue.emailID,
+      villagename: loginValue.villageName,
+      taluka: loginValue.taluka,
+      clusterName: loginValue.cluster,
+      district: loginValue.district,
+      cultivatedLand: parseFloat(loginValue.cultivatedLand),
+      desiBreeds: loginValue.desiBreeds,
+      typeOfLand: loginValue.typeOfLand,
+      sourceIrrigationItems: loginValue.irrigationSource.split(", "),
+      conservationMeasureItems: loginValue.soilConservationMeasures.split(", "),
+      microIrrigation: loginValue.microIrrigation,
+    };
+
+    // Ensure cropsSown is an object, not a string
+    if (loginValue.cropsSown) {
+      const transformedCropsSown = {};
+
+      Object.keys(loginValue.cropsSown).forEach((season) => {
+        const seasonData = loginValue.cropsSown[season];
+
+        Object.keys(seasonData).forEach((category) => {
+          const categoryData = seasonData[category];
+
+          // Only add non-empty categories
+          if (Array.isArray(categoryData) && categoryData.length > 0) {
+            if (!transformedCropsSown[season]) {
+              transformedCropsSown[season] = {};
+            }
+
+            // Add crops to the season and category
+            transformedCropsSown[season][category] = categoryData.map(
+              ({ crop, cropLand }) => ({
+                crop,
+                cropLand: String(cropLand), // Ensure cropLand is sent as string
+              })
+            );
+          }
+        });
+      });
+
+      // Add the transformed cropsSown to the payload
+      if (Object.keys(transformedCropsSown).length > 0) {
+        payload.cropsSown = transformedCropsSown;
+      }
+    }
+
+    return payload;
+  };
+
+  
+
   const handleSubmit = async () => {
     if (validateFields()) {
       try {
+        const payload = prepareApiPayload();
+
         console.log(
           "after-handleCropSelection:",
-          JSON.stringify(loginValue, null, 2)
+          JSON.stringify(payload, null, 2)
         );
-        const response = await addFarmerInfo(loginValue);
-        console.warn("addfarm-resp", response);
+
+        const response = await updateFarmerDetailsById(id, payload);
+        console.log("udateFarmer-resp", JSON.stringify(response, null, 2));
         Alert.alert(response.message);
         navigation.navigate("Home");
       } catch (error) {
-        console.log("addfarm-err", error.response.data);
+        console.log("udateFarmer-resp-err", error.response.data);
         Alert.alert("Error adding farmer information");
       }
     }
@@ -205,9 +309,87 @@ const FarmerInformation = ({ navigation }) => {
     }
   }, [isCropsSownUpdated]);
 
+  const getFarmerDetails = async () => {
+    try {
+      const response = await getFarmerById(id);
+      console.log("farmer-details", JSON.stringify(response, null, 2));
+      setFarmerData(response.data);
+    } catch (error) {
+      console.log("farmer-detail-err", error);
+    }
+  };
+
+  useEffect(() => {
+    getFarmerDetails();
+  }, []);
+
+  useEffect(() => {
+    if (farmerData) {
+      let parsedCropsSown;
+
+      if (typeof farmerData.cropsSown === "string") {
+        try {
+          parsedCropsSown = JSON.parse(farmerData.cropsSown);
+        } catch (error) {
+          console.error("error parsing cropsown", error);
+          parsedCropsSown = {};
+        }
+      } else {
+        parsedCropsSown = farmerData.cropsSown || {};
+      }
+
+      const transformedCropSown = [];
+
+      ["kharif", "rabi"].forEach((season) => {
+        Object.keys(parsedCropsSown[season] || {}).forEach((category) => {
+          (parsedCropsSown[season][category] || {}).forEach((crop) => {
+            transformedCropSown.push({
+              season,
+              category,
+              crop: crop.crop || "",
+              land: crop.cropLand || "",
+            });
+          });
+        });
+      });
+
+      const defaultCropSown =
+        transformedCropSown.length > 0
+          ? transformedCropSown
+          : [{ season: "", category: "", crop: "", land: "" }];
+
+      setCropSown(defaultCropSown);
+
+      setLoginValue({
+        name: farmerData.name,
+        mobileNumber: farmerData.mobileNumber,
+        emailID: farmerData.emailID,
+        villageName: farmerData.villageName,
+        cluster: farmerData.clusterName,
+        taluka: farmerData.taluka,
+        district: farmerData.district,
+        cultivatedLand: farmerData.cultivatedLand, //value of total land
+        typeOfLand: farmerData.typeOfLand,
+        cropsSown: parsedCropsSown,
+        desiBreeds: farmerData.desiBreeds?.toString(),
+        irrigationSource: farmerData.irrigationSource,
+        soilConservationMeasures: farmerData.soilConservationMeasures,
+        microIrrigation: farmerData.microIrrigation,
+      });
+    }
+  }, [farmerData]);
+
+  if (farmerData.length < 1) {
+    return (
+      <SafeAreaView style={styles.loaderContainer}>
+        <ActivityIndicator size={50} />
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView style={globalContainer}>
-      <FormHeader title="FARMER INFORMATION" />
+      <FormHeader title="FARMER DETAIL" />
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{ flex: 1 }}
@@ -221,6 +403,7 @@ const FarmerInformation = ({ navigation }) => {
               <Text style={styles.label}>Full Name</Text>
               <TextInput
                 style={styles.input}
+                value={loginValue.name}
                 onChangeText={(text) =>
                   setLoginValue({ ...loginValue, name: text })
                 }
@@ -233,6 +416,7 @@ const FarmerInformation = ({ navigation }) => {
               <Text style={styles.label}>Mobile No.</Text>
               <TextInput
                 style={styles.input}
+                value={loginValue.mobileNumber}
                 onChangeText={(text) =>
                   setLoginValue({ ...loginValue, mobileNumber: text })
                 }
@@ -246,6 +430,7 @@ const FarmerInformation = ({ navigation }) => {
               <Text style={styles.label}>Email id</Text>
               <TextInput
                 style={styles.input2}
+                value={loginValue.emailID}
                 onChangeText={(text) =>
                   setLoginValue({ ...loginValue, emailID: text })
                 }
@@ -261,6 +446,7 @@ const FarmerInformation = ({ navigation }) => {
               </Text>
               <TextInput
                 style={styles.input}
+                value={loginValue.cultivatedLand}
                 onChangeText={(text) =>
                   setLoginValue({
                     ...loginValue,
@@ -281,6 +467,7 @@ const FarmerInformation = ({ navigation }) => {
               </Text>
               <TextInput
                 style={styles.input}
+                value={loginValue.desiBreeds}
                 onChangeText={(text) =>
                   setLoginValue({ ...loginValue, desiBreeds: text })
                 }
@@ -641,64 +828,6 @@ const FarmerInformation = ({ navigation }) => {
               </TouchableOpacity>
             </View>
 
-            {/* <View>
-              <Text style={styles.label}>Season</Text>
-              <Dropdown
-                data={seasonItems}
-                labelField="label"
-                valueField="value"
-                value={selectedSeason}
-                onChange={(item) => setSelectedSeason(item.value)}
-                maxHeight={200}
-                style={styles.input}
-              />
-              {errors.season && (
-                <Text style={{ color: "red" }}>{errors.season}</Text>
-              )}
-            </View>
-
-            <View>
-              <Text style={styles.label}>Category</Text>
-              <Dropdown
-                data={categoryItems}
-                labelField="label"
-                valueField="value"
-                value={selectedCategory}
-                onChange={(item) => setSelectedCategory(item.value)}
-                maxHeight={200}
-                style={styles.input}
-              />
-              {errors.irrigationType && (
-                <Text style={{ color: "red" }}>{errors.irrigationType}</Text>
-              )}
-            </View>
-
-            <View>
-              <Text style={styles.label}>Crop</Text>
-              <Dropdown
-                data={cropItems}
-                labelField="label"
-                valueField="value"
-                value={selectedCrop}
-                onChange={(item) => setSelectedCrop(item.value)}
-                maxHeight={200}
-                style={styles.input}
-              />
-              {errors.crop && (
-                <Text style={{ color: "red" }}>{errors.crop}</Text>
-              )}
-            </View>
-
-            <View>
-              <Text style={styles.label}>
-                Cultivated Land <Text style={{ fontSize: 12 }}>(acre)</Text>
-              </Text>
-              <TextInput
-                style={styles.input}
-                onChangeText={(text) => setCropLand(text)}
-              />
-            </View> */}
-
             {/* //ending crops sown fields */}
 
             <View style={styles.btnContainer}>
@@ -713,7 +842,7 @@ const FarmerInformation = ({ navigation }) => {
   );
 };
 
-export default FarmerInformation;
+export default FarmerDetail;
 
 const styles = StyleSheet.create({
   // scrollContainer: {
@@ -721,6 +850,11 @@ const styles = StyleSheet.create({
   // },
   formContainer: {
     marginBottom: 30,
+  },
+  loaderContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
   },
   label: {
     fontFamily: "Poppins-Medium",

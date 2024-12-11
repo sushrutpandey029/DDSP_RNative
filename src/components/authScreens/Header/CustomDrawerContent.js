@@ -12,10 +12,16 @@ const CustomDrawerContent = (props) => {
   const dispatch = useDispatch();
   const navigation = props.navigation;
   const userData = useSelector((state) => state.auth.user);
-  console.warn("userdetail", userData.user);
 
   const handleLogout = async () => {
-    dispatch(logoutUser());
+    const result = dispatch(logoutUser());
+    if (result.meta.requestStatus === "fullfilled") {
+      navigation.navigate("Logo");
+    }
+  };
+
+  const handleNavigation = async (name) => {
+    navigation.navigate(name);
   };
 
   return (
@@ -30,7 +36,7 @@ const CustomDrawerContent = (props) => {
           />
         </View>
         <View style={styles.nameContainer}>
-          <TouchableOpacity  onPress={() => navigation.navigate("Profile")}>
+          <TouchableOpacity onPress={() => navigation.navigate("Profile")}>
             <Text style={styles.nameText}>{userData.user.fullname}</Text>
             <Text
               style={[
@@ -46,28 +52,11 @@ const CustomDrawerContent = (props) => {
 
       <View>
         <TouchableOpacity
-          onPress={() => navigation.navigate("Profile")}
+          onPress={() => handleNavigation("Profile")}
           style={styles.box}
         >
           <Icon name="person-outline" size={20} />
           <Text style={styles.customText}>View profile</Text>
-        </TouchableOpacity>
-      </View>
-
-      <View>
-        <TouchableOpacity
-          style={styles.box}
-          onPress={() => navigation.navigate("ChangePassword")}
-        >
-          <Icon name="compass-outline" size={20} />
-          <Text style={styles.customText}>Change password</Text>
-        </TouchableOpacity>
-      </View>
-
-      <View>
-        <TouchableOpacity style={styles.box}>
-          <Icon name="settings-outline" size={20} />
-          <Text style={styles.customText}>Settings</Text>
         </TouchableOpacity>
       </View>
 
@@ -80,11 +69,38 @@ const CustomDrawerContent = (props) => {
 
       <View>
         <TouchableOpacity
-          onPress={() => navigation.navigate("FormPage")}
+          onPress={() => handleNavigation("FormPage")}
           style={styles.box}
         >
           <Icon name="ellipse-outline" size={20} />
           <Text style={styles.customText}>Forms</Text>
+        </TouchableOpacity>
+      </View>
+
+      <View>
+        <TouchableOpacity
+          style={styles.box}
+          onPress={() => handleNavigation("AttendanceList")}
+        >
+          <Icon name="checkmark-circle-outline" size={20} />
+          <Text style={styles.customText}>Attendance List</Text>
+        </TouchableOpacity>
+      </View>
+
+      <View>
+        <TouchableOpacity
+          style={styles.box}
+          onPress={() => handleNavigation("ChangePassword")}
+        >
+          <Icon name="compass-outline" size={20} />
+          <Text style={styles.customText}>Change password</Text>
+        </TouchableOpacity>
+      </View>
+
+      <View>
+        <TouchableOpacity style={styles.box}>
+          <Icon name="settings-outline" size={20} />
+          <Text style={styles.customText}>Settings</Text>
         </TouchableOpacity>
       </View>
 

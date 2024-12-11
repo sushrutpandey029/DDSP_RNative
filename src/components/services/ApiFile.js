@@ -12,7 +12,15 @@ import {
   getFarmerByIdApi,
   addFieldOfficerWorkDetailApi,
   changePasswordApi,
-  detailofproductionandcultivationApi
+  detailofproductionandcultivationApi,
+  workDetailApi,
+  getWorkDetailByIdApi,
+  updateFarmerDetailsByIdApi,
+  updateWorkDetailsByIdApi,
+  getLocationApi,
+  getLocationByUserIdApi,
+  addUserLocationApi,
+  deleteLocationByIdApi
 } from "../api/Api";
 import axios from "axios";
 
@@ -104,15 +112,15 @@ export const addworkdetails = async (id, request) => {
   }
 }
 
-// export const getFarmerById = async (id, request) => {
-//   const api = `${BaseUrl}/${getFarmerByIdApi}/${id}`;
-//   try{
-//     const response = await axios.get(api);
-//     return response.data;
-//   }catch(error){
-//     throw error;
-//   }
-// }
+export const getFarmerById = async (id) => {
+  const api = `${BaseUrl}/${getFarmerByIdApi}/${id}`;
+  try{
+    const response = await axios.get(api);
+    return response.data;
+  }catch(error){
+    throw error.response;
+  }
+}
 
 export const addFieldOfficerWorkDetail = async (id, request) => {
   const api = `${BaseUrl}/${addFieldOfficerWorkDetailApi}/${id}`;
@@ -134,12 +142,92 @@ export const changePassword =async (id, request) => {
   }
 }
 
-export const detailOfProductionandCultivation = async (id, request) => {
+export const detailOfProductionandCultivation = async (id) => {
   const api = `${BaseUrl}/${detailofproductionandcultivationApi}/${id}`;
   try{
-    const response = await axios.post(api, request);
+    const response = await axios.get(api);
     return response.data;
   }catch(error) {
     throw error;
+  }
+}
+
+export const getWorkDetail = async () => {
+  const api = `${BaseUrl}/${workDetailApi}`;
+  try{
+    const response = await axios.get(api);
+    return response.data;
+  }catch(error){
+    throw error.response;
+  }
+}
+
+export const getWorkDetailById = async (id) => {
+  const api = `${BaseUrl}/${getWorkDetailByIdApi}/${id}`;
+  try{
+    const response = await axios.get(api);
+    return response.data;
+  }catch(error) {
+    throw error.response;
+  }
+}
+
+export const updateFarmerDetailsById= async (id, request) => {
+  const api = `${BaseUrl}/${updateFarmerDetailsByIdApi}/${id}`;
+  try{
+    const response = await axios.put(api, request);
+    return response.data;
+  }catch(error) {
+    throw error;
+  }
+}
+
+export const updateWorkDetailsById = async (id, request) => {
+  const api = `${BaseUrl}/${updateWorkDetailsByIdApi}/${id}`;
+  try{
+    const response = await axios.put(api, request);
+    return response.data;
+  }catch(error){
+    throw error;
+  }
+}
+
+export const getLocation = async () => {
+  const api = `${BaseUrl}/${getLocationApi}`;
+  try{
+    const response = await axios.get(api);
+    return response.data;
+  }catch(error) {
+    throw error;
+  }
+}
+
+export const getLocationByUserId = async (id) => {
+  const api = `${BaseUrl}/${getLocationByUserIdApi}/${id}`;
+  try{
+    const response = await axios.get(api);
+    return response.data;
+  }catch(error) {
+    throw error;
+  }
+}
+
+export const addUserLocation = async (request) => {
+  const api = `${BaseUrl}/${addUserLocationApi}`;
+  try{
+    const response = await axios.post(api,request);
+    return response.data;
+  }catch(err) {
+    throw err;
+  }
+}
+
+export const deleteLocationById = async (id) => {
+  const api = `${BaseUrl}/${deleteLocationByIdApi}/${id}`;
+  try{
+    const response = await axios.delete(api);
+    return response.data;
+  }catch(err){  
+    throw err;
   }
 }

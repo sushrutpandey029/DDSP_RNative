@@ -18,7 +18,7 @@ import {
   addCultivationCostDetailsPost,
 } from "../../../services/ApiFile";
 
-const DetailOfCultivation = ({ route }) => {
+const DetailOfCultivation = ({ route, navigation }) => {
   const farmerId = route.params.farmerId || null;
   const [data, setData] = useState(null);
 
@@ -190,6 +190,7 @@ const DetailOfCultivation = ({ route }) => {
       console.warn("addCulCostPost-resp", response);
       if (response.success === true) {
         Alert.alert(response.message);
+        navigation.navigate('Home');
       }
     } catch (error) {
       console.warn("addCulCostPost-err", error);
@@ -243,12 +244,12 @@ const DetailOfCultivation = ({ route }) => {
                             {" "}
                             {costField
                               .replace(/([a-z])([A-Z])/g, "$1 $2")
-                              .replace(/^./, (str) => str.toUpperCase())}
+                              .replace(/^./, (str) => str.toUpperCase())} <Text style={{fontSize: 12, fontWeight:'bold'}}>(Rs.)</Text>
                           </Text>
                           <TextInput
                             style={styles.input}
                             // placeholder={`Enter ${costField}`}
-                            placeholder="Rs."
+                            // placeholder="Rs."
                             value={String(crop.costs[costField])} // Ensure value is a string
                             keyboardType="numeric"
                             onChangeText={(value) =>

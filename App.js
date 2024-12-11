@@ -5,6 +5,7 @@ import {
   SafeAreaView,
   StatusBar,
   Platform,
+  ActivityIndicator
 } from "react-native";
 import { DefaultTheme, NavigationContainer } from "@react-navigation/native";
 import RootNavigation from "./src/navigations/RootNavigation";
@@ -47,7 +48,7 @@ export default function App() {
     return (
       <SafeAreaView style={styles.loadingContainer}>
         <StatusBar backgroundColor={"white"} barStyle={"dark-content"} />
-        <Text style={{ fontSize: 18 }}>Loading...</Text>
+        <ActivityIndicator size={50}/>
       </SafeAreaView>
     );
   }

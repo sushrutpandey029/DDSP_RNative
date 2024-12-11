@@ -14,11 +14,14 @@ import DetailOfCultivation from "../components/authScreens/Forms/allForms/Detail
 import DetailOfProduction from "../components/authScreens/Forms/allForms/DetailOfProduction";
 import FieldsWorkerDetails from "../components/authScreens/Forms/allForms/FieldsWorkerDetails";
 import ProjectCoordinationWork from "../components/authScreens/Forms/allForms/ProjectCoordinationWork";
-import { defineAnimation } from "react-native-reanimated";
-import FormHeader from "../components/authScreens/Forms/FormHeader";
+// import { defineAnimation } from "react-native-reanimated";
 import { initializeUser } from "../components/redux/slices/AuthSlice";
 import ChangePassword from "../components/authScreens/Forms/ChangePassword";
 import CropDetail from "../components/authScreens/Home/tabContainers/CropDetail";
+import FarmerDetail from "../components/authScreens/Home/tabContainers/FarmerDetail";
+import FieldWorkerDetailUpdate from "../components/authScreens/UserFile/containers/FieldWorkerDetailUpdate";
+import AttendanceList from "../components/authScreens/drawerPages/AttendanceList";
+
 
 const Stack = createNativeStackNavigator();
 
@@ -86,10 +89,26 @@ const RootNavigation = () => {
             component={ChangePassword}
             options={{ headerShown: false }}
           />
+          <Stack.Screen
+            name="CropDetail"
+            component={CropDetail}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="FarmerDetail"
+            component={FarmerDetail}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="FieldWorkUpdate"
+            component={FieldWorkerDetailUpdate}
+            options={{ headerShown: false }}
+          />
           <Stack.Screen 
-          name="CropDetail"
-          component={CropDetail}
-          options={{headerShown : false}}/>
+          name="AttendanceList"
+          component={AttendanceList}
+          options={{headerShown:false}}
+          />
         </>
       ) : (
         // UnauthStack screen

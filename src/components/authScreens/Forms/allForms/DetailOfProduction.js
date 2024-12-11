@@ -7,14 +7,18 @@ import {
   TextInput,
   TouchableOpacity,
   Alert,
+  ActivityIndicator
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { submitBtn } from "../../../../globals/style";
 import FormHeader from "../FormHeader";
 import { globalContainer } from "../../../../globals/style";
-import { addCultivationCostDetails, addProductionDetails } from "../../../services/ApiFile";
+import {
+  addCultivationCostDetails,
+  addProductionDetails,
+} from "../../../services/ApiFile";
 
-const DetailOfProduction = ({ route }) => {
+const DetailOfProduction = ({ route, navigation }) => {
   const farmerId = route.params.farmerId;
   const [data, setData] = useState(null);
 
@@ -23,13 +27,19 @@ const DetailOfProduction = ({ route }) => {
   const getCostDetails = async () => {
     try {
       const response = await addCultivationCostDetails(farmerId);
-      const updatedData = { ...response };
+      console.log("prod-getcostDetails", response);
+
+      // Parse the crops data which is in stringified JSON format
+      const cropsData = JSON.parse(response.crops);
+
+      const updatedData = { ...response, crops: cropsData };
 
       // Initialize costs for each crop
       Object.entries(updatedData.crops).forEach(([season, categories]) => {
         Object.entries(categories).forEach(([category, crops]) => {
           updatedData.crops[season][category] = crops.map((crop) => ({
-            cropName: crop,
+            cropName: crop.crop, // Use the crop name from the response
+            cropLand: crop.cropLand, // Include the cropLand if needed
             costs: costFields.reduce((acc, field) => {
               acc[field] = "0"; // Initialize each cost field with "0"
               return acc;
@@ -69,10 +79,10 @@ const DetailOfProduction = ({ route }) => {
           irrigationType,
           crops: crops.map((crop) => ({
             name: crop.cropName,
-            totalYield: crop.costs["totalYield"] || 0,
-            totalSaleValue: crop.costs["totalSaleValue"] || 0,
-            surplus: crop.costs["surplus"] || 0,
-            totalCost : crop.totalCost  
+            totalYield: crop.costs["totalYield"] || 0, // Access totalYield or default to 0
+            totalSaleValue: crop.costs["totalSaleValue"] || 0, // Access totalSaleValue or default to 0
+            surplus: crop.costs["surplus"] || 0, // Access surplus or default to 0
+            totalCost: crop.totalCost, // Total cost remains unchanged
           })),
         }))
       ),
@@ -87,9 +97,10 @@ const DetailOfProduction = ({ route }) => {
       console.log("addProCostPost-resp", response);
       console.log("addProCostPost-resp", response.message);
       Alert.alert(response.message);
-
+      navigation.navigate('Home');
     } catch (error) {
-      console.warn("addProCostPost-err", error.response);
+      console.Log("addProCostPost-err", error.response);
+      Alert.alert("error adding production ");
     }
   };
 
@@ -98,7 +109,9 @@ const DetailOfProduction = ({ route }) => {
   }, []);
 
   if (!data) {
-    return <Text>Loading...</Text>; // Loading state
+    return <SafeAreaView>
+      <ActivityIndicator size={50} style={styles.activity}/>
+    </SafeAreaView>; // Loading state
   }
 
   return (
@@ -115,7 +128,52 @@ const DetailOfProduction = ({ route }) => {
             />
           </View>
 
-          {/* Loop through seasons (rabi, kharif) */}
+          {/* {Object.entries(data.crops).map(([season, categories]) => (
+            <View key={season} style={styles.seasonContainer}>
+              <Text style={styles.seasonTitle}>{season.toUpperCase()}</Text>
+
+              {Object.entries(categories).map(([category, crops]) => (
+                <View key={category} style={styles.categoryContainer}>
+                  <Text style={styles.categoryTitle}>
+                    {category.replace("_", " ").toUpperCase()}
+                  </Text>
+
+                  {crops.map((crop, cropIndex) => (
+                    <View key={cropIndex} style={styles.cropContainer}>
+                      <Text style={styles.cropTitle}>{crop.cropName}</Text>
+
+                      {costFields.map((costField, index) => (
+                        <View key={index}>
+                          <Text style={styles.label}>
+                            {costField.toUpperCase()}
+                          </Text>
+                          <TextInput
+                            style={styles.input}
+                            value={crop.costs[costField]?.toString()}
+                            keyboardType="numeric"
+                            onChangeText={(value) =>
+                              handleCostChange(
+                                season,
+                                category,
+                                cropIndex,
+                                costField,
+                                value
+                              )
+                            }
+                          />
+                        </View>
+                      ))}
+
+                      <Text style={styles.totalCost}>
+                        Total Cost: {crop.totalCost}
+                      </Text>
+                    </View>
+                  ))}
+                </View>
+              ))}
+            </View>
+          ))} */}
+
           {Object.entries(data.crops).map(([season, categories]) => (
             <View key={season} style={styles.seasonContainer}>
               <Text style={styles.seasonTitle}>{season.toUpperCase()}</Text>
@@ -132,12 +190,16 @@ const DetailOfProduction = ({ route }) => {
                       {/* Render cost fields */}
                       {costFields.map((costField, index) => (
                         <View key={index}>
-                          <Text style={styles.label}>{costField.toUpperCase()}</Text>
+                          <Text style={styles.label}>
+                            {costField
+                              .replace(/([a-z])([A-Z])/g, "$1 $2")
+                              .toUpperCase()}{" "}
+                           <Text style={{fontSize: 12, fontWeight:'bold'}}>(Rs.)</Text>
+                          </Text>
                           <TextInput
                             style={styles.input}
-                            value={crop.costs[costField]?.toString()} // Ensure value is a string
+                            value={crop.costs[costField]?.toString() || "0"} // Ensure value is a string, default to "0"
                             keyboardType="numeric"
-                            // placeholder="rs"
                             onChangeText={(value) =>
                               handleCostChange(
                                 season,
@@ -145,14 +207,15 @@ const DetailOfProduction = ({ route }) => {
                                 cropIndex,
                                 costField,
                                 value
-                              )
+                              ) 
                             }
                           />
                         </View>
                       ))}
                       {/* Display total cost */}
                       <Text style={styles.totalCost}>
-                        Total Cost: {crop.totalCost}
+                        Total Cost: Rs. {crop.totalCost || 0}{" "}
+                        {/* Display Rs. for total cost */}
                       </Text>
                     </View>
                   ))}
@@ -235,4 +298,9 @@ const styles = StyleSheet.create({
     color: "#4CAF50",
     marginTop: 10,
   },
+  activity:{
+    flex:1,
+    justifyContent:'center',
+    alignItems:'center'
+  }
 });

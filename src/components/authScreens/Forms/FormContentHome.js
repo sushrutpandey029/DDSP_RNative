@@ -19,14 +19,17 @@ export default FormContentHome;
 
 const styles = StyleSheet.create({
   container: {
-    padding: 9,
-    // borderBottomWidth: 1,
-    // borderBottomColor: "#5B8A39",
-    // borderWidth : 1.5,
-    // borderColor : "#5B8A39",
-    margin: 4,
-    borderRadius: 7,
-    backgroundColor: "#e8efed",
+    padding: 12,
+    margin: 6,
+    borderRadius: 10,
+    backgroundColor: "#f5f7fa",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 3,
+    borderWidth: 1,
+    borderColor: "#d3d3d3",
   },
   title: {
     fontFamily: "Poppins-Medium",
@@ -35,7 +38,7 @@ const styles = StyleSheet.create({
   content: {
     fontFamily: "Poppins-Regular",
     fontSize: 11,
-    marginLeft : 22
+    marginLeft: 22,
   },
   iconTitle: {
     flexDirection: "row",
