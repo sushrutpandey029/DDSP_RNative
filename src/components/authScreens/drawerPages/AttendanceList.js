@@ -5,6 +5,9 @@ import {
   ScrollView,
   StyleSheet,
   TouchableOpacity,
+  RefreshControl,
+  ActivityIndicator,
+  Alert,
 } from "react-native";
 import React, { useState, useEffect } from "react";
 import { getLocationByUserId } from "../../services/ApiFile";
@@ -17,8 +20,11 @@ import { deleteLocationById } from "../../services/ApiFile";
 const AttendanceList = () => {
   const { user } = useSelector((state) => state.auth.user);
   const [apiAttendanceList, setApiAttendanceList] = useState([]);
+  const [refreshing, setRefreshing] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const getAttendanceList = async () => {
+    setLoading(true);
     try {
       const response = await getLocationByUserId(user.id);
       console.log("getLocationById-res", JSON.stringify(response, null, 2));
@@ -27,28 +33,41 @@ const AttendanceList = () => {
       }
     } catch (err) {
       console.log("addLocationById-err", err);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleDeleteList = async (index) => {
-    try{
-        const response = await deleteLocationById(index);
-        console.log('delte-list-resp',response);
-    }catch(err){
-        console.log('delete-list-err',err);
-    }
-  }
+  const handleDeleteList = async (id) => {
+    // try{
+    //     // const response = await deleteLocationById(id);
+    //     console.log('delte-list-resp',response);
+    //     if(response.success) {
+    //       Alert.alert("Success","deleted successfully")
+    //     }
+    // }catch(err){
+    //     console.log('delete-list-err',err);
+    // }
+  };
 
   useEffect(() => {
     getAttendanceList();
   }, []);
+
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.loaderConatiner}>
+        <ActivityIndicator size={50} />
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={globalContainer}>
       <FormHeader title="ATTENDANCE LIST" />
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.listConatiner}>
-          {apiAttendanceList ? (
+          {apiAttendanceList.length ? (
             apiAttendanceList.map((item, index) => (
               <View style={styles.list} key={index}>
                 <View>
@@ -57,17 +76,20 @@ const AttendanceList = () => {
                   <Text style={styles.txtLong}>
                     Longitude : {item.longitude}
                   </Text>
+                  <Text style={styles.txtAdress}>Address : {item.address}</Text>
                 </View>
 
                 <View>
-                  <TouchableOpacity>
+                  <TouchableOpacity onPress={() => handleDeleteList(item.id)}>
                     <Icon name="close" color={"red"} size={25} />
                   </TouchableOpacity>
                 </View>
               </View>
             ))
           ) : (
-            <Text>Attendance list not available</Text>
+            <View style={styles.noData}>
+              <Text>Attendance list not available</Text>
+            </View>
           )}
         </View>
       </ScrollView>
@@ -80,6 +102,11 @@ export default AttendanceList;
 const styles = StyleSheet.create({
   listConatiner: {
     marginBottom: 40,
+  },
+  loaderConatiner: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
   list: {
     flexDirection: "row",
@@ -98,6 +125,19 @@ const styles = StyleSheet.create({
   txtName: {
     fontFamily: "Poppins-Regular",
   },
-  txtLat: {},
-  txtLong: {},
+  txtLat: {
+    fontFamily: "Poppins-Regular",
+  },
+  txtLong: {
+    fontFamily: "Poppins-Regular",
+  },
+  txtAdress: {
+    fontFamily: "Poppins-Regular",
+    paddingRight: 11,
+  },
+  noData:{
+    // justifyContent: 'center',
+    marginTop:'50%',
+    alignItems:'center'
+  }
 });

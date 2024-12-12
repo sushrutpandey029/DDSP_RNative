@@ -17,13 +17,17 @@ import { globalContainer } from "../../../../globals/style";
 import { addFarmerInfo } from "../../../services/ApiFile";
 import { Dropdown } from "react-native-element-dropdown";
 import AntDesign from "@expo/vector-icons/AntDesign";
+import { useSelector } from "react-redux";
 import { villageItems, talukaItems, clusterItems } from "../data/Constant";
 
 const FarmerInformation = ({ navigation }) => {
+  const {user} = useSelector((state) => state.auth.user);
   const [errors, setErrors] = useState({});
   const [isCropsSownUpdated, setIsCropsSownUpdated] = useState(false);
 
   const [loginValue, setLoginValue] = useState({
+    userid:user?.id,
+    userrole:user?.role,
     name: "",
     mobileNumber: "",
     emailID: "",

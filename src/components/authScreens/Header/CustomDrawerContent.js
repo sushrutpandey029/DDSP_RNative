@@ -11,8 +11,10 @@ import { logoutUser } from "../../redux/slices/AuthSlice";
 const CustomDrawerContent = (props) => {
   const dispatch = useDispatch();
   const navigation = props.navigation;
-  const userData = useSelector((state) => state.auth.user);
+  const {user} = useSelector((state) => state.auth.user)
+  // const userData = useSelector((state) => state.auth.user);
 
+  // console.log('user',user);
   const handleLogout = async () => {
     const result = dispatch(logoutUser());
     if (result.meta.requestStatus === "fullfilled") {
@@ -30,21 +32,21 @@ const CustomDrawerContent = (props) => {
         <View style={styles.imgContainer}>
           <Image
             source={{
-              uri: `${BaseUrl}/profile-images/${userData.user.profileimage}`,
+              uri: `${BaseUrl}/profile-images/${user.profileimage}`,
             }}
             style={styles.profileImage}
           />
         </View>
         <View style={styles.nameContainer}>
           <TouchableOpacity onPress={() => navigation.navigate("Profile")}>
-            <Text style={styles.nameText}>{userData.user.fullname}</Text>
+            <Text style={styles.nameText}>{user.fullname}</Text>
             <Text
               style={[
                 styles.customText,
                 { fontSize: 12, fontFamily: "Poppins-SemiBold" },
               ]}
             >
-              {userData.user.role}
+              {user.role}
             </Text>
           </TouchableOpacity>
         </View>

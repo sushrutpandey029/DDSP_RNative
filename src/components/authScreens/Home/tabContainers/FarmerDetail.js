@@ -25,8 +25,9 @@ import {
   talukaItems,
   clusterItems,
 } from "../../Forms/data/Constant";
+ 
+const FarmerDetail = ({ route, navigation }) => {
 
-const FarmerDetail = ({ route }) => {
   const id = route.params.farmerId;
   const [farmerData, setFarmerData] = useState([]);
   console.log("farmer-name", farmerData.name);
@@ -231,9 +232,9 @@ const FarmerDetail = ({ route }) => {
       newname: loginValue.name,
       mobileNumber: loginValue.mobileNumber,
       emailID: loginValue.emailID,
-      villagename: loginValue.villageName,
+      villageName: loginValue.villageName,
       taluka: loginValue.taluka,
-      clusterName: loginValue.cluster,
+      cluster: loginValue.cluster,
       district: loginValue.district,
       cultivatedLand: parseFloat(loginValue.cultivatedLand),
       desiBreeds: loginValue.desiBreeds,
@@ -293,7 +294,7 @@ const FarmerDetail = ({ route }) => {
 
         const response = await updateFarmerDetailsById(id, payload);
         console.log("udateFarmer-resp", JSON.stringify(response, null, 2));
-        Alert.alert(response.message);
+        Alert.alert("Success",response.message);
         navigation.navigate("Home");
       } catch (error) {
         console.log("udateFarmer-resp-err", error.response.data);
@@ -314,6 +315,8 @@ const FarmerDetail = ({ route }) => {
       const response = await getFarmerById(id);
       console.log("farmer-details", JSON.stringify(response, null, 2));
       setFarmerData(response.data);
+      // setFarmerData({ ...farmerData, cropsSown: payload.cropsSown }); // last added
+
     } catch (error) {
       console.log("farmer-detail-err", error);
     }

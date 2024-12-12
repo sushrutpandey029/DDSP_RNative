@@ -1,5 +1,5 @@
-// export const BaseUrl = "https://912c-2401-4900-8845-2229-1c87-d6da-16bb-9910.ngrok-free.app";
-export const BaseUrl = "https://ddsp-backend.onrender.com";
+export const BaseUrl = "https://d3d7-106-219-165-80.ngrok-free.app";
+// export const BaseUrl = "https://ddsp-backend.onrender.com";
 
 
 export const loginApi = "api/user/userlogin";

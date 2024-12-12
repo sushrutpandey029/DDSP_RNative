@@ -192,10 +192,11 @@ const ProjectCoordinationWork = ({ navigation }) => {
               >
                 <Text>{meeting.date || "Select Date"}</Text>
               </TouchableOpacity>
-              <Text style={styles.label}>Participants</Text>
+              <Text style={styles.label}>No. of Participants</Text>
               <TextInput
                 style={styles.input}
                 value={meeting.participants}
+                keyboardType="numeric"
                 onChangeText={(text) =>
                   setReviewMeetings(
                     reviewMeetings.map((item, idx) =>

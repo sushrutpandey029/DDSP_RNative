@@ -30,7 +30,8 @@ const DetailOfProduction = ({ route, navigation }) => {
       console.log("prod-getcostDetails", response);
 
       // Parse the crops data which is in stringified JSON format
-      const cropsData = JSON.parse(response.crops);
+      // const cropsData = JSON.parse(response.crops);
+      const cropsData = response.crops;
 
       const updatedData = { ...response, crops: cropsData };
 

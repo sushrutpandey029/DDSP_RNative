@@ -14,13 +14,13 @@ import DetailOfCultivation from "../components/authScreens/Forms/allForms/Detail
 import DetailOfProduction from "../components/authScreens/Forms/allForms/DetailOfProduction";
 import FieldsWorkerDetails from "../components/authScreens/Forms/allForms/FieldsWorkerDetails";
 import ProjectCoordinationWork from "../components/authScreens/Forms/allForms/ProjectCoordinationWork";
-// import { defineAnimation } from "react-native-reanimated";
 import { initializeUser } from "../components/redux/slices/AuthSlice";
 import ChangePassword from "../components/authScreens/Forms/ChangePassword";
 import CropDetail from "../components/authScreens/Home/tabContainers/CropDetail";
 import FarmerDetail from "../components/authScreens/Home/tabContainers/FarmerDetail";
 import FieldWorkerDetailUpdate from "../components/authScreens/UserFile/containers/FieldWorkerDetailUpdate";
 import AttendanceList from "../components/authScreens/drawerPages/AttendanceList";
+import InteractionWithFarmer from "../components/authScreens/Forms/allForms/InteractionWithFarmer";
 
 
 const Stack = createNativeStackNavigator();
@@ -108,6 +108,10 @@ const RootNavigation = () => {
           name="AttendanceList"
           component={AttendanceList}
           options={{headerShown:false}}
+          />
+          <Stack.Screen 
+          name="Interaction With Farmer"
+          component={InteractionWithFarmer}
           />
         </>
       ) : (

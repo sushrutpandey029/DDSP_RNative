@@ -4,6 +4,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   Modal,
+  ScrollView,
   Button,
   ActivityIndicator,
   SafeAreaView,
@@ -52,15 +53,15 @@ const FarmerList = () => {
     }
   };
 
-  // useEffect(() => {
-  //   getFarmerList();
-  // }, []);
+  useEffect(() => {
+    getFarmerList();
+  }, []);
 
-  useFocusEffect(
-    React.useCallback(() => {
-      getFarmerList();
-    })
-  );
+  // useFocusEffect(
+  //   React.useCallback(() => {
+  //     getFarmerList();
+  //   })
+  // );
 
 
   

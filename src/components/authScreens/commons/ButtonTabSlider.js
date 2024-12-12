@@ -80,10 +80,11 @@ const styles = StyleSheet.create({
     marginHorizontal: 3,
   },
   activeButton: {
-    backgroundColor: "#5B8A39",
-  },
+    // backgroundColor: "#5B8A39",
+    backgroundColor: "#e7eae1",
+   },
   acBtnText: {
-    color : '#fff',
+    color : '#000',
     fontFamily : 'Poppins-SemiBold',
     // fontWeight : '600',
     // fontSize : 14

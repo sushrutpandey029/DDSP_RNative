@@ -13,9 +13,7 @@ import {
 import React, { useState } from "react";
 import { submitBtn } from "../../../../globals/style";
 import FormHeader from "../FormHeader";
-// import DatePicker from "react-native-modern-datepicker";
 import DatePicker from "react-native-ui-datepicker";
-// import DatePicker from "react-native-date-picker";
 import { globalContainer } from "../../../../globals/style";
 import { useDispatch, useSelector } from "react-redux";
 import { addFieldOfficerWorkDetail } from "../../../services/ApiFile";

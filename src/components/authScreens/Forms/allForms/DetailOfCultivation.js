@@ -62,7 +62,8 @@ const DetailOfCultivation = ({ route, navigation }) => {
       const response = await addCultivationCostDetails(farmerId);
 
       // Parse the crops JSON string into an object
-      const parsedCrops = JSON.parse(response.crops);
+      // const parsedCrops = JSON.parse(response.crops);
+      const parsedCrops = response.crops;
 
       // Initialize costs for each crop
       const updatedCrops = {};
@@ -187,7 +188,7 @@ const DetailOfCultivation = ({ route, navigation }) => {
         submissionData
       );
 
-      console.warn("addCulCostPost-resp", response);
+      console.log("addCulCostPost-resp", response);
       if (response.success === true) {
         Alert.alert(response.message);
         navigation.navigate('Home');

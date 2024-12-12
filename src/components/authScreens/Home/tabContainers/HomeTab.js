@@ -7,11 +7,11 @@ import {
   PermissionsAndroid,
   Platform,
   Alert,
+  ScrollView
 } from "react-native";
 import React, { useState } from "react";
 import { globalContainer } from "../../../../globals/style";
 import { useDispatch, useSelector } from "react-redux";
-import Geolocation from "react-native-geolocation-service";
 import LocationFetcher from "./LocationFetcher";
 
 const HomeTab = () => {

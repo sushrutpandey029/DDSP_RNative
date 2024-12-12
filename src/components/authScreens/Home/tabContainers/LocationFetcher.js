@@ -1,117 +1,146 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, TouchableOpacity, Alert, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Alert,
+  ScrollView,
+  StyleSheet,
+} from "react-native";
 import * as Location from "expo-location";
 import { useSelector } from "react-redux";
 import { addUserLocation } from "../../../services/ApiFile";
 
 const LocationFetcher = () => {
   const { user } = useSelector((state) => state.auth.user);
-  console.log('user',user);
-  const [isLocationFetched, setIsLocationFetched] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const [formData, setFormData] = useState({
-    userId: user?.id,
-    fullname: user?.fullname,
-    role: user?.role,
+  const [locationData, setLocationData] = useState({
     latitude: "",
     longitude: "",
-    address:""
-  })
-
-  const [disabled, setDisabled] = useState(false);
-
-   
+    address: "",
+  });
 
   const getLocation = async () => {
     try {
+      
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
         Alert.alert(
           "Permission Denied",
-          "Location permission is required to fetch your location"
+          "Location permission is required to fetch your location."
         );
         return;
       }
 
+      // const isServicesEnabled = await Location.hasServicesEnabledAsync();
+      // if (!isServicesEnabled) {
+      //   Alert.alert(
+      //     "Location Services Disabled",
+      //     "Please enable location services to fetch your location."
+      //   );
+      //   return;
+      // }      
+
+      // fetch the current location
       const currentLocation = await Location.getCurrentPositionAsync({
         accuracy: Location.Accuracy.High,
       });
 
       const { latitude, longitude } = currentLocation.coords;
-      
-      
 
-      const address =await Location.reverseGeocodeAsync({latitude, longitude});
-      console.log('Address',address);
-      // console.log('latitude',latitude);
-      // console.log('longitude',longitude);
-      console.log('address-fltr',address[0]?.formattedAddress);
+      const addressData = await Location.reverseGeocodeAsync({
+        latitude,
+        longitude,
+      });
+      const address =
+        addressData[0]?.formattedAddress ||
+        `${addressData[0]?.city || "},${addressData[0]?.region || "}`;
+      console.log("Address", address);
 
-      setFormData((prevData) => ({
-        ...prevData,
-        latitude: latitude,
-        longitude: longitude,
-        address: address[0]?.formattedAddress
-      }));
+      setLocationData({
+        latitude,
+        longitude,
+        address,
+      });
 
-      setIsLocationFetched(true);
-      // Alert.alert(
-      //   "Location Retrieved",
-      //   `Latitude: ${latitude}, Longitude: ${longitude}`
-      // );
-
-      // disable the buttons and renables after 1 minutes
-      setDisabled(true);
-      setTimeout(() => {
-        setDisabled(false)
-      }, 10000);
+      Alert.alert(
+        "Location Fetched Successfully",
+        `Latitude: ${latitude}, Longitude: ${longitude}`
+      );
     } catch (error) {
-      console.error(error);
-      Alert.alert("Error", "Unable to fetch location");
-    }
+      if (error.code === "E_LOCATION_TIMEOUT") {
+        Alert.alert(
+          "Timeout",
+          "Location fetching took too long. Please try again."
+        );
+      } else {
+        console.error("Unexpected error fetching location:", error);
+        Alert.alert(
+          "Error",
+          "An unexpected error occurred while fetching your location."
+        );
+      }
+     }
   };
 
   const handleSubmitAttendance = async () => {
-    try{
-      const response =await  addUserLocation(formData);
-      console.log('addlocation-resp',response);
-      if(response.success === true) {
-        Alert.alert(response.message);
+    if (!locationData.latitude || !locationData.longitude) {
+      Alert.alert(
+        "Error",
+        "Location not available. Please fetch your location first."
+      );
+      return;
+    }
+    setIsSubmitting(true);
+    try {
+      const payload = {
+        userId: user?.id,
+        fullname: user?.fullname,
+        role: user?.role,
+        latitude: locationData.latitude,
+        longitude: locationData.longitude,
+        address: locationData?.address,
+      };
+
+      const response = await addUserLocation(payload);
+      console.log("addlocation-resp", response);
+      if (response.success) {
+        Alert.alert("Success", "Attendance marked successfully");
+      } else {
+        Alert.alert("Failed", response.message || "Something went wrong.");
       }
-    }catch(err) {
-      console.log('addLocation-err',err.response.data)
+    } catch (err) {
+      console.error("Error submitting attendance:", err.response?.data || err);
+      Alert.alert("Error", "Failed to mark attendance. Please try again.");
+    } finally {
+      setIsSubmitting(false);
     }
-  }
+  };
 
-  const demoFunction = () => {
-
-  }
-
-  useEffect(() => {
-    if(isLocationFetched) {
-      handleSubmitAttendance();
-    }
-  },[isLocationFetched])
+  const demoFunction = () => {};
 
   return (
     <View style={styles.container}>
-       {/* {formData.latitude && formData.longitude ? (
-        <View style={styles.locationContainer}>
-          <Text>Latitude: {formData.latitude}</Text>
-          <Text>Longitude: {formData.longitude}</Text>
-        </View>
-      ) : (
-        <Text>No location fetched yet.</Text>
-      )} */}
-      <TouchableOpacity onPress={getLocation} 
-      style={[styles.mark,disabled && styles.disabled]}
-      disabled={disabled}
+      <TouchableOpacity
+        onPress={getLocation}
+        disabled={isSubmitting}
+        style={[styles.button, isSubmitting && styles.disabledButton]}
       >
         <Text style={styles.buttonText}>
-          {disabled ? "Please wait..." : "Mark Attendance"}
-          </Text>
+          {isSubmitting ? "Processing..." : "Fetch Location"}
+        </Text>
       </TouchableOpacity>
-     
+
+      <TouchableOpacity
+        onPress={handleSubmitAttendance}
+        disabled={isSubmitting}
+        style={[styles.button, isSubmitting && styles.disabledButton]}
+      >
+        <Text style={styles.buttonText}>
+          {isSubmitting ? "Processing..." : "Mark Attendance"}
+        </Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -119,25 +148,30 @@ const LocationFetcher = () => {
 export default LocationFetcher;
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
-  mark: {
+  container: {
     flex: 1,
-    padding: 8,
-    backgroundColor: "red",
-    width: "100%",
+    justifyContent: "center",
+    alignItems: "center",
+    // paddingHorizontal: 16,
+   },
+  button: {
+    padding: 15, 
+    backgroundColor: "#e7eae1",
     borderRadius: 8,
     alignItems: "center",
+    justifyContent: "center",
+    width: "80%",
     marginVertical: 10,
-    marginBottom: 30
-  },
+   },
   buttonText: {
-    color: "white",
+    color: "#7b576d",
     fontWeight: "bold",
+    fontSize: 16,
   },
   locationContainer: {
     marginTop: 10,
   },
-  disabled : {
-    backgroundColor:'grey'
-  }
+  disabledButton: {
+    backgroundColor: "grey",
+  },
 });

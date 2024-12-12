@@ -7,6 +7,7 @@ import {
   ScrollView,
   ActivityIndicator,
   TouchableOpacity,
+  RefreshControl
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -19,9 +20,12 @@ import { useFocusEffect } from "@react-navigation/native";
 const UserReport = ({ navigation }) => {
   const { user } = useSelector((state) => state.auth.user);
   const [apiWorkData, setApiWorkData] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   const getUserDetails = async () => {
     try {
+      setLoading(true)
       const response = await getWorkDetail();
 
       if (response.success === true) {
@@ -29,7 +33,9 @@ const UserReport = ({ navigation }) => {
         // console.log("workdetailResponse", JSON.stringify(response, null, 2));
       }
     } catch (error) {
-      console.error("workdetail-err", error);
+      console.error("workdetail-err", error.response);
+    }finally{
+      setLoading(false);
     }
   };
 
@@ -38,17 +44,23 @@ const UserReport = ({ navigation }) => {
       ? apiWorkData
       : apiWorkData.filter((item) => item.userid == user.id);
 
-  // useEffect(() => {
-  //   getUserDetails();
-  // }, []);
+  useEffect(() => {
+    getUserDetails();
+  }, []);
 
-  useFocusEffect(
-    React.useCallback(() => {
-      getUserDetails(); // Call API when component is focused
-    }, [])
-  );
+  // useFocusEffect(
+  //   React.useCallback(() => {
+  //     getUserDetails(); // Call API when component is focused
+  //   }, [])
+  // );
 
-  if (apiWorkData.length < 1) {
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await getUserDetails();
+    setRefreshing(false);
+  }
+
+  if (loading) {
     return (
       <SafeAreaView style={styles.loaderContainer}>
         <ActivityIndicator size={50} />
@@ -60,7 +72,11 @@ const UserReport = ({ navigation }) => {
     <SafeAreaView style={globalContainer}>
       <FormHeader title="REPORT DETAIL" />
 
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView showsVerticalScrollIndicator={false}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh}/>
+      }
+      >
         {filteredData.length > 0 ? (
           filteredData.map((item, index) => (
             <TouchableOpacity

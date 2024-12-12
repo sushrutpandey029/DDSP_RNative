@@ -18,6 +18,7 @@ import HomeTab from "./tabContainers/HomeTab";
 
 const HomePage = ({ navigation }) => {
   const [tabValue, setTabValue] = useState("home");
+  const { user } = useSelector((state) => state.auth.user);
 
   return (
     <ScrollView>
@@ -38,19 +39,29 @@ const HomePage = ({ navigation }) => {
                 content="Lorem ipsum dolor sit amet consectetur. Massa vestibulum neque integer nunc massa vitae duis."
               />
             </TouchableOpacity>
-            
+
             <TouchableOpacity onPress={() => navigation.navigate("FieldWork")}>
               <FormContentHome
                 title="Field Worker Details"
                 content="Lorem ipsum dolor sit amet consectetur. Massa vestibulum neque integer nunc massa vitae duis."
               />
             </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => navigation.navigate("ProjectWork")}
-            >
-              <FormContentHome
-                title="Project Coordination Work"
-                content="Lorem ipsum dolor sit amet consectetur. Massa vestibulum neque integer nunc massa vitae duis."
+
+            {user.role === "Project Coordinator" && (
+              <TouchableOpacity
+                onPress={() => navigation.navigate("ProjectWork")}
+              >
+                <FormContentHome
+                  title="Project Coordination Work"
+                  content="Lorem ipsum dolor sit amet consectetur. Massa vestibulum neque integer nunc massa vitae duis."
+                />
+              </TouchableOpacity>
+            )}
+
+            <TouchableOpacity onPress={() => navigation.navigate("Interaction With Farmer")}>
+              <FormContentHome 
+              title="Interaction With Farmers"
+              content="Lorem ipsum dolor sit amet consectetur. Massa vestibulum neque integer nunc massa vitae duis."
               />
             </TouchableOpacity>
           </View>
@@ -84,7 +95,7 @@ const styles = StyleSheet.create({
     marginHorizontal: Dimensions.get("window").width * 0.03,
   },
   nullData: {
-     alignItems: "center",
-    marginTop : '50%'
+    alignItems: "center",
+    marginTop: "50%",
   },
 });
