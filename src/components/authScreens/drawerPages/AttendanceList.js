@@ -8,7 +8,7 @@ import {
   RefreshControl,
   ActivityIndicator,
   Alert,
-} from "react-native";
+ } from "react-native";
 import React, { useState, useEffect } from "react";
 import { getLocationByUserId } from "../../services/ApiFile";
 import { useSelector } from "react-redux";
@@ -38,17 +38,42 @@ const AttendanceList = () => {
     }
   };
 
+  const showConfirmation = (id) => {
+      Alert.alert("Delete Confirmation",
+        "Are you sure you want to delete this attendance ?",
+        [
+          {
+            text:"Cancel",
+            style:"cancel"
+          },{
+            text:"Confirm",
+            onPress:() => handleDeleteList(id),
+            style:"default"
+          }
+        ]
+      )
+  }
+
+
   const handleDeleteList = async (id) => {
-    // try{
-    //     // const response = await deleteLocationById(id);
-    //     console.log('delte-list-resp',response);
-    //     if(response.success) {
-    //       Alert.alert("Success","deleted successfully")
-    //     }
-    // }catch(err){
-    //     console.log('delete-list-err',err);
-    // }
+    try{
+        const response = await deleteLocationById(id);
+        console.log('delte-list-resp',response);
+        if(response.success) {
+          handleOnRefresh();
+          Alert.alert("Success Message","Attendance deleted successfully.")
+        }
+    }catch(err){
+        console.log('delete-list-err',err);
+        Alert.alert("Error","An error occured while deleting farmer.")
+    }
   };
+
+  const handleOnRefresh =async () => {
+    setRefreshing(true);
+    await getAttendanceList();
+    setRefreshing(false);
+  }
 
   useEffect(() => {
     getAttendanceList();
@@ -65,7 +90,10 @@ const AttendanceList = () => {
   return (
     <SafeAreaView style={globalContainer}>
       <FormHeader title="ATTENDANCE LIST" />
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView 
+      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleOnRefresh} />}
+      showsVerticalScrollIndicator={false}
+      >
         <View style={styles.listConatiner}>
           {apiAttendanceList.length ? (
             apiAttendanceList.map((item, index) => (
@@ -80,7 +108,7 @@ const AttendanceList = () => {
                 </View>
 
                 <View>
-                  <TouchableOpacity onPress={() => handleDeleteList(item.id)}>
+                  <TouchableOpacity onPress={() => showConfirmation(item.id)}>
                     <Icon name="close" color={"red"} size={25} />
                   </TouchableOpacity>
                 </View>

@@ -110,8 +110,9 @@ const RootNavigation = () => {
           options={{headerShown:false}}
           />
           <Stack.Screen 
-          name="Interaction With Farmer"
+          name="InteractionWithFarmer"
           component={InteractionWithFarmer}
+          options={{headerShown:false}}
           />
         </>
       ) : (

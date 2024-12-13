@@ -76,7 +76,7 @@ const FarmerList = () => {
   }
 
   return (
-    <View>
+    <ScrollView>
       {farmerDetails.map((item) => (
         <View style={styles.container} key={item.id}>
           <TouchableOpacity onPress={() => openModal(item.id,item.farmerID)}>
@@ -118,7 +118,8 @@ const FarmerList = () => {
           </View>
         </View>
       </Modal>
-    </View>
+      
+    </ScrollView>
   );
 };
 

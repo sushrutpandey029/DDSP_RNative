@@ -62,7 +62,7 @@ const FieldsWorkerDetails = ({ navigation }) => {
     return `${year}-${month}-${day}`;
   };
 
-  const handleDateChange = (selectedDate) => {
+  const handleDateChange =async (selectedDate) => {
     if (selectedDate) {
       const dateObj = new Date(selectedDate); // Ensure it's a Date object
       if (!isNaN(dateObj)) {

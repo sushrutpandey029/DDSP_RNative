@@ -20,7 +20,9 @@ import {
   getLocationApi,
   getLocationByUserIdApi,
   addUserLocationApi,
-  deleteLocationByIdApi
+  deleteLocationByIdApi,
+  addInteractionApi,
+  getFarmerListByUserIdApi
 } from "../api/Api";
 import axios from "axios";
 
@@ -202,6 +204,7 @@ export const getLocation = async () => {
   }
 }
 
+
 export const getLocationByUserId = async (id) => {
   const api = `${BaseUrl}/${getLocationByUserIdApi}/${id}`;
   try{
@@ -212,6 +215,7 @@ export const getLocationByUserId = async (id) => {
   }
 }
 
+ // api for adding attendace
 export const addUserLocation = async (request) => {
   const api = `${BaseUrl}/${addUserLocationApi}`;
   try{
@@ -222,6 +226,7 @@ export const addUserLocation = async (request) => {
   }
 }
 
+ // api for deleting attendance list by id
 export const deleteLocationById = async (id) => {
   const api = `${BaseUrl}/${deleteLocationByIdApi}/${id}`;
   try{
@@ -229,5 +234,27 @@ export const deleteLocationById = async (id) => {
     return response.data;
   }catch(err){  
     throw err;
+  }
+}
+
+// add interaction with farmer api
+export const addInteraction = async (request) => {
+  const api = `${BaseUrl}/${addInteractionApi}`;
+  try{
+    const response = await axios.post(api,request);
+    return response.data;
+  }catch(err){
+    throw err;
+  }
+}
+
+// get farmerlist by user id api
+export const getFarmerListByUserId = async(id) => {
+  const api = `${BaseUrl}/${getFarmerListByUserIdApi}/${id}`;
+  try{
+    const response = await axios.get(api);
+     return response.data;
+  }catch(err){
+     throw err;
   }
 }

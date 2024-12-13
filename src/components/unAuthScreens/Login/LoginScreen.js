@@ -28,32 +28,18 @@ const LoginScreen = ({ navigation }) => {
   const authState = useSelector((state) => state.auth);
   const error = authState.error;
   const [customError, setCustomError] = useState('');
-  // const {isLoggedIn, user, error, loading} = useSelector((state) => state.auth)
-
+ 
   const handleLogin = async () => {
 
-    // if(!loginValue.emailid && !loginValue.password) {
-    //   setCustomError("All fields are required");
-    // }
-    // else if(!loginValue.emailid){
-    //   setCustomError("Email is required");
-    //   return
-    // }
-    // else if(!loginValue.password){
-    //   setCustomError("Password is required")
-    //   return
-    // }else{
-    //   setCustomError("");
       dispatch(loginUser(loginValue));
 
-    // }
+    
 
    };
 
   useEffect(() => {
     if (authState.isLoggedIn) {
-      // console.warn("user-login", authState.user);
-      navigation.navigate("Drawer");
+       navigation.navigate("Drawer");
     }  
   }, [authState.isLoggedIn]);
 
@@ -67,9 +53,6 @@ const LoginScreen = ({ navigation }) => {
         </View>
         <View style={styles.fieldContainer}>
           <View>
-          {/* {customError && (
-              <Text style={[styles.label, { color: "red" }]}>{customError}</Text>
-            )} */}
             {error && (
               <Text style={[styles.label, { color: "red" }]}>{error}</Text>
             )}
@@ -107,8 +90,7 @@ export default LoginScreen;
 const styles = StyleSheet.create({
   container: {
     marginBottom: 30,
-    // paddingHorizontal: "3%",
-  },
+   },
   imageContainer: {
     flex: 1,
     justifyContent: "flex-end",

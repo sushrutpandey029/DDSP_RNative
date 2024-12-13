@@ -24,3 +24,5 @@ export const getLocationApi = "api/user/getalllocation";
 export const getLocationByUserIdApi = "api/user/getlocationbyuserid";
 export const addUserLocationApi = "api/user/adduserlocation";
 export const deleteLocationByIdApi = "api/user/locationdeletebyid";
+export const addInteractionApi= "api/user/addInteraction";
+export const getFarmerListByUserIdApi = "api/user/farmerlistbyuserid";

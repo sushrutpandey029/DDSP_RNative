@@ -645,63 +645,6 @@ const FarmerInformation = ({ navigation }) => {
               </TouchableOpacity>
             </View>
 
-            {/* <View>
-              <Text style={styles.label}>Season</Text>
-              <Dropdown
-                data={seasonItems}
-                labelField="label"
-                valueField="value"
-                value={selectedSeason}
-                onChange={(item) => setSelectedSeason(item.value)}
-                maxHeight={200}
-                style={styles.input}
-              />
-              {errors.season && (
-                <Text style={{ color: "red" }}>{errors.season}</Text>
-              )}
-            </View>
-
-            <View>
-              <Text style={styles.label}>Category</Text>
-              <Dropdown
-                data={categoryItems}
-                labelField="label"
-                valueField="value"
-                value={selectedCategory}
-                onChange={(item) => setSelectedCategory(item.value)}
-                maxHeight={200}
-                style={styles.input}
-              />
-              {errors.irrigationType && (
-                <Text style={{ color: "red" }}>{errors.irrigationType}</Text>
-              )}
-            </View>
-
-            <View>
-              <Text style={styles.label}>Crop</Text>
-              <Dropdown
-                data={cropItems}
-                labelField="label"
-                valueField="value"
-                value={selectedCrop}
-                onChange={(item) => setSelectedCrop(item.value)}
-                maxHeight={200}
-                style={styles.input}
-              />
-              {errors.crop && (
-                <Text style={{ color: "red" }}>{errors.crop}</Text>
-              )}
-            </View>
-
-            <View>
-              <Text style={styles.label}>
-                Cultivated Land <Text style={{ fontSize: 12 }}>(acre)</Text>
-              </Text>
-              <TextInput
-                style={styles.input}
-                onChangeText={(text) => setCropLand(text)}
-              />
-            </View> */}
 
             {/* //ending crops sown fields */}
 

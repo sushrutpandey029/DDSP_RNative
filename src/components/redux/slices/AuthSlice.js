@@ -9,19 +9,13 @@ export const loginUser = createAsyncThunk(
     try {
       const userData = await authLogin(credentials);
       console.log("login-user-data", userData);
-      // console.log("login-user-data-sttus", userData.status);
-      if (userData.status === true) {
+       if (userData.status === true) {
         await AsyncStorage.setItem("userData", JSON.stringify(userData));
         return userData;
       } else {
         return rejectWithValue("Login failed. Please check your credentials.");
       }
     } catch (error) {
-      // console.log("Error Details:", {
-      //   message: error.message,
-      //   response: error.response?.data,
-      //   stack: error.stack,
-      // });
       const errorMessage =
         error.response?.data?.errors?.[0]?.errormessage ||
         "User not found. Please try again.";
@@ -59,12 +53,6 @@ export const logoutUser = createAsyncThunk(
         return rejectWithValue("Failed to logout. Pleaser try again.");
       }
     }catch(error) {
-      // console.error("Error during logout : ",{
-      //   message : error.message,
-      //   response : error.response?.data,
-      //   stack : error.stack,
-      // })
-
       const errorMessage = error.response?.data?.message || "An error occured during logout.";
       return rejectWithValue(errorMessage);
     }
@@ -82,16 +70,6 @@ const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    // logout: (state) => {
-    //   state.isLoggedIn = false;
-    //   state.user = null;
-    //   state.error = null;
-    //   state.loading = false;
-    //   AsyncStorage.removeItem("userData");
-    // },
-    // setUser: (state, action) => {
-    //   (state.isLoggedIn = true), (state.user = action.payload);
-    // },
     updateUser: (state, action) => {
       state.user.user = {
         ...state.user.user, // Keep existing fields

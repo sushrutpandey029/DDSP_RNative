@@ -6,7 +6,7 @@ import {
   Dimensions,
   ScrollView,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Header from "../Header/Header";
 import HomeFarmerImage from "../commons/HomeFarmerImage";
 import ButtonTabSlider from "../commons/ButtonTabSlider";
@@ -15,10 +15,17 @@ import { TouchableOpacity } from "react-native-gesture-handler";
 import { useSelector, useDispatch } from "react-redux";
 import FarmerList from "./tabContainers/FarmerList";
 import HomeTab from "./tabContainers/HomeTab";
+import { getFarmerById } from "../../redux/slices/FarmerSlice";
 
 const HomePage = ({ navigation }) => {
   const [tabValue, setTabValue] = useState("home");
+  const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth.user);
+ 
+ 
+  useEffect(() => {
+     dispatch(getFarmerById(user.id))
+  },[])
 
   return (
     <ScrollView>
@@ -58,10 +65,12 @@ const HomePage = ({ navigation }) => {
               </TouchableOpacity>
             )}
 
-            <TouchableOpacity onPress={() => navigation.navigate("Interaction With Farmer")}>
-              <FormContentHome 
-              title="Interaction With Farmers"
-              content="Lorem ipsum dolor sit amet consectetur. Massa vestibulum neque integer nunc massa vitae duis."
+            <TouchableOpacity
+              onPress={() => navigation.navigate("InteractionWithFarmer")}
+            >
+              <FormContentHome
+                title="Interaction With Farmers"
+                content="Lorem ipsum dolor sit amet consectetur. Massa vestibulum neque integer nunc massa vitae duis."
               />
             </TouchableOpacity>
           </View>

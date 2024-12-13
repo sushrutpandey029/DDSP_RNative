@@ -835,7 +835,7 @@ const FarmerDetail = ({ route, navigation }) => {
 
             <View style={styles.btnContainer}>
               <TouchableOpacity style={submitBtn} onPress={handleCropSelection}>
-                <Text style={styles.inpText}>Submit</Text>
+                <Text style={styles.inpText}>Update</Text>
               </TouchableOpacity>
             </View>
           </View>
