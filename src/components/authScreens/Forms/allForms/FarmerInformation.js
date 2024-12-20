@@ -9,6 +9,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   Alert,
+  ActivityIndicator,
 } from "react-native";
 import React, { useState, useEffect } from "react";
 import { submitBtn } from "../../../../globals/style";
@@ -21,13 +22,14 @@ import { useSelector } from "react-redux";
 import { villageItems, talukaItems, clusterItems } from "../data/Constant";
 
 const FarmerInformation = ({ navigation }) => {
-  const {user} = useSelector((state) => state.auth.user);
+  const { user } = useSelector((state) => state.auth.user);
   const [errors, setErrors] = useState({});
   const [isCropsSownUpdated, setIsCropsSownUpdated] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const [loginValue, setLoginValue] = useState({
-    userid:user?.id,
-    userrole:user?.role,
+    userid: user?.id,
+    userrole: user?.role,
     name: "",
     mobileNumber: "",
     emailID: "",
@@ -78,7 +80,6 @@ const FarmerInformation = ({ navigation }) => {
     { label: "Well", value: "Well" },
     { label: "Canal", value: "Canal" },
   ]);
-
 
   const [districtItems, setDistrictItems] = useState([
     { label: "Yavatmal", value: "Yavatmal" },
@@ -187,17 +188,29 @@ const FarmerInformation = ({ navigation }) => {
   const handleSubmit = async () => {
     if (validateFields()) {
       try {
+        setLoading(true);
+
         console.log(
           "after-handleCropSelection:",
           JSON.stringify(loginValue, null, 2)
         );
         const response = await addFarmerInfo(loginValue);
         console.warn("addfarm-resp", response);
-        Alert.alert(response.message);
-        navigation.navigate("Home");
+        setLoading(false);
+        // Alert.alert(response.message);
+        Alert.alert("Success Message", `${response.message}.`, [
+          {
+            text: "Ok",
+            onPress: () => navigation.navigate("Home"),
+            style: "default",
+          },
+        ]);
+        // navigation.navigate("Home");
       } catch (error) {
         console.log("addfarm-err", error.response.data);
         Alert.alert("Error adding farmer information");
+      } finally {
+        setLoading(false);
       }
     }
   };
@@ -298,6 +311,7 @@ const FarmerInformation = ({ navigation }) => {
             <View>
               <Text style={styles.label}> Village</Text>
               <Dropdown
+                mode="modal"
                 data={villageItems}
                 labelField={"label"}
                 valueField={"value"}
@@ -327,6 +341,7 @@ const FarmerInformation = ({ navigation }) => {
             <View>
               <Text style={styles.label}>Taluka</Text>
               <Dropdown
+                mode="modal"
                 data={talukaItems}
                 labelField="label"
                 valueField="value"
@@ -357,6 +372,7 @@ const FarmerInformation = ({ navigation }) => {
             <View>
               <Text style={styles.label}>Cluster</Text>
               <Dropdown
+                mode="modal"
                 data={clusterItems}
                 labelField="label"
                 valueField="value"
@@ -387,6 +403,7 @@ const FarmerInformation = ({ navigation }) => {
             <View>
               <Text style={styles.label}>District</Text>
               <Dropdown
+                mode="modal"
                 data={districtItems}
                 labelField="label"
                 valueField="value"
@@ -416,6 +433,7 @@ const FarmerInformation = ({ navigation }) => {
             <View>
               <Text style={styles.label}>Land type</Text>
               <Dropdown
+                mode="modal"
                 data={landItems}
                 labelField="label"
                 valueField="value"
@@ -447,6 +465,7 @@ const FarmerInformation = ({ navigation }) => {
                 Soil and Water Conservation Measures
               </Text>
               <Dropdown
+                mode="modal"
                 data={conservationMeasureItems}
                 labelField="label"
                 valueField="value"
@@ -481,6 +500,7 @@ const FarmerInformation = ({ navigation }) => {
             <View>
               <Text style={styles.label}> Irrigation Source</Text>
               <Dropdown
+                mode="modal"
                 data={sourceIrrigationItems}
                 labelField="label"
                 valueField="value"
@@ -510,6 +530,7 @@ const FarmerInformation = ({ navigation }) => {
             <View>
               <Text style={styles.label}>Micro Irrigation</Text>
               <Dropdown
+                mode="modal"
                 data={microIrrigationItems}
                 labelField="label"
                 valueField="value"
@@ -549,6 +570,7 @@ const FarmerInformation = ({ navigation }) => {
                 <View>
                   <Text style={styles.label}>Season</Text>
                   <Dropdown
+                    mode="modal"
                     data={seasonItems}
                     labelField={"label"}
                     valueField={"value"}
@@ -569,6 +591,7 @@ const FarmerInformation = ({ navigation }) => {
                 <View>
                   <Text style={styles.label}>Category</Text>
                   <Dropdown
+                    mode="modal"
                     data={categoryItems}
                     labelField={"label"}
                     valueField={"value"}
@@ -589,6 +612,7 @@ const FarmerInformation = ({ navigation }) => {
                 <View>
                   <Text style={styles.label}>Crop</Text>
                   <Dropdown
+                    mode="modal"
                     data={cropItems}
                     labelField={"label"}
                     valueField={"value"}
@@ -645,17 +669,26 @@ const FarmerInformation = ({ navigation }) => {
               </TouchableOpacity>
             </View>
 
-
             {/* //ending crops sown fields */}
 
             <View style={styles.btnContainer}>
-              <TouchableOpacity style={submitBtn} onPress={handleCropSelection}>
+              <TouchableOpacity
+                style={submitBtn}
+                onPress={handleCropSelection}
+                disabled={loading}
+              >
                 <Text style={styles.inpText}>Submit</Text>
               </TouchableOpacity>
             </View>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
+      {loading && (
+        <View style={styles.loaderOverlay}>
+          <ActivityIndicator size={50} color={"#ffffff"} />
+          <Text style={[styles.inpText, { fontSize: 14 }]}>processing...</Text>
+        </View>
+      )}
     </SafeAreaView>
   );
 };
@@ -720,10 +753,6 @@ const styles = StyleSheet.create({
   scrollContainer: {
     paddingBottom: 30,
   },
-  // label: {
-  //   fontSize: 16,
-  //   marginVertical: 10,
-  // },
   dropdown: {
     height: 50,
     borderBottomColor: "gray",
@@ -802,5 +831,12 @@ const styles = StyleSheet.create({
     alignSelf: "flex-end",
     // borderBottomWidth: 1,
     margin: 2,
+  },
+  loaderOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
+    zIndex: 999,
   },
 });

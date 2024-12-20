@@ -8,8 +8,9 @@ import {
   TouchableOpacity,
   Modal,
   Alert,
+  ActivityIndicator
 } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { submitBtn } from "../../../../globals/style";
 import FormHeader from "../FormHeader";
 import { globalContainer } from "../../../../globals/style";
@@ -17,33 +18,22 @@ import { useSelector } from "react-redux";
 import DatePicker from "react-native-ui-datepicker";
 import { addworkdetails } from "../../../services/ApiFile";
 import { Dropdown } from "react-native-element-dropdown";
+import { MultiSelect } from "react-native-element-dropdown";
 import { villageItems } from "../data/Constant";
-import AntDesign from "@expo/vector-icons/AntDesign"
+import AntDesign from "@expo/vector-icons/AntDesign";
 
 const ProjectCoordinationWork = ({ navigation }) => {
   const userDetails = useSelector((state) => state.auth.user.user);
+  const { FOlist } = useSelector((state) => state.officer);
+  const { APClist } = useSelector((state) => state.officer);
 
-  // State for each section
-  const [trainingProgrammes, setTrainingProgrammes] = useState([
-    { date: "", name: "", participants: "" },
-  ]);
+  const [date, setDate] = useState(new Date());
+  const [loading, setLoading] = useState(false);
 
-  const [reviewMeetings, setReviewMeetings] = useState([
-    { date: "", participants: "" },
-  ]);
-
-  const [monitoringVisits, setMonitoringVisits] = useState([
-    { date: "", cluster: "", observations: "" },
-  ]);
-
-  const [reports, setReports] = useState([
-    { report: { submittedDate: "", details: "" } },
-  ]);
-
-  // State for the DatePicker modal
-  const [datePickerVisible, setDatePickerVisible] = useState(false);
-  const [currentIndex, setCurrentIndex] = useState(null);
-  const [currentSection, setCurrentSection] = useState("");
+  const [dropdownVisible, setDropdownVisible] = useState({
+    FO: false,
+    APC: false,
+  });
 
   const formatDate = (selectedDate) => {
     if (!selectedDate) return "";
@@ -52,6 +42,33 @@ const ProjectCoordinationWork = ({ navigation }) => {
     const year = selectedDate.getFullYear();
     return `${day}-${month}-${year}`;
   };
+
+  // State for each section
+  const [trainingProgrammes, setTrainingProgrammes] = useState([
+    { date: formatDate(date), name: "", participants: "", villageName: "" },
+  ]);
+
+  const [reviewMeetings, setReviewMeetings] = useState([
+    {
+      date: formatDate(date),
+      participants: "",
+      fieldOfficer: [],
+      asstProjectCoordinator: [],
+    },
+  ]);
+
+  const [monitoringVisits, setMonitoringVisits] = useState([
+    { date: formatDate(date), cluster: "", observations: "" },
+  ]);
+
+  const [reports, setReports] = useState([
+    { submittedDate: formatDate(date), details: "" },
+  ]);
+
+  // State for the DatePicker modal
+  const [datePickerVisible, setDatePickerVisible] = useState(false);
+  const [currentIndex, setCurrentIndex] = useState(null);
+  const [currentSection, setCurrentSection] = useState("");
 
   const openDatePicker = (section, index) => {
     setCurrentSection(section);
@@ -84,9 +101,7 @@ const ProjectCoordinationWork = ({ navigation }) => {
         setReports(
           reports.map((item, idx) =>
             idx === currentIndex
-              ? {
-                  report: { ...item.report, submittedDate: formattedDate },
-                }
+              ? { ...item, submittedDate: formattedDate } // removed item.report syntax
               : item
           )
         );
@@ -103,18 +118,64 @@ const ProjectCoordinationWork = ({ navigation }) => {
       reports,
     };
 
-    console.log("Form Submitted: ", formData);
+    console.log("Form Submitted: ", JSON.stringify(formData, null, 2));
+    // console.log(
+    //   "Form Submitted-reviewMeetings: ",
+    //   JSON.stringify(formData.reviewMeetings, null, 2)
+    // );
 
     try {
-      const response = await addworkdetails(userDetails.id, formData);
+
+      setLoading(true);
+
+      // const response = await addworkdetails(userDetails.id, formData);
+
       console.log("addWork-resp", response);
-      Alert.alert("Data submitted successfully");
-      navigation.navigate("Home");
+      setLoading(false);
+
+      Alert.alert("Success Message", "Data submitted successfully.", [
+        {
+          text: "Ok",
+          onPress: () => navigation.navigate("Home"),
+          style: "default",
+        },
+      ]);
     } catch (error) {
       console.log("addWork-err", error.response.data);
-      Alert(error.response.data.message);
+      Alert("Failed Message", error.response.data.message);
+    } finally {
+
+      setLoading(false);
+
     }
   };
+
+  // const FOItems = FOlist?.data?.data?.map((item) => ({
+  //   label: item.fullname.trim(),
+  //   value: item.fullname.trim(),
+  // }));
+
+  const FOItems = useMemo(() => {
+    return FOlist?.data?.data?.map((item) => ({
+      label: item.fullname,
+      value: item.fullname,
+    }));
+  }, [FOlist]);
+
+  const APCItems = useMemo(() => {
+    return APClist?.data?.data?.map((item) => ({
+      label: item.fullname,
+      value: item.fullname,
+    }));
+  }, [APClist]);
+
+  // const APCItems = APClist?.data?.data?.map((item) => ({
+  //   label: item.fullname.trim(),
+  //   value: item.fullname.trim(),
+  // }));
+
+  console.log("FOItems", FOItems);
+  console.log("APCItems", APCItems);
 
   return (
     <SafeAreaView style={globalContainer}>
@@ -132,6 +193,7 @@ const ProjectCoordinationWork = ({ navigation }) => {
               >
                 <Text>{programme.date || "Select Date"}</Text>
               </TouchableOpacity>
+
               <Text style={styles.label}>Program Name</Text>
               <TextInput
                 style={styles.input}
@@ -157,6 +219,39 @@ const ProjectCoordinationWork = ({ navigation }) => {
                   )
                 }
               />
+
+              {/* field name of place is villageName */}
+              <Text style={styles.label}>Place</Text>
+              <Dropdown
+                mode="modal"
+                searchField={"String"}
+                search
+                searchPlaceholder="search..."
+                // searchQuery
+                data={villageItems}
+                labelField={"label"}
+                valueField={"value"}
+                style={styles.input}
+                fontFamily="Poppins-Regular"
+                onChange={(item) =>
+                  setTrainingProgrammes((prev) =>
+                    prev.map((row, idx) =>
+                      idx === index ? { ...row, villageName: item.value } : row
+                    )
+                  )
+                }
+                placeholderStyle={styles.placeholderStyle}
+                selectedTextStyle={styles.selectedTextStyle}
+                iconStyle={styles.iconStyle}
+                renderLeftIcon={() => (
+                  <AntDesign
+                    name="Safety"
+                    size={20}
+                    color={"#000"}
+                    style={styles.icon}
+                  />
+                )}
+              />
               <TouchableOpacity
                 onPress={() =>
                   setTrainingProgrammes(
@@ -173,7 +268,7 @@ const ProjectCoordinationWork = ({ navigation }) => {
             onPress={() =>
               setTrainingProgrammes([
                 ...trainingProgrammes,
-                { date: "", name: "", participants: "" },
+                { date: formatDate(date), name: "", participants: "" },
               ])
             }
             style={styles.addButton}
@@ -192,6 +287,7 @@ const ProjectCoordinationWork = ({ navigation }) => {
               >
                 <Text>{meeting.date || "Select Date"}</Text>
               </TouchableOpacity>
+
               <Text style={styles.label}>No. of Participants</Text>
               <TextInput
                 style={styles.input}
@@ -205,6 +301,105 @@ const ProjectCoordinationWork = ({ navigation }) => {
                   )
                 }
               />
+
+              <Text style={styles.label}>Field Officer</Text>
+              <MultiSelect
+                mode="modal"
+                data={FOItems}
+                labelField={"label"}
+                valueField={"value"}
+                value={meeting.fieldOfficer}
+                style={styles.input}
+                visible={dropdownVisible.FO}
+                // confirmSelectItem={"true"}
+                onFocus={() =>
+                  setDropdownVisible({ ...dropdownVisible, FO: true })
+                }
+                onBlur={() =>
+                  setDropdownVisible({ ...dropdownVisible, FO: false })
+                }
+                onChange={(selectedItem) => {
+                  setReviewMeetings((prev) =>
+                    prev.map((row, idx) =>
+                      idx === index
+                        ? {
+                            ...row,
+                            fieldOfficer: selectedItem.map((item) => item),
+                          }
+                        : row
+                    )
+                  );
+                  setDropdownVisible({ ...dropdownVisible, FO: false });
+                }}
+                placeholderStyle={styles.placeholderStyle}
+                selectedTextStyle={styles.selectedTextStyle}
+                iconStyle={styles.iconStyle}
+                activeColor="#e4f0ed"
+                fontFamily="Poppins-Regular"
+                renderLeftIcon={() => (
+                  <AntDesign
+                    name="Safety"
+                    size={20}
+                    color={"#000"}
+                    style={styles.icon}
+                  />
+                )}
+                // renderFooter={() => (
+                //   <View style={styles.footer}>
+                //     <TouchableOpacity
+                //       style={styles.confirmButton}
+                //       onPress={() => setDropdownVisible({...dropdownVisible, FO : false})} // Close modal on confirm
+                //     >
+                //       <Text style={styles.confirmButtonText}>Confirm</Text>
+                //     </TouchableOpacity>
+                //   </View>
+                // )}
+              />
+
+              <Text style={styles.label}>Assistant Project Coordinator</Text>
+              <MultiSelect
+                mode="modal"
+                data={APCItems}
+                labelField={"label"}
+                valueField={"value"}
+                style={styles.input}
+                value={meeting.asstProjectCoordinator}
+                visible={dropdownVisible.APC}
+                fontFamily="Poppins-Regular"
+                onFocus={() =>
+                  setDropdownVisible({ ...dropdownVisible, APC: true })
+                }
+                onBlur={() =>
+                  setDropdownVisible({ ...dropdownVisible, APC: false })
+                }
+                onChange={(selectedItem) => {
+                  setReviewMeetings((prev) =>
+                    prev.map((row, idx) =>
+                      idx === index
+                        ? {
+                            ...row,
+                            asstProjectCoordinator: selectedItem.map(
+                              (item) => item
+                            ),
+                          }
+                        : row
+                    )
+                  );
+                  setDropdownVisible({ ...dropdownVisible, APC: false });
+                }}
+                placeholderStyle={styles.placeholderStyle}
+                selectedTextStyle={styles.selectedTextStyle}
+                iconStyle={styles.iconStyle}
+                renderLeftIcon={() => (
+                  <AntDesign
+                    name="Safety"
+                    color={"#000"}
+                    size={20}
+                    style={styles.icon}
+                  />
+                )}
+              />
+
               <TouchableOpacity
                 onPress={() =>
                   setReviewMeetings(
@@ -221,7 +416,7 @@ const ProjectCoordinationWork = ({ navigation }) => {
             onPress={() =>
               setReviewMeetings([
                 ...reviewMeetings,
-                { date: "", participants: "" },
+                { date: formatDate(date), participants: "" },
               ])
             }
             style={styles.addButton}
@@ -241,39 +436,29 @@ const ProjectCoordinationWork = ({ navigation }) => {
                 <Text>{visit.date || "Select Date"}</Text>
               </TouchableOpacity>
               <Text style={styles.label}>Cluster / Village</Text>
-              <Dropdown 
+              <Dropdown
+                mode="modal"
                 data={villageItems}
-                labelField={'label'}
-                valueField={'value'}
+                labelField={"label"}
+                valueField={"value"}
                 style={styles.input}
                 value={visit.cluster}
-                onChange={(item) => 
-                  setMonitoringVisits((prev) => 
-                  prev.map((row, idx) => 
-                    idx === index ? {...row, cluster : item.value} : row
-                  ))
-                }
-                renderLeftIcon={() => (
-                  <AntDesign 
-                  name="Safety"
-                  size={20}
-                  style={styles.icon}
-                  color={'black'}
-                  />
-                )}
-
-              />
-              {/* <TextInput
-                style={styles.input}
-                value={visit.cluster}
-                onChangeText={(text) =>
-                  setMonitoringVisits(
-                    monitoringVisits.map((item, idx) =>
-                      idx === index ? { ...item, cluster: text } : item
+                onChange={(item) =>
+                  setMonitoringVisits((prev) =>
+                    prev.map((row, idx) =>
+                      idx === index ? { ...row, cluster: item.value } : row
                     )
                   )
                 }
-              /> */}
+                renderLeftIcon={() => (
+                  <AntDesign
+                    name="Safety"
+                    size={20}
+                    style={styles.icon}
+                    color={"black"}
+                  />
+                )}
+              />
               <Text style={styles.label}>Observations in brief</Text>
               <TextInput
                 style={styles.textarea}
@@ -305,7 +490,7 @@ const ProjectCoordinationWork = ({ navigation }) => {
             onPress={() =>
               setMonitoringVisits([
                 ...monitoringVisits,
-                { date: "", cluster: "", observations: "" },
+                { date: formatDate(date), cluster: "", observations: "" },
               ])
             }
             style={styles.addButton}
@@ -322,18 +507,16 @@ const ProjectCoordinationWork = ({ navigation }) => {
                 style={styles.dateInput}
                 onPress={() => openDatePicker("reports", index)}
               >
-                <Text>{report.report.submittedDate || "Select Date"}</Text>
+                <Text>{report.submittedDate || "Select Date"}</Text>
               </TouchableOpacity>
               <Text style={styles.label}>Report Details</Text>
               <TextInput
                 style={styles.input}
-                value={report.report.details}
+                value={report.details}
                 onChangeText={(text) =>
                   setReports(
                     reports.map((item, idx) =>
-                      idx === index
-                        ? { report: { ...item.report, details: text } }
-                        : item
+                      idx === index ? { ...item.report, details: text } : item
                     )
                   )
                 }
@@ -352,7 +535,7 @@ const ProjectCoordinationWork = ({ navigation }) => {
             onPress={() =>
               setReports([
                 ...reports,
-                { report: { submittedDate: "", details: "" } },
+                { submittedDate: formatDate(date), details: "" },
               ])
             }
             style={styles.addButton}
@@ -361,16 +544,14 @@ const ProjectCoordinationWork = ({ navigation }) => {
           </TouchableOpacity>
 
           <View style={styles.btnContainer}>
-            <TouchableOpacity style={submitBtn} onPress={handleSubmit}>
+            <TouchableOpacity
+              style={submitBtn}
+              onPress={handleSubmit}
+              disabled={loading}
+            >
               <Text style={styles.submitText}>Submit</Text>
             </TouchableOpacity>
           </View>
-          {/* <TouchableOpacity
-            onPress={handleSubmit}
-            style={[submitBtn.button, styles.submit]}
-          >
-            <Text style={submitBtn.text}>Submit</Text>
-          </TouchableOpacity> */}
         </View>
       </ScrollView>
       <Modal
@@ -408,13 +589,18 @@ const ProjectCoordinationWork = ({ navigation }) => {
           </View>
         </View>
       </Modal>
+      {loading && (
+        <View style={styles.loaderOverlay}>
+          <ActivityIndicator size={50} color={"#ffffff"} />
+          <Text style={[styles.title, { fontSize: 14, color:"#fff" }]}>processing...</Text>
+        </View>
+      )}
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   formContainer: {
-    // padding: 10,
     marginBottom: 40,
   },
   title: {
@@ -428,15 +614,22 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 14,
     fontFamily: "Poppins-Medium",
-    // fontWeight: "bold",
     marginBottom: 5,
   },
   input: {
+    // borderWidth: 1,
+    // borderColor: "#ccc",
+    // borderRadius: 10,
+    // padding: 8,
+    // marginBottom: 10,
+    height: 49,
     borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 10,
-    padding: 8,
-    marginBottom: 10,
+    borderColor: "#CBD5E1",
+    borderRadius: 15,
+    fontSize: 14,
+    fontFamily: "Poppins-Regular",
+    backgroundColor: "#F8FAFC",
+    paddingHorizontal: 15,
   },
   textarea: {
     borderWidth: 1,
@@ -461,6 +654,7 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 10,
     width: "30%",
+    marginTop: 7,
   },
   removeButtonText: {
     color: "white",
@@ -505,8 +699,6 @@ const styles = StyleSheet.create({
   closeButton: {
     marginTop: 6,
     padding: 10,
-    // backgroundColor: "#ddd",
-    // borderRadius: 10,
   },
   btnContainer: {
     marginTop: 30,
@@ -517,9 +709,43 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: "center",
   },
-  icon : {
-    marginRight:5
-  }
+  icon: {
+    marginRight: 5,
+  },
+  placeholderStyle: {
+    fontSize: 14,
+  },
+  selectedTextStyle: {
+    fontSize: 14,
+  },
+  iconStyle: {
+    width: 20,
+    height: 20,
+  },
+  footer: {
+    padding: 10,
+    alignItems: "center",
+    borderTopWidth: 1,
+    borderColor: "#ccc",
+  },
+  confirmButton: {
+    backgroundColor: "#007BFF",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+  },
+  confirmButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  loaderOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
+    zIndex: 999,
+  },
 });
 
 export default ProjectCoordinationWork;

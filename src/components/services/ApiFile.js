@@ -22,7 +22,9 @@ import {
   addUserLocationApi,
   deleteLocationByIdApi,
   addInteractionApi,
-  getFarmerListByUserIdApi
+  getFarmerListByUserIdApi,
+  getAllAsstPCApi,
+  getAllFieldOfficerApi
 } from "../api/Api";
 import axios from "axios";
 
@@ -256,5 +258,27 @@ export const getFarmerListByUserId = async(id) => {
      return response.data;
   }catch(err){
      throw err;
+  }
+}
+
+//get all field officer list api
+export const getAllFieldOfficer = async () => {
+  const api = `${BaseUrl}/${getAllFieldOfficerApi}`;
+  try{
+    const response = await axios.get(api);
+    return response.data
+  }catch(error){
+    throw error;
+  }
+}
+
+// get all assistant project coordinator list api
+export const getAllAsstPC = async () => {
+  const api = `${BaseUrl}/${getAllAsstPCApi}`;
+  try{
+    const response = await axios.get(api);
+    return response.data;
+  }catch(error) {
+    throw error;
   }
 }

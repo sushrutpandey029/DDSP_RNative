@@ -13,7 +13,7 @@ import { globalContainer } from "../../../globals/style";
 const FormPage = ({ navigation }) => {
   return (
     <View style={globalContainer}>
-      <FormHeader title={"FARMER INFORMATION"} />
+      <FormHeader title={"FORM PAGE"} />
       <ScrollView style={styles.container}>
         <TouchableOpacity
           onPress={() => navigation.navigate("FarmerInformation")}

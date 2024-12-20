@@ -16,6 +16,7 @@ export const loginUser = createAsyncThunk(
         return rejectWithValue("Login failed. Please check your credentials.");
       }
     } catch (error) {
+      console.log("login-err",error.response.data);
       const errorMessage =
         error.response?.data?.errors?.[0]?.errormessage ||
         "User not found. Please try again.";

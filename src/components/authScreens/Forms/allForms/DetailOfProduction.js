@@ -7,7 +7,7 @@ import {
   TextInput,
   TouchableOpacity,
   Alert,
-  ActivityIndicator
+  ActivityIndicator,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { submitBtn } from "../../../../globals/style";
@@ -21,6 +21,7 @@ import {
 const DetailOfProduction = ({ route, navigation }) => {
   const farmerId = route.params.farmerId;
   const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const costFields = ["totalYield", "totalSaleValue", "surplus"];
 
@@ -90,6 +91,8 @@ const DetailOfProduction = ({ route, navigation }) => {
     };
 
     try {
+      setLoading(true);
+
       // Log submission data to check correctness
       console.log("Submission Data:", JSON.stringify(submissionData, null, 2));
 
@@ -97,11 +100,19 @@ const DetailOfProduction = ({ route, navigation }) => {
       const response = await addProductionDetails(farmerId, submissionData);
       console.log("addProCostPost-resp", response);
       console.log("addProCostPost-resp", response.message);
-      Alert.alert(response.message);
-      navigation.navigate('Home');
+      setLoading(false);
+      Alert.alert("Success Message", `${response.message}.`, [
+        {
+          text: "Ok",
+          onPress: navigation.navigate("Home"),
+          style: "default",
+        },
+      ]);
     } catch (error) {
       console.Log("addProCostPost-err", error.response);
       Alert.alert("error adding production ");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -110,9 +121,13 @@ const DetailOfProduction = ({ route, navigation }) => {
   }, []);
 
   if (!data) {
-    return <SafeAreaView>
-      <ActivityIndicator size={50} style={styles.activity}/>
-    </SafeAreaView>; // Loading state
+    return (
+      <SafeAreaView
+        style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+      >
+        <ActivityIndicator size={50} style={styles.activity} />
+      </SafeAreaView>
+    ); // Loading state
   }
 
   return (
@@ -195,7 +210,9 @@ const DetailOfProduction = ({ route, navigation }) => {
                             {costField
                               .replace(/([a-z])([A-Z])/g, "$1 $2")
                               .toUpperCase()}{" "}
-                           <Text style={{fontSize: 12, fontWeight:'bold'}}>(Rs.)</Text>
+                            <Text style={{ fontSize: 12, fontWeight: "bold" }}>
+                              (Rs.)
+                            </Text>
                           </Text>
                           <TextInput
                             style={styles.input}
@@ -208,7 +225,7 @@ const DetailOfProduction = ({ route, navigation }) => {
                                 cropIndex,
                                 costField,
                                 value
-                              ) 
+                              )
                             }
                           />
                         </View>
@@ -227,12 +244,22 @@ const DetailOfProduction = ({ route, navigation }) => {
 
           {/* Submit Button */}
           <View style={styles.btnContainer}>
-            <TouchableOpacity style={submitBtn} onPress={handleSubmit}>
+            <TouchableOpacity
+              style={submitBtn}
+              onPress={handleSubmit}
+              disabled={loading}
+            >
               <Text style={styles.inpText}>Submit</Text>
             </TouchableOpacity>
           </View>
         </View>
       </ScrollView>
+        {loading && (
+          <View style={styles.loaderOverlay}>
+            <ActivityIndicator size={50} color={"#ffffff"} />
+            <Text style={[styles.inpText, { fontSize: 14 }]}>processing...</Text>
+          </View>
+        )}
     </SafeAreaView>
   );
 };
@@ -299,9 +326,16 @@ const styles = StyleSheet.create({
     color: "#4CAF50",
     marginTop: 10,
   },
-  activity:{
-    flex:1,
-    justifyContent:'center',
-    alignItems:'center'
-  }
+  activity: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  loaderOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
+    zIndex: 999,
+  },
 });

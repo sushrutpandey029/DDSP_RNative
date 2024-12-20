@@ -57,69 +57,62 @@ const FarmerList = () => {
     getFarmerList();
   }, []);
 
-  // useFocusEffect(
-  //   React.useCallback(() => {
-  //     getFarmerList();
-  //   })
-  // );
-
-
-  
-  
-
   if (farmerDetails.length < 1) {
     return (
-      <SafeAreaView style={styles.loadingContainer}>
+      <View style={styles.loadingContainer}>
         <ActivityIndicator size={50} style={{ marginTop: "50%" }} />
-      </SafeAreaView>
+      </View>
     );
   }
 
   return (
-    <ScrollView>
-      {farmerDetails.map((item) => (
-        <View style={styles.container} key={item.id}>
-          <TouchableOpacity onPress={() => openModal(item.id,item.farmerID)}>
-            <Text style={styles.txtName}>{item.name}</Text>
-            <Text style={styles.txtEmail}>{item.emailID}</Text>
-            <Text style={styles.txtId}>{item.farmerID}</Text>
-          </TouchableOpacity>
-        </View>
-      ))}
-      <Modal
-        transparent={true}
-        visible={modalVisible}
-        animationType="slide"
-        onRequestClose={closeModal}
-      >
-        <View style={styles.centerdView}>
-          <View style={styles.modalView}>
-            <TouchableOpacity onPress={() => handlePress("CropDetail")}>
-              <Text style={styles.txt}> Crop Detail</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity onPress={() => handlePress("FarmerDetail")}>
-              <Text style={styles.txt}>Farmer Detail</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              onPress={() => handlePress("DetailOfCultivation")}
-            >
-              <Text style={styles.txt}> Add Cultivation</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity onPress={() => handlePress("DetailOfProduction")}>
-              <Text style={styles.txt}>Add Production</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity onPress={closeModal} style={styles.closeButton}>
-              <Text style={[styles.txt, { color: "red" }]}>Close</Text>
+    <View style={{marginBottom:20}}>
+      <ScrollView>
+        {farmerDetails.map((item) => (
+          <View style={styles.container} key={item.id}>
+            <TouchableOpacity onPress={() => openModal(item.id, item.farmerID)}>
+              <Text style={styles.txtName}>{item.name}</Text>
+              <Text style={styles.txtEmail}>{item.emailID}</Text>
+              <Text style={styles.txtId}>{item.farmerID}</Text>
             </TouchableOpacity>
           </View>
-        </View>
-      </Modal>
-      
-    </ScrollView>
+        ))}
+        <Modal
+          transparent={true}
+          visible={modalVisible}
+          animationType="slide"
+          onRequestClose={closeModal}
+        >
+          <View style={styles.centerdView}>
+            <View style={styles.modalView}>
+              <TouchableOpacity onPress={() => handlePress("CropDetail")}>
+                <Text style={styles.txt}> Crop Detail</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity onPress={() => handlePress("FarmerDetail")}>
+                <Text style={styles.txt}>Farmer Detail</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={() => handlePress("DetailOfCultivation")}
+              >
+                <Text style={styles.txt}> Add Cultivation</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={() => handlePress("DetailOfProduction")}
+              >
+                <Text style={styles.txt}>Add Production</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity onPress={closeModal} style={styles.closeButton}>
+                <Text style={[styles.txt, { color: "red" }]}>Close</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+      </ScrollView>
+    </View>
   );
 };
 

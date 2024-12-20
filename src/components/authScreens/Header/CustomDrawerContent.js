@@ -17,7 +17,7 @@ const CustomDrawerContent = (props) => {
   // console.log('user',user);
   const handleLogout = async () => {
     const result = dispatch(logoutUser());
-    if (result.meta.requestStatus === "fullfilled") {
+    if (result.meta?.requestStatus === "fullfilled") {
       navigation.navigate("Logo");
     }
   };

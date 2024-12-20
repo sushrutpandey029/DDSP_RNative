@@ -210,7 +210,7 @@ const ProfilePage = ({ navigation }) => {
           </View> */}
           <View style={styles.btnContainer}>
             <TouchableOpacity style={submitBtn} onPress={handleSumbit}>
-              <Text style={styles.inpText}>Submit</Text>
+              <Text style={styles.inpText}>Update</Text>
             </TouchableOpacity>
           </View>
         </View>

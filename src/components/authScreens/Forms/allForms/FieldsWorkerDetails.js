@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   Modal,
   Alert,
+  ActivityIndicator,
 } from "react-native";
 import React, { useState } from "react";
 import { submitBtn } from "../../../../globals/style";
@@ -24,8 +25,11 @@ import { villageItems } from "../data/Constant";
 const FieldsWorkerDetails = ({ navigation }) => {
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth.user);
+  const { farmerList } = useSelector((state) => state.farmer);
 
   console.log("FWorkDetls", user.id);
+
+  console.log("farmerList", farmerList);
 
   const [open, setOpen] = useState(false);
   const [date, setDate] = useState(new Date());
@@ -40,11 +44,18 @@ const FieldsWorkerDetails = ({ navigation }) => {
   const [farmersInTraining, setFarmersInTraining] = useState("");
   const [consultancyTelephone, setConsultancyTelephone] = useState("");
   const [consultancyWhatsApp, setConsultancyWhatsApp] = useState("");
+  const [observationinbrif, setobservationinbrif] = useState("");
 
   const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
+
+  const filterFarmerName = farmerList?.data.map((farmer) => ({
+    label: farmer.name.trim(),
+    value: farmer.name.trim(),
+  }));
 
   const [inputSupplied, setInputSupplied] = useState([
-    { name: "", quantity: "" },
+    { farmerName: "", name: "", quantity: "" },
   ]);
 
   const [ownLandCultivatedItems] = useState([
@@ -58,11 +69,10 @@ const FieldsWorkerDetails = ({ navigation }) => {
     const day = selectedDate.getDate().toString().padStart(2, "0");
     const month = (selectedDate.getMonth() + 1).toString().padStart(2, "0");
     const year = selectedDate.getFullYear();
-    // return `${day}-${month}-${year}`;
     return `${year}-${month}-${day}`;
   };
 
-  const handleDateChange =async (selectedDate) => {
+  const handleDateChange = async (selectedDate) => {
     if (selectedDate) {
       const dateObj = new Date(selectedDate); // Ensure it's a Date object
       if (!isNaN(dateObj)) {
@@ -73,7 +83,10 @@ const FieldsWorkerDetails = ({ navigation }) => {
   };
 
   const handleAddInputSupplied = () => {
-    setInputSupplied([...inputSupplied, { name: "", quantity: "" }]);
+    setInputSupplied([
+      ...inputSupplied,
+      { farmerName: "", name: "", quantity: "" },
+    ]);
   };
 
   const handleRemoveInputSupplied = (index) => {
@@ -128,6 +141,7 @@ const FieldsWorkerDetails = ({ navigation }) => {
   const handleSubmit = async () => {
     console.log("validateErrors", validateFields());
     console.log("errors-resp", errors);
+
     if (validateFields()) {
       const requestData = {
         userid: user.id,
@@ -149,18 +163,32 @@ const FieldsWorkerDetails = ({ navigation }) => {
         inputSupplied,
         consultancyTelephone: parseInt(consultancyTelephone),
         consultancyWhatsApp: parseInt(consultancyWhatsApp),
+        observationinbrif: observationinbrif,
       };
 
-      console.log("requested-data", requestData);
+      console.log("requested-data",JSON.stringify(requestData,null,2) );
+      // console.log(
+      //   "requested-data-addform-inputsupplied",
+      //   JSON.stringify(requestData.inputSupplied, null, 2)
+      // );
 
       try {
+        setLoading(true);
+
         const response = await addFieldOfficerWorkDetail(user.id, requestData);
-        console.log("fldWrkDetls-Submitted response:", response);
-        Alert.alert("Data submitted successfully");
-        navigation.navigate('Home')
+        console.log("fldWrkDetls-Submitted response:",JSON.stringify(response,null,2) );
+        Alert.alert("Success Message", "Data submitted successfully.", [
+          {
+            text: "Ok",
+            onPress: () => navigation.navigate("Home"),
+            style: "default",
+          },
+        ]);
       } catch (error) {
         console.log("fldWrkDetls-Error submitting form:", error.response.data);
         Alert.alert(error.response.data.message);
+      } finally {
+        setLoading(false);
       }
     }
   };
@@ -264,19 +292,19 @@ const FieldsWorkerDetails = ({ navigation }) => {
 
           <View style={styles.field}>
             <Text style={styles.label}>Visited village name</Text>
-            <Dropdown 
+            <Dropdown
               data={villageItems}
-              labelField={'label'}
-              valueField={'value'}
+              labelField={"label"}
+              valueField={"value"}
               value={villagesVisited}
               onChange={(item) => setVillagesVisited(item.value)}
               style={styles.input}
               renderLeftIcon={() => (
-                <AntDesign 
-                name="Safety"
-                style={styles.icon}
-                size={20}
-                color={'black'}
+                <AntDesign
+                  name="Safety"
+                  style={styles.icon}
+                  size={20}
+                  color={"black"}
                 />
               )}
             />
@@ -445,6 +473,15 @@ const FieldsWorkerDetails = ({ navigation }) => {
           </View>
 
           <View style={styles.field}>
+            <Text style={styles.label}>Observations in brief</Text>
+            <TextInput
+              style={styles.textarea}
+              value={observationinbrif}
+              onChangeText={setobservationinbrif}
+            />
+          </View>
+
+          <View style={styles.field}>
             <Text style={[styles.label, { fontFamily: "Poppins-SemiBold" }]}>
               Input supplied to farmers
             </Text>
@@ -453,8 +490,34 @@ const FieldsWorkerDetails = ({ navigation }) => {
                 <View style={{ alignSelf: "flex-end" }}>
                   <Text>Entry {index + 1}</Text>
                 </View>
+
                 <View>
-                  <Text style={styles.label}>Name</Text>
+                  <Text style={styles.label}>Farmer Name</Text>
+                  <Dropdown
+                    data={filterFarmerName}
+                    labelField={"label"}
+                    value={item.farmerName}
+                    valueField={"value"}
+                    onChange={(item) =>
+                      handleInputSuppliedChange(index, "farmerName", item.value)
+                    }
+                    style={styles.input}
+                    placeholderStyle={styles.placeholderStyle}
+                    iconStyle={styles.iconStyle}
+                    selectedTextStyle={styles.selectedTextStyle}
+                    renderLeftIcon={() => (
+                      <AntDesign
+                        name="Safety"
+                        size={20}
+                        color={"#000"}
+                        style={styles.icon}
+                      />
+                    )}
+                  />
+                </View>
+
+                <View>
+                  <Text style={styles.label}>Input Supplied Name</Text>
                   <TextInput
                     style={[styles.input]}
                     // placeholder="Input Name"
@@ -499,12 +562,22 @@ const FieldsWorkerDetails = ({ navigation }) => {
           </View>
 
           <View style={styles.btnContainer}>
-            <TouchableOpacity style={submitBtn} onPress={handleSubmit}>
+            <TouchableOpacity
+              style={submitBtn}
+              onPress={handleSubmit}
+              disabled={loading}
+            >
               <Text style={styles.inpText}>Submit</Text>
             </TouchableOpacity>
           </View>
         </View>
       </ScrollView>
+      {loading && (
+        <View style={styles.loaderOverlay}>
+          <ActivityIndicator size={70} color={"#ffffff"} />
+          <Text style={[styles.inpText, {fontSize:14}]}>processing...</Text>
+        </View>
+      )}
     </SafeAreaView>
   );
 };
@@ -627,8 +700,6 @@ const styles = StyleSheet.create({
   closeButton: {
     marginTop: 6,
     padding: 10,
-    // backgroundColor: "#ddd",
-    // borderRadius: 10,
   },
   monthStyle: {
     backgroundColor: "#cde1e3",
@@ -661,5 +732,22 @@ const styles = StyleSheet.create({
   },
   icon: {
     marginRight: 5,
+  },
+  textarea: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 10,
+    padding: 10,
+    marginBottom: 10,
+    height: 150,
+    textAlignVertical: "top",
+    fontSize: 14,
+  },
+  loaderOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
+    zIndex: 999,
   },
 });

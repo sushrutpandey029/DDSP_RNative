@@ -30,6 +30,8 @@ const FarmerDetail = ({ route, navigation }) => {
 
   const id = route.params.farmerId;
   const [farmerData, setFarmerData] = useState([]);
+  const [loading, setLoading] = useState(false);
+
   console.log("farmer-name", farmerData.name);
   console.log("farmer-id", id);
 
@@ -285,6 +287,7 @@ const FarmerDetail = ({ route, navigation }) => {
   const handleSubmit = async () => {
     if (validateFields()) {
       try {
+        setLoading(true)
         const payload = prepareApiPayload();
 
         console.log(
@@ -294,11 +297,22 @@ const FarmerDetail = ({ route, navigation }) => {
 
         const response = await updateFarmerDetailsById(id, payload);
         console.log("udateFarmer-resp", JSON.stringify(response, null, 2));
-        Alert.alert("Success",response.message);
-        navigation.navigate("Home");
+        setLoading(false)
+        Alert.alert("Success Message",`${response.message}.`,
+          [
+            {
+              text : "Ok",
+              onPress : () => navigation.navigate("Home"),
+              style:"default"
+            }
+          ]
+        );
+        // navigation.navigate("Home");
       } catch (error) {
         console.log("udateFarmer-resp-err", error.response.data);
         Alert.alert("Error adding farmer information");
+      }finally {
+        setLoading(false)
       }
     }
   };
@@ -834,13 +848,19 @@ const FarmerDetail = ({ route, navigation }) => {
             {/* //ending crops sown fields */}
 
             <View style={styles.btnContainer}>
-              <TouchableOpacity style={submitBtn} onPress={handleCropSelection}>
+              <TouchableOpacity style={submitBtn} onPress={handleCropSelection} disabled={loading}>
                 <Text style={styles.inpText}>Update</Text>
               </TouchableOpacity>
             </View>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
+       {loading && (
+              <View style={styles.loaderOverlay}>
+                <ActivityIndicator size={50} color={"#ffffff"} />
+                <Text style={[styles.label, { fontSize: 14, color:"#fff" }]}>processing...</Text>
+              </View>
+            )}
     </SafeAreaView>
   );
 };
@@ -992,5 +1012,12 @@ const styles = StyleSheet.create({
     alignSelf: "flex-end",
     // borderBottomWidth: 1,
     margin: 2,
+  },
+  loaderOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
+    zIndex: 999,
   },
 });

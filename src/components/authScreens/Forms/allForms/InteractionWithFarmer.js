@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   Modal,
   Alert,
+  ActivityIndicator,
 } from "react-native";
 import FormHeader from "../FormHeader";
 import { globalContainer, submitBtn } from "../../../../globals/style";
@@ -21,14 +22,15 @@ import DatePicker from "react-native-ui-datepicker";
 
 const InteractionWithFarmer = ({ navigation }) => {
   const { user } = useSelector((state) => state.auth.user);
-  const {farmerList} = useSelector((state) => state.farmer);
- 
+  const { farmerList } = useSelector((state) => state.farmer);
+
   const [date, setDate] = useState(new Date());
   const [open, setOpen] = useState(false);
-  const [apiFarmerList, setApiFarmerList] = useState([]);
-    console.log('farmer-inter-form',farmerList)
+  const [loading, setLoading] = useState(false);
 
-  console.log("user-interact", user);
+  console.log("farmer-inter-form", farmerList);
+
+  // console.log("user-interact", user);
 
   const formatDate = (selectedDate) => {
     if (!selectedDate) return "";
@@ -47,7 +49,12 @@ const InteractionWithFarmer = ({ navigation }) => {
     observationInBrief: "",
   });
 
-   const handleChange = async (name, value) => {
+  const filterFarmerName = farmerList?.data.map((farmer) => ({
+    label: farmer.name.trim(),
+    value: farmer.name.trim(),
+  }));
+
+  const handleChange = async (name, value) => {
     setPayload((prev) => ({
       ...prev,
       [name]: value,
@@ -64,22 +71,31 @@ const InteractionWithFarmer = ({ navigation }) => {
     }
   };
 
-
   const handleSubmit = async () => {
+    console.log("payload", payload);
     try {
+      setLoading(true);
+
       const response = await addInteraction(payload);
       console.log("addinteraction-resp", response);
       if (response.success) {
-        Alert.alert("Success Message", response.message);
-        navigation.navigate("Home");
+        setLoading(false);
+        Alert.alert("Success Message", `${response.message}.`, [
+          {
+            text: "Ok",
+            onPress: () => navigation.navigate("Home"),
+            style: "default",
+          },
+        ]);
+        // navigation.navigate("Home");
       }
     } catch (err) {
-      console.log("addinteraction-err", err.response);
-      Alert.alert("Error Message", err.response.message);
+      console.log("addinteraction-err", err.response.data);
+      Alert.alert("Error Message", err.response.data.message);
+    } finally {
+      setLoading(false);
     }
   };
-
-
 
   return (
     <SafeAreaView style={globalContainer}>
@@ -137,6 +153,7 @@ const InteractionWithFarmer = ({ navigation }) => {
           <View>
             <Text style={styles.label}>Village</Text>
             <Dropdown
+              mode="modal"
               data={villageItems}
               labelField={"label"}
               valueField={"value"}
@@ -162,11 +179,14 @@ const InteractionWithFarmer = ({ navigation }) => {
             <Text style={styles.label}>Farmer</Text>
             {/* <TextInput style={styles.input} /> */}
             <Dropdown
+            mode="modal"
               style={styles.input}
-              data={apiFarmerList.map((farmer) => ({
-                label: farmer.name,
-                value: farmer.name,
-              }))}
+              // data={filterFarmerName.map((farmer) => ({
+              //   label: farmer,
+              //   value: farmer,
+              // }))}
+
+              data={filterFarmerName}
               labelField={"label"}
               valueField={"value"}
               value={payload.farmer}
@@ -199,12 +219,24 @@ const InteractionWithFarmer = ({ navigation }) => {
           </View>
 
           <View style={styles.btnContainer}>
-            <TouchableOpacity onPress={handleSubmit} style={submitBtn}>
+            <TouchableOpacity
+              onPress={handleSubmit}
+              style={submitBtn}
+              disabled={loading}
+            >
               <Text style={styles.btnText}>Submit</Text>
             </TouchableOpacity>
           </View>
         </View>
       </ScrollView>
+      {loading && (
+        <View style={styles.loaderOverlay}>
+          <ActivityIndicator size={50} color={"#ffffff"} />
+          <Text style={[styles.label, { fontSize: 14, color: "#fff" }]}>
+            processing...
+          </Text>
+        </View>
+      )}
     </SafeAreaView>
   );
 };
@@ -287,5 +319,12 @@ const styles = StyleSheet.create({
   closeButton: {
     marginTop: 6,
     padding: 10,
+  },
+  loaderOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
+    zIndex: 999,
   },
 });

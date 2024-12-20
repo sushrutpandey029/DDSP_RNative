@@ -1,4 +1,4 @@
-export const BaseUrl = "https://d3d7-106-219-165-80.ngrok-free.app";
+export const BaseUrl = "https://5761-2401-4900-8559-9f0c-9d79-528d-3e06-535d.ngrok-free.app";
 // export const BaseUrl = "https://ddsp-backend.onrender.com";
 
 
@@ -26,3 +26,5 @@ export const addUserLocationApi = "api/user/adduserlocation";
 export const deleteLocationByIdApi = "api/user/locationdeletebyid";
 export const addInteractionApi= "api/user/addInteraction";
 export const getFarmerListByUserIdApi = "api/user/farmerlistbyuserid";
+export const getAllFieldOfficerApi = "api/user/allfieldofficer";
+export const getAllAsstPCApi = "api/user/allasstpc";

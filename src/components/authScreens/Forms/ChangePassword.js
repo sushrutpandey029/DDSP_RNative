@@ -5,7 +5,8 @@ import {
   TextInput,
   StyleSheet,
   TouchableOpacity,
-  Alert
+  Alert,
+  ActivityIndicator
 } from "react-native";
 import React, { useState } from "react";
 import FormHeader from "./FormHeader";
@@ -13,10 +14,12 @@ import { globalContainer, submitBtn } from "../../../globals/style";
 import { changePassword } from "../../services/ApiFile";
 import { useDispatch, useSelector } from "react-redux";
 
-const ChangePassword = () => {
+const ChangePassword = ({ navigation }) => {
   const dispatch = useDispatch();
+
   const { user } = useSelector((state) => state.auth.user);
   const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
 
   const [formData, setFormData] = useState({
     oldpassword: "",
@@ -50,12 +53,23 @@ const ChangePassword = () => {
 
     if (validateFields()) {
       try {
+        setLoading(true);
+
         const response = await changePassword(user.id, formData);
         console.log("changPswd-resp", response);
-        Alert.alert(response.message);
+        setLoading(false);
+        Alert.alert("Success Message", `${response.message}.`, [
+          {
+            text: "Ok",
+            onPress: () => navigation.navigate("Home"),
+            style: "default",
+          },
+        ]);
       } catch (error) {
         console.log("changPswd-err", error.response.data.errormessage);
-        Alert.alert(error.response.data.errormessage)
+        Alert.alert("Error Message", error.response.data.errormessage);
+      } finally {
+        setLoading(false);
       }
     }
   };
@@ -104,11 +118,21 @@ const ChangePassword = () => {
         </View>
 
         <View style={styles.btnContainer}>
-          <TouchableOpacity style={submitBtn} onPress={handleSubmit}>
+          <TouchableOpacity
+            style={submitBtn}
+            onPress={handleSubmit}
+            disabled={loading}
+          >
             <Text style={styles.inpText}>Update</Text>
           </TouchableOpacity>
         </View>
       </View>
+      {loading && (
+        <View style={styles.loaderOverlay}>
+          <ActivityIndicator size={50} color={"#ffffff"} />
+          <Text style={[styles.inpText, { fontSize: 14 }]}>processing...</Text>
+        </View>
+      )}
     </SafeAreaView>
   );
 };
@@ -144,7 +168,13 @@ const styles = StyleSheet.create({
   },
   btnContainer: {
     alignItems: "center",
-    marginVertical : 40
+    marginVertical: 40,
+  },
+  loaderOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
+    zIndex: 999,
   },
 });
-

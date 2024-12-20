@@ -21,6 +21,7 @@ import {
 const DetailOfCultivation = ({ route, navigation }) => {
   const farmerId = route.params.farmerId || null;
   const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(false)
 
   const costFields = [
     "seedCost",
@@ -182,6 +183,8 @@ const DetailOfCultivation = ({ route, navigation }) => {
     };
 
     try {
+
+      setLoading(true);
       // Make API call with the constructed submission data
       const response = await addCultivationCostDetailsPost(
         farmerId,
@@ -190,11 +193,25 @@ const DetailOfCultivation = ({ route, navigation }) => {
 
       console.log("addCulCostPost-resp", response);
       if (response.success === true) {
-        Alert.alert(response.message);
-        navigation.navigate('Home');
+
+        setLoading(false);
+        Alert.alert("Success Message",`${response.message}.`, 
+          [
+            {
+              text: "Ok",
+              onPress: () => navigation.navigate('Home'),
+              style: "default"
+
+            }
+          ]
+        );
+        // Alert.alert(response.message);
+        // navigation.navigate('Home');
       }
     } catch (error) {
       console.warn("addCulCostPost-err", error);
+    } finally{
+      setLoading(false);
     }
 
     console.log("Submission Data:", JSON.stringify(submissionData, null, 2));
@@ -278,12 +295,18 @@ const DetailOfCultivation = ({ route, navigation }) => {
 
           {/* Submit Button */}
           <View style={styles.btnContainer}>
-            <TouchableOpacity style={submitBtn} onPress={handleSubmit}>
+            <TouchableOpacity style={submitBtn} onPress={handleSubmit} disabled={loading}>
               <Text style={styles.inpText}>Submit</Text>
             </TouchableOpacity>
           </View>
         </View>
       </ScrollView>
+       {loading && (
+              <View style={styles.loaderOverlay}>
+                <ActivityIndicator size={50} color={"#ffffff"} />
+                <Text style={[styles.inpText, { fontSize: 14 }]}>processing...</Text>
+              </View>
+            )}
     </SafeAreaView>
   );
 };
@@ -352,6 +375,13 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
+  },
+  loaderOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
+    zIndex: 999,
   },
 });
 

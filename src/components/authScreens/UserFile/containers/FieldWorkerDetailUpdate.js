@@ -9,24 +9,34 @@ import {
   TouchableOpacity,
   Modal,
   Alert,
+  ActivityIndicator,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import FormHeader from "../../Forms/FormHeader";
 import { globalContainer, submitBtn } from "../../../../globals/style";
-import { getWorkDetailById,updateWorkDetailsById } from "../../../services/ApiFile";
+import {
+  getWorkDetailById,
+  updateWorkDetailsById,
+} from "../../../services/ApiFile";
 import DatePicker from "react-native-ui-datepicker";
 import { useDispatch, useSelector } from "react-redux";
 import { Dropdown } from "react-native-element-dropdown";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { villageItems } from "../../Forms/data/Constant";
 
-const FieldWorkerDetailUpdate = ({ route }) => {
+const FieldWorkerDetailUpdate = ({ route, navigation }) => {
+
   const id = route.params.id;
-  console.log('fwdu-id',id)
+  console.log("fwdu-id", id);
 
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth.user);
+  const { farmerList } = useSelector((state) => state.farmer);
 
+  const filterFarmerName = farmerList?.data.map((farmer) => ({
+    label: farmer.name.trim(),
+    value: farmer.name.trim(),
+  }));
   console.log("FWorkDetls", user.id);
 
   const [open, setOpen] = useState(false);
@@ -42,12 +52,14 @@ const FieldWorkerDetailUpdate = ({ route }) => {
   const [farmersInTraining, setFarmersInTraining] = useState("");
   const [consultancyTelephone, setConsultancyTelephone] = useState("");
   const [consultancyWhatsApp, setConsultancyWhatsApp] = useState("");
+  const [observationinbrif, setobservationinbrif] = useState("");
 
   const [errors, setErrors] = useState({});
   const [apiWorkData, setApiWorkData] = useState([]);
+  const [loading, setLoading] = useState(false)
 
   const [inputSupplied, setInputSupplied] = useState([
-    { name: "", quantity: "" },
+    { farmerName: "", name: "", quantity: "" },
   ]);
 
   const [ownLandCultivatedItems] = useState([
@@ -76,7 +88,10 @@ const FieldWorkerDetailUpdate = ({ route }) => {
   };
 
   const handleAddInputSupplied = () => {
-    setInputSupplied([...inputSupplied, { name: "", quantity: "" }]);
+    setInputSupplied([
+      ...inputSupplied,
+      { farmerName: "", name: "", quantity: "" },
+    ]);
   };
 
   const handleRemoveInputSupplied = (index) => {
@@ -140,22 +155,44 @@ const FieldWorkerDetailUpdate = ({ route }) => {
         farmersContactedInGroupMeetings: parseInt(farmersInGroup),
         clusterTrainingPlace: trainingPlace,
         farmersAttendedTraining: parseInt(farmersInTraining),
-        inputSupplied: inputSupplied.filter((item) => item.name.trim() !== "" && item.quantity.trim() !== ""),
+        // inputSupplied,
+        inputSupplied: inputSupplied.filter(
+          (item) =>
+            item.farmerName.trim() !== "" &&
+            item.name.trim() !== "" &&
+            item.quantity.trim() !== ""
+        ),
         consultancyTelephone: parseInt(consultancyTelephone),
         consultancyWhatsApp: parseInt(consultancyWhatsApp),
-        totatotalConsultancy: parseInt(consultancyTelephone) + parseInt(consultancyWhatsApp)
+        totatotalConsultancy:
+          parseInt(consultancyTelephone) + parseInt(consultancyWhatsApp),
+          observationinbrif:observationinbrif
       };
 
       console.log("requested-data", requestData);
+      console.log(
+        "requested-data-updateform-inputsupplied",
+        JSON.stringify(requestData.inputSupplied, null, 2)
+      );
 
       try {
+
+        setLoading(true);
+
         const response = await updateWorkDetailsById(id, requestData);
         console.log("updateWorkDetail-resp:", response);
-        Alert.alert("Data submitted successfully");
-        // navigation.navigate("Home");
+        Alert.alert("Success Message", "Data updated successfully", [
+          {
+            text: "Ok",
+            onPress: () => navigation.navigate("Home"),
+            style: "default",
+          },
+        ]);
       } catch (error) {
         console.log("updateWorkDetail-resp-err:", error.response.data);
         Alert.alert(error.response.data.message);
+      } finally{
+        setLoading(false);
       }
     }
   };
@@ -163,11 +200,10 @@ const FieldWorkerDetailUpdate = ({ route }) => {
   const getWorkDetail = async () => {
     try {
       const response = await getWorkDetailById(id);
-      if(response.success === true) {
+      if (response.success === true) {
         console.log("getWorkDetail-resp", JSON.stringify(response, null, 2));
         setApiWorkData(response.data);
       }
-      
     } catch (error) {
       console.log("getWorkDetail-err", error);
     }
@@ -178,41 +214,49 @@ const FieldWorkerDetailUpdate = ({ route }) => {
   }, []);
 
   useEffect(() => {
-    if(apiWorkData) {
+    if (apiWorkData) {
       setOwnLandCultivated(apiWorkData.ownLandCultivatedUnderNaturalFarming);
       setClusterID(apiWorkData.clusterID);
       setVillagesVisited(apiWorkData.villagesVisited);
       setTravelInKms(apiWorkData.travelInKms?.toString());
       setFarmersContacted(apiWorkData.farmersContactedIndividually?.toString());
       setGroupMeetings(apiWorkData.groupMeetingsConducted?.toString());
-      setFarmersInGroup(apiWorkData.farmersContactedInGroupMeetings?.toString());
+      setFarmersInGroup(
+        apiWorkData.farmersContactedInGroupMeetings?.toString()
+      );
       setTrainingPlace(apiWorkData.clusterTrainingPlace);
       setFarmersInTraining(apiWorkData.farmersAttendedTraining?.toString());
       setConsultancyTelephone(apiWorkData.consultancyTelephone?.toString());
       setConsultancyWhatsApp(apiWorkData.consultancyWhatsApp?.toString());
+      setobservationinbrif(apiWorkData.observationinbrif)
       // setDate(apiWorkData.workDate)
       if (apiWorkData.inputSupplied) {
         try {
-          const parsedInputSupplied = JSON.parse(apiWorkData.inputSupplied);
+          // const parsedInputSupplied = JSON.parse(apiWorkData.inputSupplied);
+          const parsedInputSupplied = apiWorkData.inputSupplied;
+
           if (Array.isArray(parsedInputSupplied)) {
             setInputSupplied(
               parsedInputSupplied.map((item) => ({
+                farmerName: item.farmerName || "",
                 name: item.name || "",
                 quantity: item.quantity || "",
               }))
             );
           } else {
-            setInputSupplied([{ name: "", quantity: "" }]); // Default to an empty entry if parsing fails
+            setInputSupplied([{ farmerName: "", name: "", quantity: "" }]); // Default to an empty entry if parsing fails
           }
         } catch (error) {
           console.error("Error parsing inputSupplied:", error);
-          setInputSupplied([{ name: "", quantity: "" }]); // Default fallback
+          setInputSupplied([{ farmerName: "", name: "", quantity: "" }]); // Default fallback
         }
       } else {
-        setInputSupplied([{ name: "", quantity: "" }]); // Default to one empty entry if no data
+        setInputSupplied([{ farmerName: "", name: "", quantity: "" }]); // Default to one empty entry if no data
       }
     }
-  },[apiWorkData])
+  }, [apiWorkData]);
+
+  console.log("input-supplied-forworkerdetailsupdate", inputSupplied);
 
   return (
     <SafeAreaView style={globalContainer}>
@@ -489,6 +533,15 @@ const FieldWorkerDetailUpdate = ({ route }) => {
           </View>
 
           <View style={styles.field}>
+            <Text style={styles.label}>Observations in brief</Text>
+            <TextInput
+              style={styles.textarea}
+              value={observationinbrif}
+              onChangeText={setobservationinbrif}
+            />
+          </View>
+
+          <View style={styles.field}>
             <Text style={[styles.label, { fontFamily: "Poppins-SemiBold" }]}>
               Input supplied to farmers
             </Text>
@@ -497,8 +550,34 @@ const FieldWorkerDetailUpdate = ({ route }) => {
                 <View style={{ alignSelf: "flex-end" }}>
                   <Text>Entry {index + 1}</Text>
                 </View>
+
                 <View>
-                  <Text style={styles.label}>Name</Text>
+                  <Text style={styles.label}>Farmer Name</Text>
+                  <Dropdown
+                    data={filterFarmerName}
+                    labelField={"label"}
+                    valueField={"value"}
+                    value={item.farmerName}
+                    onChange={(item) =>
+                      handleInputSuppliedChange(index, "farmerName", item.value)
+                    }
+                    style={styles.input}
+                    placeholderStyle={styles.placeholderStyle}
+                    iconStyle={styles.iconStyle}
+                    selectedTextStyle={styles.selectedTextStyle}
+                    renderLeftIcon={() => (
+                      <AntDesign
+                        name="Safety"
+                        size={20}
+                        color={"#000"}
+                        style={styles.icon}
+                      />
+                    )}
+                  />
+                </View>
+
+                <View>
+                  <Text style={styles.label}>Input Supplied Name</Text>
                   <TextInput
                     style={[styles.input]}
                     // placeholder="Input Name"
@@ -549,6 +628,12 @@ const FieldWorkerDetailUpdate = ({ route }) => {
           </View>
         </View>
       </ScrollView>
+      {loading && (
+        <View style={styles.loaderOverlay}>
+          <ActivityIndicator size={50} color={"#ffffff"}/>
+          <Text style={[styles.inpText, {fontSize: 14}]}>processing...</Text>
+        </View>
+      )}
     </SafeAreaView>
   );
 };
@@ -705,5 +790,22 @@ const styles = StyleSheet.create({
   },
   icon: {
     marginRight: 5,
+  },
+  textarea: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 10,
+    padding: 10,
+    marginBottom: 10,
+    height: 150,
+    textAlignVertical: "top",
+    fontSize: 14,
+  },
+  loaderOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
+    zIndex: 999,
   },
 });

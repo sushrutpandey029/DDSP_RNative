@@ -23,7 +23,6 @@ const LocationFetcher = () => {
 
   const getLocation = async () => {
     try {
-      
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
         Alert.alert(
@@ -40,7 +39,7 @@ const LocationFetcher = () => {
       //     "Please enable location services to fetch your location."
       //   );
       //   return;
-      // }      
+      // }
 
       // fetch the current location
       const currentLocation = await Location.getCurrentPositionAsync({
@@ -81,7 +80,7 @@ const LocationFetcher = () => {
           "An unexpected error occurred while fetching your location."
         );
       }
-     }
+    }
   };
 
   const handleSubmitAttendance = async () => {
@@ -106,7 +105,7 @@ const LocationFetcher = () => {
       const response = await addUserLocation(payload);
       console.log("addlocation-resp", response);
       if (response.success) {
-        Alert.alert("Success", "Attendance marked successfully");
+        Alert.alert("Success", "Attendance marked successfully.");
       } else {
         Alert.alert("Failed", response.message || "Something went wrong.");
       }
@@ -122,26 +121,26 @@ const LocationFetcher = () => {
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity
-        onPress={getLocation}
-        disabled={isSubmitting}
-        style={[styles.button, isSubmitting && styles.disabledButton]}
-      >
-        <Text style={styles.buttonText}>
-          {isSubmitting ? "Processing..." : "Fetch Location"}
-        </Text>
-      </TouchableOpacity>
+         <TouchableOpacity
+          onPress={getLocation}
+          disabled={isSubmitting}
+          style={[styles.button, isSubmitting && styles.disabledButton]}
+        >
+          <Text style={styles.buttonText}>
+            {isSubmitting ? "Processing..." : "Fetch Location"}
+          </Text>
+        </TouchableOpacity>
 
-      <TouchableOpacity
-        onPress={handleSubmitAttendance}
-        disabled={isSubmitting}
-        style={[styles.button, isSubmitting && styles.disabledButton]}
-      >
-        <Text style={styles.buttonText}>
-          {isSubmitting ? "Processing..." : "Mark Attendance"}
-        </Text>
-      </TouchableOpacity>
-    </View>
+        <TouchableOpacity
+          onPress={handleSubmitAttendance}
+          disabled={isSubmitting}
+          style={[styles.button, isSubmitting && styles.disabledButton]}
+        >
+          <Text style={styles.buttonText}>
+            {isSubmitting ? "Processing..." : "Mark Attendance"}
+          </Text>
+        </TouchableOpacity>
+     </View>
   );
 };
 
@@ -152,27 +151,23 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    // paddingHorizontal: 16,
-   },
+     
+  },
   button: {
-    padding: 15, 
+    padding: 15,
     backgroundColor: "#e7eae1",
     borderRadius: 8,
     alignItems: "center",
     justifyContent: "center",
     width: "80%",
     marginVertical: 10,
-   },
+  },
   buttonText: {
     color: "#7b576d",
     fontWeight: "bold",
-    fontSize: 16,
-  },
-  locationContainer: {
-    marginTop: 10,
+    fontSize: 14,
   },
   disabledButton: {
     backgroundColor: "grey",
-    
   },
 });
