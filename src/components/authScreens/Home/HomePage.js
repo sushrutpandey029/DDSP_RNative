@@ -23,6 +23,7 @@ const HomePage = ({ navigation }) => {
   const [tabValue, setTabValue] = useState("home");
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth.user);
+  // console.log("user-details",user);
  
   useEffect(() => {
     dispatch(getFarmerById(user.id));

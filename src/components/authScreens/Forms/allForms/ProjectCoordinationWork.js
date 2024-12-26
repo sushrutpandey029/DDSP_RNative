@@ -128,7 +128,7 @@ const ProjectCoordinationWork = ({ navigation }) => {
 
       setLoading(true);
 
-      // const response = await addworkdetails(userDetails.id, formData);
+      const response = await addworkdetails(userDetails.id, formData);
 
       console.log("addWork-resp", response);
       setLoading(false);
