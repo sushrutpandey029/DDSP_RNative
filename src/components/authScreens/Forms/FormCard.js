@@ -6,11 +6,11 @@ const FormCard = (props) => {
   return (
     <View style={styles.container}>
      <View>
-        <Image source={mainImage} style={{height : 150, width : 150}}/>
+        <Image source={mainImage} style={{height : 180, width : 160}}/>
      </View>
      <View style={styles.txtContainer}>
         <Text style={styles.title}>{props.title}</Text>
-        <Text>Lorem ipsum dolor sit amet consectetur. Neque rhoncus venenatis eget  </Text>
+        <Text>{props.content}</Text>
      </View>
     </View>
   )

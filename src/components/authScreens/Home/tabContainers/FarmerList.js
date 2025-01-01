@@ -8,6 +8,7 @@ import {
   Button,
   ActivityIndicator,
   SafeAreaView,
+  RefreshControl
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { getFarmerDetails } from "../../../services/ApiFile";
@@ -20,6 +21,7 @@ const FarmerList = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [farmerId, setFarmerId] = useState("");
   const [fId, setFId] = useState("");
+  const [refreshing, setRefreshing] = useState(false);
 
   const navigation = useNavigation();
 
@@ -53,6 +55,12 @@ const FarmerList = () => {
     }
   };
 
+  const handleOnRefresh  = async() => {
+    setRefreshing(true);
+    await getFarmerList();
+    setRefreshing(false);
+  }
+
   useEffect(() => {
     getFarmerList();
   }, []);
@@ -66,8 +74,11 @@ const FarmerList = () => {
   }
 
   return (
-    <View style={{marginBottom:20}}>
-      <ScrollView>
+    <View >
+      <ScrollView
+      showsVerticalScrollIndicator={false}
+      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleOnRefresh}/>}
+      >
         {farmerDetails.map((item) => (
           <View style={styles.container} key={item.id}>
             <TouchableOpacity onPress={() => openModal(item.id, item.farmerID)}>

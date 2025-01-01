@@ -27,15 +27,15 @@ const FieldsWorkerDetails = ({ navigation }) => {
   const { user } = useSelector((state) => state.auth.user);
   const { farmerList } = useSelector((state) => state.farmer);
 
-  console.log("FWorkDetls", user.id);
+  console.log("FWorkDetls-user", user);
 
   console.log("farmerList", farmerList);
 
   const [open, setOpen] = useState(false);
   const [date, setDate] = useState(new Date());
   const [villagesVisited, setVillagesVisited] = useState("");
-  const [ownLandCultivated, setOwnLandCultivated] = useState("");
-  const [clusterID, setClusterID] = useState("");
+  const [ownLandCultivated, setOwnLandCultivated] = useState(user.cultivatedland);
+  const [clusterID, setClusterID] = useState(user.clusterid);
   const [travelInKms, setTravelInKms] = useState("");
   const [farmersContacted, setFarmersContacted] = useState("");
   const [groupMeetings, setGroupMeetings] = useState("");
@@ -103,35 +103,28 @@ const FieldsWorkerDetails = ({ navigation }) => {
   const validateFields = () => {
     let validateErrors = {};
 
-    if (!villagesVisited)
-      validateErrors.villagesVisited = "Village is required";
-    if (!ownLandCultivated)
-      validateErrors.ownLandCultivated = "Own Land Cultivated is required";
-    if (!clusterID) validateErrors.clusterID = "Cluster is required";
-    if (!travelInKms) validateErrors.travelInKms = "Distance is required";
-    if (!farmersContacted)
-      validateErrors.farmersContacted = "No. of farmers is required";
-    if (!groupMeetings)
-      validateErrors.groupMeetings = "Group meeting is required";
-    if (!farmersInGroup)
-      validateErrors.farmersInGroup = "Farmers in group is required";
-    if (!trainingPlace)
-      validateErrors.trainingPlace = "Training place is required";
-    if (!farmersInTraining)
-      validateErrors.farmersInTraining = "Farmers in training is required";
-    if (!consultancyTelephone)
-      validateErrors.consultancyTelephone = "Telephone is required";
-    if (!consultancyWhatsApp)
-      validateErrors.consultancyWhatsApp = "Whatsapp is required";
+    if (!date) validateErrors.date = "required";
 
-    // inputSupplied.forEach((input, index) => {
-    //   if (!input.name) {
-    //     validateErrors[`inputSuppliedName${index}`] = "Name is required";
-    //   }
-    //   if (!input.quantity) {
-    //     validateErrors[`inputSuppliedQuantity${index}`] = "Quantity is required";
-    //   }
-    // });
+    // if (!villagesVisited)
+    //   validateErrors.villagesVisited = "Village is required";
+    // if (!ownLandCultivated)
+    //   validateErrors.ownLandCultivated = "Own Land Cultivated is required";
+    // if (!clusterID) validateErrors.clusterID = "Cluster is required";
+    // if (!travelInKms) validateErrors.travelInKms = "Distance is required";
+    // if (!farmersContacted)
+    //   validateErrors.farmersContacted = "No. of farmers is required";
+    // if (!groupMeetings)
+    //   validateErrors.groupMeetings = "Group meeting is required";
+    // if (!farmersInGroup)
+    //   validateErrors.farmersInGroup = "Farmers in group is required";
+    // if (!trainingPlace)
+    //   validateErrors.trainingPlace = "Training place is required";
+    // if (!farmersInTraining)
+    //   validateErrors.farmersInTraining = "Farmers in training is required";
+    // if (!consultancyTelephone)
+    //   validateErrors.consultancyTelephone = "Telephone is required";
+    // if (!consultancyWhatsApp)
+    //   validateErrors.consultancyWhatsApp = "Whatsapp is required";
 
     setErrors(validateErrors);
 
@@ -146,12 +139,12 @@ const FieldsWorkerDetails = ({ navigation }) => {
       const requestData = {
         userid: user.id,
         name: user.fullname,
-        address: user.address,
+        address: user.village,
         qualifications: user.qualification,
         mobileNumber: user.phonenumber,
         emailID: user.emailid,
         ownLandCultivatedUnderNaturalFarming: ownLandCultivated,
-        clusterID,
+        clusterID : user.clusterid,
         workDate: formatDate(date),
         villagesVisited,
         travelInKms: parseInt(travelInKms),
@@ -166,7 +159,7 @@ const FieldsWorkerDetails = ({ navigation }) => {
         observationinbrif: observationinbrif,
       };
 
-      console.log("requested-data",JSON.stringify(requestData,null,2) );
+      console.log("requested-data", JSON.stringify(requestData, null, 2));
       // console.log(
       //   "requested-data-addform-inputsupplied",
       //   JSON.stringify(requestData.inputSupplied, null, 2)
@@ -176,7 +169,10 @@ const FieldsWorkerDetails = ({ navigation }) => {
         setLoading(true);
 
         const response = await addFieldOfficerWorkDetail(user.id, requestData);
-        console.log("fldWrkDetls-Submitted response:",JSON.stringify(response,null,2) );
+        console.log(
+          "fldWrkDetls-Submitted response:",
+          JSON.stringify(response, null, 2)
+        );
         Alert.alert("Success Message", "Data submitted successfully.", [
           {
             text: "Ok",
@@ -186,7 +182,7 @@ const FieldsWorkerDetails = ({ navigation }) => {
         ]);
       } catch (error) {
         console.log("fldWrkDetls-Error submitting form:", error.response.data);
-        Alert.alert(error.response.data.message);
+        Alert.alert("Error Message",error.response.data.message);
       } finally {
         setLoading(false);
       }
@@ -198,8 +194,8 @@ const FieldsWorkerDetails = ({ navigation }) => {
       <FormHeader title={"FIELDS WORKER DETAILS"} />
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.formContainer}>
-          <View style={styles.twoField}>
-            <View style={styles.inField}>
+          {/* <View > */}
+            <View >
               <Text style={styles.label}>Name</Text>
               <TextInput
                 style={styles.input}
@@ -207,15 +203,17 @@ const FieldsWorkerDetails = ({ navigation }) => {
                 editable={false}
               />
             </View>
-            <View style={styles.inField}>
-              <Text style={styles.label}>Address</Text>
+            <View style={styles.field}>
+              {/* village is associated with address in database or keyname */}
+              <Text style={styles.label}>Village Name</Text>
               <TextInput
                 style={styles.input}
-                value={user.address}
+                value={user.village}
                 editable={false}
               />
             </View>
-          </View>
+          {/* </View> */}
+
           <View style={styles.field}>
             <Text style={styles.label}>Email id</Text>
             <TextInput
@@ -247,7 +245,14 @@ const FieldsWorkerDetails = ({ navigation }) => {
             <Text style={styles.label}>
               Land cultivated under Natural Farming ?
             </Text>
-            <Dropdown
+            <TextInput 
+            style={styles.input}
+            value={ownLandCultivated}
+            // onChangeText={setClusterID}
+            editable={false}
+            />
+            {/* <Dropdown
+              mode="modal"
               data={ownLandCultivatedItems}
               labelField={"label"}
               valueField={"value"}
@@ -263,7 +268,7 @@ const FieldsWorkerDetails = ({ navigation }) => {
                   color={"black"}
                 />
               )}
-            />
+            /> */}
 
             {errors.ownLandCultivated && (
               <Text style={{ color: "red" }}>{errors.ownLandCultivated}</Text>
@@ -274,7 +279,8 @@ const FieldsWorkerDetails = ({ navigation }) => {
             <TextInput
               style={styles.input}
               value={clusterID}
-              onChangeText={setClusterID}
+              // onChangeText={setClusterID}
+              editable={false}
             />
             {errors.clusterID && (
               <Text style={{ color: "red" }}>{errors.clusterID}</Text>
@@ -293,6 +299,7 @@ const FieldsWorkerDetails = ({ navigation }) => {
           <View style={styles.field}>
             <Text style={styles.label}>Visited village name</Text>
             <Dropdown
+              mode="modal"
               data={villageItems}
               labelField={"label"}
               valueField={"value"}
@@ -325,6 +332,7 @@ const FieldsWorkerDetails = ({ navigation }) => {
             >
               <Text>{date ? formatDate(date) : "Select a date"}</Text>
             </TouchableOpacity>
+            {errors.date && <Text style={{ color: "red" }}>{errors.date}</Text>}
           </View>
 
           {/* // calendra modal */}
@@ -494,6 +502,7 @@ const FieldsWorkerDetails = ({ navigation }) => {
                 <View>
                   <Text style={styles.label}>Farmer Name</Text>
                   <Dropdown
+                    mode="modal"
                     data={filterFarmerName}
                     labelField={"label"}
                     value={item.farmerName}
@@ -528,12 +537,12 @@ const FieldsWorkerDetails = ({ navigation }) => {
                   />
                 </View>
                 <View>
+                  {/* quantity is changed into price */}
                   <Text style={styles.label}>
                     Quantity <Text style={{ fontSize: 12 }}>(L)</Text>
                   </Text>
                   <TextInput
                     style={[styles.input]}
-                    // placeholder="Quantity"
                     value={item.quantity}
                     onChangeText={(value) =>
                       handleInputSuppliedChange(index, "quantity", value)
@@ -575,7 +584,7 @@ const FieldsWorkerDetails = ({ navigation }) => {
       {loading && (
         <View style={styles.loaderOverlay}>
           <ActivityIndicator size={70} color={"#ffffff"} />
-          <Text style={[styles.inpText, {fontSize:14}]}>processing...</Text>
+          <Text style={[styles.inpText, { fontSize: 14 }]}>processing...</Text>
         </View>
       )}
     </SafeAreaView>

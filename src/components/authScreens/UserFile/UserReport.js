@@ -30,7 +30,7 @@ const UserReport = ({ navigation }) => {
 
       if (response.success === true) {
         setApiWorkData(response.data);
-        // console.log("workdetailResponse", JSON.stringify(response, null, 2));
+        console.log("workdetailResponse", response);
       }
     } catch (error) {
       console.error("workdetail-err", error.response);

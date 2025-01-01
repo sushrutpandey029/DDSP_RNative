@@ -16,14 +16,15 @@ const FormTab = () => {
             >
               <FormContentHome
                 title="Farmer Information"
-                content="Lorem ipsum dolor sit amet consectetur. Massa vestibulum neque integer nunc massa vitae duis."
+                content="Details of individual farmer participating in the project and the crops cultivated by him under Natural Farming and also under chemical farming, if any.
+"
               />
             </TouchableOpacity>
 
             <TouchableOpacity onPress={() => navigation.navigate("FieldWork")}>
               <FormContentHome
                 title="Field Worker Details"
-                content="Lorem ipsum dolor sit amet consectetur. Massa vestibulum neque integer nunc massa vitae duis."
+                content="Details of individual  Field worker and the tasks planned and/or performed by him."
               />
             </TouchableOpacity>
 

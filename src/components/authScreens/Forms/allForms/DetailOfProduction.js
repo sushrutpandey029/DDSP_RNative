@@ -22,6 +22,7 @@ const DetailOfProduction = ({ route, navigation }) => {
   const farmerId = route.params.farmerId;
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState({});
 
   const costFields = ["totalYield", "totalSaleValue", "surplus"];
 
@@ -43,7 +44,7 @@ const DetailOfProduction = ({ route, navigation }) => {
             cropName: crop.crop, // Use the crop name from the response
             cropLand: crop.cropLand, // Include the cropLand if needed
             costs: costFields.reduce((acc, field) => {
-              acc[field] = "0"; // Initialize each cost field with "0"
+              acc[field] = null; // Initialize each cost field with "0"
               return acc;
             }, {}),
             totalCost: 0, // Initialize total cost
@@ -72,7 +73,41 @@ const DetailOfProduction = ({ route, navigation }) => {
     setData(updatedData);
   };
 
+  const validateFields = () => {
+    const errors = {};
+
+    Object.entries(data.crops).forEach(([season, categories]) => {
+      Object.entries(categories).forEach(([category, crops]) => {
+        crops.forEach((crop, cropIndex) => {
+          costFields.forEach((costField) => {
+            const value = crop.costs[costField]?.toString();
+            if (!value || isNaN(parseFloat(value)) || parseFloat(value) < 0) {
+              errors[
+                `${season}-${category}-${cropIndex}-${costField}`
+              ] = `required`;
+              // `${costField} must be a valid number and not empty.`;
+            }
+          });
+        });
+      });
+    });
+
+    return errors;
+  };
+
+  const handleValidation = () => {
+    const validationErrors = validateFields();
+    setErrors(validationErrors);
+    return Object.keys(validationErrors).length === 0;
+  };
+
   const handleSubmit = async () => {
+
+    if (!handleValidation()) {
+      Alert.alert("Validation Error", "Please correct the highlighted fields.");
+      return;
+    }
+
     const submissionData = {
       farmerID: data.farmerID,
       cropName: Object.entries(data.crops).flatMap(([season, categories]) =>
@@ -109,8 +144,8 @@ const DetailOfProduction = ({ route, navigation }) => {
         },
       ]);
     } catch (error) {
-      console.Log("addProCostPost-err", error.response);
-      Alert.alert("error adding production ");
+      console.log("addProCostPost-err", error.response);
+      Alert.alert("Error Message","error adding production ");
     } finally {
       setLoading(false);
     }
@@ -228,6 +263,17 @@ const DetailOfProduction = ({ route, navigation }) => {
                               )
                             }
                           />
+                          {errors[
+                            `${season}-${category}-${cropIndex}-${costField}`
+                          ] && (
+                            <Text style={styles.errorText}>
+                              {
+                                errors[
+                                  `${season}-${category}-${cropIndex}-${costField}`
+                                ]
+                              }
+                            </Text>
+                          )}
                         </View>
                       ))}
                       {/* Display total cost */}
@@ -247,19 +293,19 @@ const DetailOfProduction = ({ route, navigation }) => {
             <TouchableOpacity
               style={submitBtn}
               onPress={handleSubmit}
-              disabled={loading}
+              // disabled={loading}
             >
               <Text style={styles.inpText}>Submit</Text>
             </TouchableOpacity>
           </View>
         </View>
       </ScrollView>
-        {loading && (
-          <View style={styles.loaderOverlay}>
-            <ActivityIndicator size={50} color={"#ffffff"} />
-            <Text style={[styles.inpText, { fontSize: 14 }]}>processing...</Text>
-          </View>
-        )}
+      {loading && (
+        <View style={styles.loaderOverlay}>
+          <ActivityIndicator size={50} color={"#ffffff"} />
+          <Text style={[styles.inpText, { fontSize: 14 }]}>processing...</Text>
+        </View>
+      )}
     </SafeAreaView>
   );
 };
@@ -337,5 +383,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "rgba(0,0,0,0.5)",
     zIndex: 999,
+  },
+  errorText: {
+    color: "red",
+    fontSize: 12,
+    fontFamily: "Poppins-Regular",
+    marginTop: 5,
   },
 });

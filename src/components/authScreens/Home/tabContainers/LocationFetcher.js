@@ -6,14 +6,17 @@ import {
   Alert,
   ScrollView,
   StyleSheet,
+  ActivityIndicator
 } from "react-native";
 import * as Location from "expo-location";
 import { useSelector } from "react-redux";
 import { addUserLocation } from "../../../services/ApiFile";
+import {globalContainer} from "../../../../globals/style"
 
 const LocationFetcher = () => {
   const { user } = useSelector((state) => state.auth.user);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const [locationData, setLocationData] = useState({
     latitude: "",
@@ -23,6 +26,7 @@ const LocationFetcher = () => {
 
   const getLocation = async () => {
     try {
+      setLoading(true);
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
         Alert.alert(
@@ -32,16 +36,6 @@ const LocationFetcher = () => {
         return;
       }
 
-      // const isServicesEnabled = await Location.hasServicesEnabledAsync();
-      // if (!isServicesEnabled) {
-      //   Alert.alert(
-      //     "Location Services Disabled",
-      //     "Please enable location services to fetch your location."
-      //   );
-      //   return;
-      // }
-
-      // fetch the current location
       const currentLocation = await Location.getCurrentPositionAsync({
         accuracy: Location.Accuracy.High,
       });
@@ -54,7 +48,7 @@ const LocationFetcher = () => {
       });
       const address =
         addressData[0]?.formattedAddress ||
-        `${addressData[0]?.city || "},${addressData[0]?.region || "}`;
+        `${addressData[0]?.city || ""}, ${addressData[0]?.region || ""}`;
       console.log("Address", address);
 
       setLocationData({
@@ -63,6 +57,7 @@ const LocationFetcher = () => {
         address,
       });
 
+      setLoading(false)
       Alert.alert(
         "Location Fetched Successfully",
         `Latitude: ${latitude}, Longitude: ${longitude}`
@@ -80,6 +75,9 @@ const LocationFetcher = () => {
           "An unexpected error occurred while fetching your location."
         );
       }
+    }
+    finally{
+      setLoading(false)
     }
   };
 
@@ -117,11 +115,10 @@ const LocationFetcher = () => {
     }
   };
 
-  const demoFunction = () => {};
-
   return (
-    <View style={styles.container}>
-         <TouchableOpacity
+    <View >
+      <ScrollView  contentContainerStyle={styles.contentContainer}>
+        <TouchableOpacity
           onPress={getLocation}
           disabled={isSubmitting}
           style={[styles.button, isSubmitting && styles.disabledButton]}
@@ -140,18 +137,30 @@ const LocationFetcher = () => {
             {isSubmitting ? "Processing..." : "Mark Attendance"}
           </Text>
         </TouchableOpacity>
-     </View>
+      </ScrollView>
+      {/* {loading && (
+        <View style={styles.loaderOverlay}>
+          <ActivityIndicator size={50} color={"#ffffff"} />
+          <Text style={[styles.label, { fontSize: 14, color: "#fff" }]}>
+            processing...
+          </Text>
+        </View>
+      )} */}
+    </View>
   );
 };
 
 export default LocationFetcher;
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
+  container:{
+    flex: 1, // Make the root View full screen
+    backgroundColor: "#f0f0f0",
+  },
+  contentContainer: {
+    flexGrow: 1,
     justifyContent: "center",
     alignItems: "center",
-     
   },
   button: {
     padding: 15,
@@ -169,5 +178,12 @@ const styles = StyleSheet.create({
   },
   disabledButton: {
     backgroundColor: "grey",
+  },
+  loaderOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
+    zIndex: 999,
   },
 });

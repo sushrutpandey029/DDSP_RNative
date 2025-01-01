@@ -71,6 +71,8 @@ const InteractionWithFarmer = ({ navigation }) => {
     }
   };
 
+  
+
   const handleSubmit = async () => {
     console.log("payload", payload);
     try {

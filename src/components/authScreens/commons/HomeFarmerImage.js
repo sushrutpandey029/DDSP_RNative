@@ -1,6 +1,9 @@
 import { View, Text, Image, StyleSheet } from 'react-native'
 import React from 'react'
-import MainImage from "../../../../assets/images/mainImage.png"
+import MainImage from "../../../../assets/images/banner4.png"
+// import MainImage from "../../../../assets/images/mainImage.png"
+
+
 
 const HomeFarmerImage = () => {
   return (
@@ -14,6 +17,6 @@ export default HomeFarmerImage
 
 const styles = StyleSheet.create({
    img:{
-    width : '100%',
+     width: "100%",
      }
 })

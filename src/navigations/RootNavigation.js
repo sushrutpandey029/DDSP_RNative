@@ -21,7 +21,8 @@ import FarmerDetail from "../components/authScreens/Home/tabContainers/FarmerDet
 import FieldWorkerDetailUpdate from "../components/authScreens/UserFile/containers/FieldWorkerDetailUpdate";
 import AttendanceList from "../components/authScreens/drawerPages/AttendanceList";
 import InteractionWithFarmer from "../components/authScreens/Forms/allForms/InteractionWithFarmer";
-
+import FarmerInteractionList from "../components/authScreens/drawerPages/FarmerInteractionList";
+import InteractionDetails from "../components/authScreens/drawerPages/InteractionDetails";
 
 const Stack = createNativeStackNavigator();
 
@@ -104,15 +105,25 @@ const RootNavigation = () => {
             component={FieldWorkerDetailUpdate}
             options={{ headerShown: false }}
           />
-          <Stack.Screen 
-          name="AttendanceList"
-          component={AttendanceList}
-          options={{headerShown:false}}
+          <Stack.Screen
+            name="AttendanceList"
+            component={AttendanceList}
+            options={{ headerShown: false }}
           />
-          <Stack.Screen 
-          name="InteractionWithFarmer"
-          component={InteractionWithFarmer}
-          options={{headerShown:false}}
+          <Stack.Screen
+            name="InteractionWithFarmer"
+            component={InteractionWithFarmer}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="FarmerInteractionList"
+            component={FarmerInteractionList}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="InteractionDetails"
+            component={InteractionDetails}
+            options={{ headerShown: false }}
           />
         </>
       ) : (

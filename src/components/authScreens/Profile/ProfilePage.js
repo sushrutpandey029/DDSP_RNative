@@ -25,6 +25,7 @@ const ProfilePage = ({ navigation }) => {
   const dispatch = useDispatch();
   const userData = useSelector((state) => state.auth.user.user);
   const userId = userData.id;
+  console.log("userDatas",userData)
 
 
   const [open, setOpen] = useState(false);
@@ -34,7 +35,7 @@ const ProfilePage = ({ navigation }) => {
     fullname: userData.fullname,
     emailid: userData.emailid,
     phonenumber: userData.phonenumber,
-    address: userData.address,
+    // address: userData.address,
     dob: userData.dob,
     qualification: userData.qualification,
   });
@@ -68,7 +69,7 @@ const ProfilePage = ({ navigation }) => {
       if (response?.user) {
         dispatch(updateUser(response.user)); // Update Redux state
         console.log("User updated:", response.user);
-        Alert.alert(response.message);
+        Alert.alert("Success Message",`${response.message}.`);
       } else {
         console.log("User data is missing in the response:", response);
         Alert.alert("Error", "Failed to update user data.");
@@ -102,6 +103,7 @@ const ProfilePage = ({ navigation }) => {
               onChangeText={(text) =>
                 setInputValue({ ...inputValue, fullname: text })
               }
+              editable={false}
             />
           </View>
           <View>
@@ -112,10 +114,10 @@ const ProfilePage = ({ navigation }) => {
               onChangeText={(text) =>
                 setInputValue({ ...inputValue, emailid: text })
               }
+              editable={false}
             />
           </View>
-          <View style={styles.twoBtn}>
-            <View style={styles.inBtn}>
+             <View >
               <Text style={styles.label}>Phone Number</Text>
               <TextInput
                 style={styles.input2}
@@ -125,7 +127,7 @@ const ProfilePage = ({ navigation }) => {
                 }
               />
             </View>
-            <View style={styles.inBtn}>
+            <View >
               <Text style={styles.label}>Role</Text>
               <TextInput
                 style={styles.input}
@@ -133,9 +135,8 @@ const ProfilePage = ({ navigation }) => {
                 editable={false}
               />
             </View>
-          </View>
-
-          <View>
+ 
+          {/* <View>
             <Text style={styles.label}>Address</Text>
             <TextInput
               style={styles.input}
@@ -144,7 +145,7 @@ const ProfilePage = ({ navigation }) => {
                 setInputValue({ ...inputValue, address: text })
               }
             />
-          </View>
+          </View> */}
           <View>
             <Text style={styles.label}>DOB</Text>
             {/* <TextInput

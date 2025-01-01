@@ -516,7 +516,7 @@ const ProjectCoordinationWork = ({ navigation }) => {
                 onChangeText={(text) =>
                   setReports(
                     reports.map((item, idx) =>
-                      idx === index ? { ...item.report, details: text } : item
+                      idx === index ? { ...item, details: text } : item
                     )
                   )
                 }

@@ -21,42 +21,18 @@ import {
 const DetailOfCultivation = ({ route, navigation }) => {
   const farmerId = route.params.farmerId || null;
   const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState({});
 
   const costFields = [
     "seedCost",
-    "landCost",
+    "landCost", // landCost is changed to landPreparationcost
     "fertilizerCost",
     "pesticideCost",
     "harvestCost",
     "laborCost",
     "miscCost",
   ];
-
-  // const getCostDetails = async () => {
-  //   try {
-  //     const response = await addCultivationCostDetails(farmerId);
-  //     const updatedData = { ...response };
-
-  //     // Initialize costs for each crop
-  //     Object.entries(updatedData.crops).forEach(([season, categories]) => {
-  //       Object.entries(categories).forEach(([category, crops]) => {
-  //         updatedData.crops[season][category] = crops.map((crop) => ({
-  //           cropName: crop,
-  //           costs: costFields.reduce((acc, field) => {
-  //             acc[field] = ""; // Initialize each cost field with an empty string
-  //             return acc;
-  //           }, {}),
-  //         }));
-  //       });
-  //     });
-
-  //     setData(updatedData);
-  //     console.log("addcostcul-resp", updatedData);
-  //   } catch (error) {
-  //     console.warn("addcostcul-err", error);
-  //   }
-  // };
 
   const getCostDetails = async () => {
     try {
@@ -93,20 +69,6 @@ const DetailOfCultivation = ({ route, navigation }) => {
       console.warn("addcostcul-err", error);
     }
   };
-
-  // const handleCostChange = (season, category, cropIndex, costType, value) => {
-  //   const updatedData = { ...data };
-  //   const crop = updatedData.crops[season][category][cropIndex];
-  //   crop.costs[costType] = parseFloat(value) || 0 ;
-
-  //   // Recalculate total cost
-  //   crop.totalCost = Object.values(crop.costs).reduce(
-  //     (total, cost) => total + (parseFloat(cost) || 0),
-  //     0
-  //   );
-
-  //   setData(updatedData);
-  // };
 
   const handleCostChange = (season, category, cropIndex, costType, value) => {
     // Deep clone the data to avoid mutating the state directly
@@ -159,7 +121,37 @@ const DetailOfCultivation = ({ route, navigation }) => {
   //   // addCultivationCostDetails(submissionData);
   // };
 
+  const validateFields = () => {
+    let validateErrors = {};
+
+    // Loop through cost fields and validate
+    costFields.forEach((field) => {
+      Object.entries(data.crops).forEach(([season, categories]) => {
+        Object.entries(categories).forEach(([category, crops]) => {
+          crops.forEach((crop) => {
+            // Validate each cost field for the crop
+            if (!crop.costs[field]) {
+              validateErrors[`${season}_${category}_${crop.crop}_${field}`] =
+                "required";
+              // `${field.replace(/([a-z])([A-Z])/g, "$1 $2").toUpperCase()} is required`;
+            }
+          });
+        });
+      });
+    });
+
+    setErrors(validateErrors);
+
+    return Object.keys(validateErrors).length === 0; // Returns true if no errors
+  };
+
   const handleSubmit = async () => {
+    const isValid = validateFields();
+
+    if (!isValid) {
+      Alert.alert("Validation Error", "Please correct the highlighted fields.");
+      return;
+    }
     // Construct data in the required format for submission
     const submissionData = {
       farmerID: data.farmerID,
@@ -183,7 +175,6 @@ const DetailOfCultivation = ({ route, navigation }) => {
     };
 
     try {
-
       setLoading(true);
       // Make API call with the constructed submission data
       const response = await addCultivationCostDetailsPost(
@@ -193,24 +184,19 @@ const DetailOfCultivation = ({ route, navigation }) => {
 
       console.log("addCulCostPost-resp", response);
       if (response.success === true) {
-
         setLoading(false);
-        Alert.alert("Success Message",`${response.message}.`, 
-          [
-            {
-              text: "Ok",
-              onPress: () => navigation.navigate('Home'),
-              style: "default"
-
-            }
-          ]
-        );
-        // Alert.alert(response.message);
-        // navigation.navigate('Home');
+        Alert.alert("Success Message", `${response.message}.`, [
+          {
+            text: "Ok",
+            onPress: () => navigation.navigate("Home"),
+            style: "default",
+          },
+        ]);
       }
     } catch (error) {
       console.warn("addCulCostPost-err", error);
-    } finally{
+      Alert.alert("Error Message", "failed to add cultivation details.");
+    } finally {
       setLoading(false);
     }
 
@@ -262,7 +248,10 @@ const DetailOfCultivation = ({ route, navigation }) => {
                             {" "}
                             {costField
                               .replace(/([a-z])([A-Z])/g, "$1 $2")
-                              .replace(/^./, (str) => str.toUpperCase())} <Text style={{fontSize: 12, fontWeight:'bold'}}>(Rs.)</Text>
+                              .replace(/^./, (str) => str.toUpperCase())}{" "}
+                            <Text style={{ fontSize: 12, fontWeight: "bold" }}>
+                              (Rs.)
+                            </Text>
                           </Text>
                           <TextInput
                             style={styles.input}
@@ -280,6 +269,17 @@ const DetailOfCultivation = ({ route, navigation }) => {
                               )
                             }
                           />
+                          {errors[
+                            `${season}_${category}_${crop.crop}_${costField}`
+                          ] && (
+                            <Text style={{ color: "red", fontSize: 12 }}>
+                              {
+                                errors[
+                                  `${season}_${category}_${crop.crop}_${costField}`
+                                ]
+                              }
+                            </Text>
+                          )}
                         </View>
                       ))}
                       {/* Display total cost */}
@@ -295,18 +295,22 @@ const DetailOfCultivation = ({ route, navigation }) => {
 
           {/* Submit Button */}
           <View style={styles.btnContainer}>
-            <TouchableOpacity style={submitBtn} onPress={handleSubmit} disabled={loading}>
+            <TouchableOpacity
+              style={submitBtn}
+              onPress={handleSubmit}
+              disabled={loading}
+            >
               <Text style={styles.inpText}>Submit</Text>
             </TouchableOpacity>
           </View>
         </View>
       </ScrollView>
-       {loading && (
-              <View style={styles.loaderOverlay}>
-                <ActivityIndicator size={50} color={"#ffffff"} />
-                <Text style={[styles.inpText, { fontSize: 14 }]}>processing...</Text>
-              </View>
-            )}
+      {loading && (
+        <View style={styles.loaderOverlay}>
+          <ActivityIndicator size={50} color={"#ffffff"} />
+          <Text style={[styles.inpText, { fontSize: 14 }]}>processing...</Text>
+        </View>
+      )}
     </SafeAreaView>
   );
 };
@@ -384,48 +388,3 @@ const styles = StyleSheet.create({
     zIndex: 999,
   },
 });
-
-// {Object.entries(data.crops).map(([season, categories]) => (
-//   <View key={season} style={styles.seasonContainer}>
-//     <Text style={styles.seasonTitle}>{season.toUpperCase()}</Text>
-//     {/* Loop through crop categories */}
-//     {Object.entries(categories).map(([category, crops]) => (
-//       <View key={category} style={styles.categoryContainer}>
-//         <Text style={styles.categoryTitle}>
-//           {category.replace("_", " ").toUpperCase()}
-//         </Text>
-//         {/* Loop through crops */}
-//         {crops.map((crop, cropIndex) => (
-//           <View key={cropIndex} style={styles.cropContainer}>
-//             <Text style={styles.cropTitle}>{crop.cropName}</Text>
-//             {/* Render cost fields */}
-//             {costFields.map((costField, index) => (
-//               <View key={index}>
-//                 <Text style={styles.label}>{costField}</Text>
-//                 <TextInput
-//                   style={styles.input}
-//                   // placeholder={`Enter ${costField}`}
-//                   value={crop.costs[costField]}
-//                   keyboardType="numeric"
-//                   onChangeText={(value) =>
-//                     handleCostChange(
-//                       season,
-//                       category,
-//                       cropIndex,
-//                       costField,
-//                       value
-//                     )
-//                   }
-//                 />
-//               </View>
-//             ))}
-//             {/* Display total cost */}
-//             <Text style={styles.totalCost}>
-//               Total Cost: {crop.totalCost}
-//             </Text>
-//           </View>
-//         ))}
-//       </View>
-//     ))}
-//   </View>
-// ))}

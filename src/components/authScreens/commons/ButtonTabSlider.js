@@ -8,9 +8,11 @@ import {
 } from "react-native";
 import React, { useState } from "react";
 import { btn1, btn2 } from "../../../globals/style";
+import { useSelector } from "react-redux";
 
 const ButtonTabSlider = ({ setTabValue }) => {
   const [activeButton, setActiveButton] = useState(0);
+  const { user } = useSelector((state) => state.auth.user);
 
   const handleButtonPress = (index, value) => {
     setActiveButton(index);
@@ -19,70 +21,60 @@ const ButtonTabSlider = ({ setTabValue }) => {
   return (
     <View style={styles.container}>
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-           <View style={styles.btnContainer}>
-            <TouchableOpacity
-              style={[btn2, activeButton === 0 && styles.activeButton]}
-              onPress={() => handleButtonPress(0, "home")}
+        <View style={styles.btnContainer}>
+          <TouchableOpacity
+            style={[btn2, activeButton === 0 && styles.activeButton]}
+            onPress={() => handleButtonPress(0, "home")}
+          >
+            <Text
+              style={[styles.btnText, activeButton === 0 && styles.acBtnText]}
             >
-              <Text
-                style={[styles.btnText, activeButton === 0 && styles.acBtnText]}
-              >
-                Home
-              </Text>
-            </TouchableOpacity>
-          </View>
+              Home
+            </Text>
+          </TouchableOpacity>
+        </View>
 
-          <View style={styles.btnContainer}>
-            <TouchableOpacity
-              style={[btn2, activeButton === 1 && styles.activeButton]}
-              onPress={() => handleButtonPress(1, "form")}
+        <View style={styles.btnContainer}>
+          <TouchableOpacity
+            style={[btn2, activeButton === 1 && styles.activeButton]}
+            onPress={() => handleButtonPress(1, "form")}
+          >
+            <Text
+              style={[styles.btnText, activeButton === 1 && styles.acBtnText]}
             >
-              <Text
-                style={[styles.btnText, activeButton === 1 && styles.acBtnText]}
-              >
-                Form
-              </Text>
-            </TouchableOpacity>
-          </View>
+              Form
+            </Text>
+          </TouchableOpacity>
+        </View>
 
+        {user.role === "Project Coordinator" && (
           <View style={styles.btnContainer}>
             <TouchableOpacity
               style={[btn2, activeButton === 2 && styles.activeButton]}
-              onPress={() => handleButtonPress(2, "latesTask")}
+              onPress={() => handleButtonPress(2, "report")}
             >
               <Text
                 style={[styles.btnText, activeButton === 2 && styles.acBtnText]}
               >
-                Latest Task
+                Reports
               </Text>
             </TouchableOpacity>
           </View>
+        )}
 
-          <View style={styles.btnContainer}>
-            <TouchableOpacity
-              style={[btn2, activeButton === 3 && styles.activeButton]}
-              onPress={() => handleButtonPress(3, "submit")}
+        <View style={styles.btnContainer}>
+          <TouchableOpacity
+            style={[btn2, activeButton === 3 && styles.activeButton]}
+            onPress={() => handleButtonPress(3, "farmer")}
+          >
+            <Text
+              style={[styles.btnText, activeButton === 3 && styles.acBtnText]}
             >
-              <Text
-                style={[styles.btnText, activeButton === 3 && styles.acBtnText]}
-              >
-                Submit
-              </Text>
-            </TouchableOpacity>
-          </View>
-          <View style={styles.btnContainer}>
-            <TouchableOpacity
-              style={[btn2, activeButton === 4 && styles.activeButton]}
-              onPress={() => handleButtonPress(4, "farmer")}
-            >
-              <Text
-                style={[styles.btnText, activeButton === 4 && styles.acBtnText]}
-              >
-                Farmers
-              </Text>
-            </TouchableOpacity>
-          </View>
-       </ScrollView>
+              Farmers
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
     </View>
   );
 };
@@ -94,11 +86,11 @@ const styles = StyleSheet.create({
     // flex: 1,
     flexDirection: "row",
     marginTop: "4%",
-    marginBottom : '4%',
+    marginBottom: "4%",
     marginHorizontal: 10,
-   },
+  },
   btnContainer: {
-    marginHorizontal: 3,
+    marginHorizontal: 10,
   },
   activeButton: {
     // backgroundColor: "#5B8A39",

@@ -41,6 +41,7 @@ const FieldWorkerDetailUpdate = ({ route, navigation }) => {
 
   const [open, setOpen] = useState(false);
   const [date, setDate] = useState(new Date());
+  const [village, setVillage] = useState("");
   const [villagesVisited, setVillagesVisited] = useState("");
   const [ownLandCultivated, setOwnLandCultivated] = useState("");
   const [clusterID, setClusterID] = useState("");
@@ -108,26 +109,29 @@ const FieldWorkerDetailUpdate = ({ route, navigation }) => {
   const validateFields = () => {
     let validateErrors = {};
 
-    if (!villagesVisited)
-      validateErrors.villagesVisited = "Village is required";
-    if (!ownLandCultivated)
-      validateErrors.ownLandCultivated = "Own Land Cultivated is required";
-    if (!clusterID) validateErrors.clusterID = "Cluster is required";
-    if (!travelInKms) validateErrors.travelInKms = "Distance is required";
-    if (!farmersContacted)
-      validateErrors.farmersContacted = "No. of farmers is required";
-    if (!groupMeetings)
-      validateErrors.groupMeetings = "Group meeting is required";
-    if (!farmersInGroup)
-      validateErrors.farmersInGroup = "Farmers in group is required";
-    if (!trainingPlace)
-      validateErrors.trainingPlace = "Training place is required";
-    if (!farmersInTraining)
-      validateErrors.farmersInTraining = "Farmers in training is required";
-    if (!consultancyTelephone)
-      validateErrors.consultancyTelephone = "Telephone is required";
-    if (!consultancyWhatsApp)
-      validateErrors.consultancyWhatsApp = "Whatsapp is required";
+    if(!date)
+      validateErrors.date = "required"
+
+    // if (!villagesVisited)
+    //   validateErrors.villagesVisited = "Village is required";
+    // if (!ownLandCultivated)
+    //   validateErrors.ownLandCultivated = "Own Land Cultivated is required";
+    // if (!clusterID) validateErrors.clusterID = "Cluster is required";
+    // if (!travelInKms) validateErrors.travelInKms = "Distance is required";
+    // if (!farmersContacted)
+    //   validateErrors.farmersContacted = "No. of farmers is required";
+    // if (!groupMeetings)
+    //   validateErrors.groupMeetings = "Group meeting is required";
+    // if (!farmersInGroup)
+    //   validateErrors.farmersInGroup = "Farmers in group is required";
+    // if (!trainingPlace)
+    //   validateErrors.trainingPlace = "Training place is required";
+    // if (!farmersInTraining)
+    //   validateErrors.farmersInTraining = "Farmers in training is required";
+    // if (!consultancyTelephone)
+    //   validateErrors.consultancyTelephone = "Telephone is required";
+    // if (!consultancyWhatsApp)
+    //   validateErrors.consultancyWhatsApp = "Whatsapp is required";
 
     setErrors(validateErrors);
 
@@ -141,7 +145,7 @@ const FieldWorkerDetailUpdate = ({ route, navigation }) => {
       const requestData = {
         userid: user.id,
         name: user.fullname,
-        address: user.address,
+        address: village,
         qualifications: user.qualification,
         mobileNumber: user.phonenumber,
         emailID: user.emailid,
@@ -181,7 +185,7 @@ const FieldWorkerDetailUpdate = ({ route, navigation }) => {
 
         const response = await updateWorkDetailsById(id, requestData);
         console.log("updateWorkDetail-resp:", response);
-        Alert.alert("Success Message", "Data updated successfully", [
+        Alert.alert("Success Message", "Data updated successfully.", [
           {
             text: "Ok",
             onPress: () => navigation.navigate("Home"),
@@ -190,7 +194,7 @@ const FieldWorkerDetailUpdate = ({ route, navigation }) => {
         ]);
       } catch (error) {
         console.log("updateWorkDetail-resp-err:", error.response.data);
-        Alert.alert(error.response.data.message);
+        Alert.alert("Error Message",error.response.data.message);
       } finally{
         setLoading(false);
       }
@@ -217,6 +221,7 @@ const FieldWorkerDetailUpdate = ({ route, navigation }) => {
     if (apiWorkData) {
       setOwnLandCultivated(apiWorkData.ownLandCultivatedUnderNaturalFarming);
       setClusterID(apiWorkData.clusterID);
+      setVillage(apiWorkData.address);
       setVillagesVisited(apiWorkData.villagesVisited);
       setTravelInKms(apiWorkData.travelInKms?.toString());
       setFarmersContacted(apiWorkData.farmersContactedIndividually?.toString());
@@ -263,8 +268,8 @@ const FieldWorkerDetailUpdate = ({ route, navigation }) => {
       <FormHeader title="FIELD WORKER DETAIL UPDATE" />
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.formContainer}>
-          <View style={styles.twoField}>
-            <View style={styles.inField}>
+          {/* <View style={styles.twoField}> */}
+            <View style={styles.field}>
               <Text style={styles.label}>Name</Text>
               <TextInput
                 style={styles.input}
@@ -272,15 +277,15 @@ const FieldWorkerDetailUpdate = ({ route, navigation }) => {
                 editable={false}
               />
             </View>
-            <View style={styles.inField}>
-              <Text style={styles.label}>Address</Text>
+            <View style={styles.field}>
+              <Text style={styles.label}>Village Name</Text>
               <TextInput
                 style={styles.input}
-                value={user.address}
+                value={village}
                 editable={false}
               />
             </View>
-          </View>
+          {/* </View> */}
           <View style={styles.field}>
             <Text style={styles.label}>Email id</Text>
             <TextInput
@@ -312,7 +317,13 @@ const FieldWorkerDetailUpdate = ({ route, navigation }) => {
             <Text style={styles.label}>
               Land cultivated under Natural Farming ?
             </Text>
-            <Dropdown
+            <TextInput
+              style={styles.input}
+              value={clusterID}
+              // onChangeText={setClusterID}
+              editable={false}
+            />
+            {/* <Dropdown
               data={ownLandCultivatedItems}
               labelField={"label"}
               valueField={"value"}
@@ -328,7 +339,7 @@ const FieldWorkerDetailUpdate = ({ route, navigation }) => {
                   color={"black"}
                 />
               )}
-            />
+            /> */}
 
             {errors.ownLandCultivated && (
               <Text style={{ color: "red" }}>{errors.ownLandCultivated}</Text>
@@ -340,6 +351,7 @@ const FieldWorkerDetailUpdate = ({ route, navigation }) => {
               style={styles.input}
               value={clusterID}
               onChangeText={setClusterID}
+              editable={false}
             />
             {errors.clusterID && (
               <Text style={{ color: "red" }}>{errors.clusterID}</Text>
@@ -358,6 +370,7 @@ const FieldWorkerDetailUpdate = ({ route, navigation }) => {
           <View style={styles.field}>
             <Text style={styles.label}>Visited village name</Text>
             <Dropdown
+            mode="modal"
               data={villageItems}
               labelField={"label"}
               valueField={"value"}
@@ -385,6 +398,7 @@ const FieldWorkerDetailUpdate = ({ route, navigation }) => {
             >
               <Text>{date ? formatDate(date) : "Select a date"}</Text>
             </TouchableOpacity>
+            {errors.date && (<Text style={{ color: "red" }}>{errors.date}</Text>)}
           </View>
 
           {/* // calendra modal */}
@@ -392,7 +406,6 @@ const FieldWorkerDetailUpdate = ({ route, navigation }) => {
             <View style={styles.centeredView}>
               <View style={[styles.modalView, { backgroundColor: "#9ac6ca" }]}>
                 <DatePicker
-                  modal
                   mode="single"
                   open={open}
                   selectedItemColor="#637e76"
@@ -593,8 +606,7 @@ const FieldWorkerDetailUpdate = ({ route, navigation }) => {
                   </Text>
                   <TextInput
                     style={[styles.input]}
-                    // placeholder="Quantity"
-                    value={item.quantity}
+                     value={item.quantity}
                     onChangeText={(value) =>
                       handleInputSuppliedChange(index, "quantity", value)
                     }

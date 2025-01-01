@@ -70,7 +70,7 @@ const CropTab = ({ data, type }) => {
           keyExtractor={(item) => item.id.toString()}
         />
       ) : (
-        <Text style={styles.noDataText}>No data available</Text>
+        <Text style={styles.noDataText}>No data available.</Text>
       )}
 
       <Modal
@@ -91,7 +91,8 @@ const CropTab = ({ data, type }) => {
                       Seed Cost: {selectCrop.costs.seedCost}
                     </Text>
                     <Text style={styles.modalTitle}>
-                      Land Cost: {selectCrop.costs.landCost}
+                    {/* //land cost is changed into landPreparaitoncost */}
+                      Land Cost: {selectCrop.costs.landCost} 
                     </Text>
                     <Text style={styles.modalTitle}>
                       Fertilizer Cost: {selectCrop.costs.fertilizerCost}

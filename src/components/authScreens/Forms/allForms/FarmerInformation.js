@@ -18,14 +18,16 @@ import { globalContainer } from "../../../../globals/style";
 import { addFarmerInfo } from "../../../services/ApiFile";
 import { Dropdown } from "react-native-element-dropdown";
 import AntDesign from "@expo/vector-icons/AntDesign";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { villageItems, talukaItems, clusterItems } from "../data/Constant";
+import { getFarmerById } from "../../../redux/slices/FarmerSlice";
 
 const FarmerInformation = ({ navigation }) => {
   const { user } = useSelector((state) => state.auth.user);
   const [errors, setErrors] = useState({});
   const [isCropsSownUpdated, setIsCropsSownUpdated] = useState(false);
   const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch();
 
   const [loginValue, setLoginValue] = useState({
     userid: user?.id,
@@ -110,7 +112,23 @@ const FarmerInformation = ({ navigation }) => {
   ]);
 
   const handleCropSelection = () => {
-    let updatedCropsSown = { ...loginValue.cropsSown };
+    // let updatedCropsSown = { ...loginValue.cropsSown };
+    // let updatedCropsSown = { ...loginValue.cropsSown };
+
+    let updatedCropsSown = {
+      kharif: {
+        chemical_irrigated: [],
+        chemical_unirrigated: [],
+        natural_irrigated: [],
+        natural_unirrigated: [],
+      },
+      rabi: {
+        chemical_irrigated: [],
+        chemical_unirrigated: [],
+        natural_irrigated: [],
+        natural_unirrigated: [],
+      },
+    };
 
     cropSown.forEach((entry) => {
       const { season, category, crop, land } = entry;
@@ -156,29 +174,41 @@ const FarmerInformation = ({ navigation }) => {
   const validateFields = () => {
     let validateErrors = {};
 
-    if (!loginValue.name) validateErrors.name = "Name is required";
-    if (!loginValue.mobileNumber)
-      validateErrors.mobileNumber = "Mobile is required";
-    if (!loginValue.emailID) validateErrors.emailID = "Email ID is required";
-    else if (!/\S+@\S+\.\S+/.test(loginValue.emailID))
-      validateErrors.emailID = "Email ID is invalid";
-    if (!loginValue.villageName)
-      validateErrors.villageName = "Village Name is required";
-    if (!loginValue.taluka) validateErrors.taluka = "Taluka is required";
-    if (!loginValue.district) validateErrors.district = "District is requierd";
-    if (!loginValue.cultivatedLand)
-      validateErrors.cultivatedLand = "Cultivated Land is required";
-    if (!loginValue.typeOfLand)
-      validateErrors.typeOfLand = "Type of Land is required";
-    if (!loginValue.desiBreeds)
-      validateErrors.desiBreeds = "Desi breeds is requierd";
+    if (!loginValue.name) validateErrors.name = "required";
+    if (!loginValue.mobileNumber) validateErrors.mobileNumber = "required";
+    // if (!loginValue.emailID) validateErrors.emailID = "Email ID is required";
+    // else if (!/\S+@\S+\.\S+/.test(loginValue.emailID))
+    //   validateErrors.emailID = "Email ID is invalid";
+    if (!loginValue.villageName) validateErrors.villageName = "required";
+    if (!loginValue.taluka) validateErrors.taluka = "required";
+    if (!loginValue.cluster) validateErrors.cluster = "required";
+    if (!loginValue.district) validateErrors.district = "required";
+    if (!loginValue.cultivatedLand) validateErrors.cultivatedLand = "required";
+    // if (!loginValue.typeOfLand)
+    //   validateErrors.typeOfLand = "Type of Land is required";
+    // if (!loginValue.desiBreeds)
+    //   validateErrors.desiBreeds = "Desi breeds is requierd";
     if (!loginValue.irrigationSource)
-      validateErrors.irrigationSource = "Irrigation source is required";
+      validateErrors.irrigationSource = "required";
     if (!loginValue.soilConservationMeasures)
-      validateErrors.soilConservationMeasures =
-        "Soil Conservation measures is required";
+      validateErrors.soilConservationMeasures = "required";
     if (!loginValue.microIrrigation)
-      validateErrors.microIrrigation = "MicroIrrigation is required";
+      validateErrors.microIrrigation = "required";
+
+    cropSown.forEach((entry, index) => {
+      if (!entry.season) {
+        validateErrors[`cropSown[${index}].season`] = "required";
+      }
+      if (!entry.category) {
+        validateErrors[`cropSown[${index}].category`] = "required";
+      }
+      if (!entry.crop) {
+        validateErrors[`cropSown[${index}].crop`] = "required";
+      }
+      if (!entry.land) {
+        validateErrors[`cropSown[${index}].land`] = "required";
+      }
+    });
 
     setErrors(validateErrors);
 
@@ -186,32 +216,38 @@ const FarmerInformation = ({ navigation }) => {
   };
 
   const handleSubmit = async () => {
-    if (validateFields()) {
-      try {
-        setLoading(true);
+    const isValid = validateFields();
 
-        console.log(
-          "after-handleCropSelection:",
-          JSON.stringify(loginValue, null, 2)
-        );
-        const response = await addFarmerInfo(loginValue);
-        console.warn("addfarm-resp", response);
-        setLoading(false);
-        // Alert.alert(response.message);
-        Alert.alert("Success Message", `${response.message}.`, [
-          {
-            text: "Ok",
-            onPress: () => navigation.navigate("Home"),
-            style: "default",
-          },
-        ]);
-        // navigation.navigate("Home");
-      } catch (error) {
-        console.log("addfarm-err", error.response.data);
-        Alert.alert("Error adding farmer information");
-      } finally {
-        setLoading(false);
-      }
+    if (!isValid) {
+      Alert.alert("Validation Error", "Please correct the highlighted fields.");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      console.log(
+        "after-handleCropSelection:",
+        JSON.stringify(loginValue, null, 2)
+      );
+      const response = await addFarmerInfo(loginValue);
+      console.warn("addfarm-resp", response);
+      dispatch(getFarmerById(user.id));
+      setLoading(false);
+      // Alert.alert(response.message);
+      Alert.alert("Success Message", `${response.message}.`, [
+        {
+          text: "Ok",
+          onPress: () => navigation.navigate("Home"),
+          style: "default",
+        },
+      ]);
+      // navigation.navigate("Home");
+    } catch (error) {
+      console.log("addfarm-err", error.response.data);
+      Alert.alert("Error Message", error.response.data.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -395,9 +431,9 @@ const FarmerInformation = ({ navigation }) => {
                   />
                 )}
               />
-              {/* {errors.taluka && (
-                <Text style={{ color: "red" }}>{errors.taluka}</Text>
-              )} */}
+              {errors.cluster && (
+                <Text style={{ color: "red" }}>{errors.cluster}</Text>
+              )}
             </View>
 
             <View>
@@ -585,6 +621,11 @@ const FarmerInformation = ({ navigation }) => {
                     style={styles.input}
                     maxHeight={300}
                   />
+                  {errors[`cropSown[${index}].season`] && (
+                    <Text style={{ color: "red" }}>
+                      {errors[`cropSown[${index}].season`]}
+                    </Text>
+                  )}
                 </View>
 
                 {/* category dropdown */}
@@ -606,6 +647,11 @@ const FarmerInformation = ({ navigation }) => {
                     style={styles.input}
                     maxHeight={300}
                   />
+                   {errors[`cropSown[${index}].category`] && (
+                    <Text style={{ color: "red" }}>
+                      {errors[`cropSown[${index}].category`]}
+                    </Text>
+                  )}
                 </View>
 
                 {/* crop drowdown */}
@@ -627,6 +673,11 @@ const FarmerInformation = ({ navigation }) => {
                     style={styles.input}
                     maxHeight={300}
                   />
+                   {errors[`cropSown[${index}].crop`] && (
+                    <Text style={{ color: "red" }}>
+                      {errors[`cropSown[${index}].crop`]}
+                    </Text>
+                  )}
                 </View>
 
                 {/* cultivated land for the crop */}
@@ -646,6 +697,11 @@ const FarmerInformation = ({ navigation }) => {
                     }
                     style={styles.input}
                   />
+                   {errors[`cropSown[${index}].land`] && (
+                    <Text style={{ color: "red" }}>
+                      {errors[`cropSown[${index}].land`]}
+                    </Text>
+                  )}
                 </View>
 
                 {/* remove button */}

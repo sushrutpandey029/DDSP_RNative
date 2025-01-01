@@ -24,7 +24,10 @@ import {
   addInteractionApi,
   getFarmerListByUserIdApi,
   getAllAsstPCApi,
-  getAllFieldOfficerApi
+  getAllFieldOfficerApi,
+  getCoordinatorDetailsByIDApi,
+  getFarmerInteractionApi,
+  getInteractionDetailsApi
 } from "../api/Api";
 import axios from "axios";
 
@@ -280,5 +283,38 @@ export const getAllAsstPC = async () => {
     return response.data;
   }catch(error) {
     throw error;
+  }
+}
+
+// get coordinator details list by id
+export const getCoordinatorDetailsByID = async (id) => {
+  const api = `${BaseUrl}/${getCoordinatorDetailsByIDApi}/${id}`;
+  try{
+    const response = await axios.get(api);
+    return response.data;
+  }catch(err) {
+    throw err;
+  }
+}
+
+// api to get all the list of farmer interaction
+export const getFarmerInteraction = async () => {
+  const api = `${BaseUrl}/${getFarmerInteractionApi}`;
+  try{
+    const response = await axios.get(api);
+    return response.data;
+  }catch(err){
+    throw err;
+  }
+}
+
+//api to get interaction details with each farmer
+export const getInteractionDetails = async (village,farmer) => {
+  const api = `${BaseUrl}/${getInteractionDetailsApi}/${village}/${farmer}`;
+  try{
+    const response = await axios.get(api);
+    return response.data;
+  }catch(err) {
+    throw err;
   }
 }

@@ -62,12 +62,6 @@ const CustomDrawerContent = (props) => {
         </TouchableOpacity>
       </View>
 
-      <View>
-        <TouchableOpacity style={styles.box}>
-          <Icon name="ellipse-outline" size={20} />
-          <Text style={styles.customText}>List item</Text>
-        </TouchableOpacity>
-      </View>
 
       <View>
         <TouchableOpacity
@@ -92,6 +86,16 @@ const CustomDrawerContent = (props) => {
       <View>
         <TouchableOpacity
           style={styles.box}
+          onPress={() => handleNavigation("FarmerInteractionList")}
+        >
+          <Icon name="checkmark-circle-outline" size={20} />
+          <Text style={styles.customText}>Interaction List</Text>
+        </TouchableOpacity>
+      </View>
+
+      <View>
+        <TouchableOpacity
+          style={styles.box}
           onPress={() => handleNavigation("ChangePassword")}
         >
           <Icon name="compass-outline" size={20} />
@@ -99,26 +103,7 @@ const CustomDrawerContent = (props) => {
         </TouchableOpacity>
       </View>
 
-      <View>
-        <TouchableOpacity style={styles.box}>
-          <Icon name="settings-outline" size={20} />
-          <Text style={styles.customText}>Settings</Text>
-        </TouchableOpacity>
-      </View>
 
-      <View>
-        <TouchableOpacity style={styles.box}>
-          <Icon name="people-outline" size={20} />
-          <Text style={styles.customText}>Team</Text>
-        </TouchableOpacity>
-      </View>
-
-      <View>
-        <TouchableOpacity style={styles.box}>
-          <Icon name="help-circle-outline" size={20} />
-          <Text style={styles.customText}>Support</Text>
-        </TouchableOpacity>
-      </View>
 
       <View>
         <TouchableOpacity style={styles.box} onPress={handleLogout}>
@@ -140,11 +125,12 @@ const styles = StyleSheet.create({
     // backgroundColor : "#fff"
   },
   infoContainer: {
-    flexDirection: "row",
+    // flexDirection: "column",
   },
   imgContainer: {},
   nameContainer: {
-    paddingHorizontal: 2,
+    // paddingHorizontal: 2,
+    marginTop:10
   },
   customText: {
     fontFamily: "Poppins-Regular",
@@ -159,8 +145,8 @@ const styles = StyleSheet.create({
     paddingLeft: 8,
   },
   profileImage: {
-    height: 60,
-    width: 60,
+    height: 80,
+    width: 80,
     borderRadius: 100,
   },
   box: {
