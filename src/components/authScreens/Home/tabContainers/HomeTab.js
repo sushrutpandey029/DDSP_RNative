@@ -45,12 +45,21 @@ const styles = StyleSheet.create({
   },
   tag: {
     alignItems: "center",
-    paddingHorizontal: 30,
+    padding: 20,
     marginTop: 20,
     marginBottom: 30,
+    backgroundColor:"#ff9935",
+    width:250,
+    height:250,
+    margin:"auto",
+    borderRadius:200,
+    lineHeight:20,
+    // paddingTop:20
+
   },
   text:{
     fontFamily:"Poppins-Medium",
-    fontSize:18
+    fontSize:16,
+    // paddingTop:20
   }
 });

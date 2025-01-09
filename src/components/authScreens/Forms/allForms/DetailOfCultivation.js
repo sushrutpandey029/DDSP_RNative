@@ -88,38 +88,6 @@ const DetailOfCultivation = ({ route, navigation }) => {
     setData(updatedData);
   };
 
-  // const handleSubmit =async () => {
-  //   // Construct data in the required format for submission
-  //   const submissionData = {
-  //     farmerID: data.farmerID,
-  //     crops: Object.entries(data.crops).reduce((acc, [season, categories]) => {
-  //       acc[season] = Object.entries(categories).reduce((categoryAcc, [category, crops]) => {
-  //         categoryAcc[category] = crops.map((crop) => ({
-  //           cropName: crop.cropName,
-  //           costs: crop.costs, // Pass the costs object directly
-  //           season,
-  //           category
-  //         }));
-  //         return categoryAcc;
-  //       }, {});
-  //       return acc;
-  //     }, {}),
-  //   };
-
-  //   try{
-  //     const response = await addCultivationCostDetailsPost(farmerId, submissionData);
-  //     console.warn('addCulCostPost-resp',response)
-  //     if(response.success == true){
-  //       Alert.alert(response.message);
-  //     }
-  //   }catch(error){
-  //     console.warn('addCulCostPost-err',error)
-  //   }
-
-  //   console.log("Submission Data:", JSON.stringify(submissionData, null, 2));
-  //   // Call the API to send the data to the server
-  //   // addCultivationCostDetails(submissionData);
-  // };
 
   const validateFields = () => {
     let validateErrors = {};
@@ -173,6 +141,8 @@ const DetailOfCultivation = ({ route, navigation }) => {
         return acc;
       }, {}),
     };
+
+    console.log("submission-data",JSON.stringify(submissionData,null,2))
 
     try {
       setLoading(true);
@@ -246,7 +216,7 @@ const DetailOfCultivation = ({ route, navigation }) => {
                         <View key={index}>
                           <Text style={styles.label}>
                             {" "}
-                            {costField
+                            { costField === "landCost" ? "Land Preparation Cost" : costField
                               .replace(/([a-z])([A-Z])/g, "$1 $2")
                               .replace(/^./, (str) => str.toUpperCase())}{" "}
                             <Text style={{ fontSize: 12, fontWeight: "bold" }}>

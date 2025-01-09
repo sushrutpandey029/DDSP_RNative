@@ -23,6 +23,7 @@ import AttendanceList from "../components/authScreens/drawerPages/AttendanceList
 import InteractionWithFarmer from "../components/authScreens/Forms/allForms/InteractionWithFarmer";
 import FarmerInteractionList from "../components/authScreens/drawerPages/FarmerInteractionList";
 import InteractionDetails from "../components/authScreens/drawerPages/InteractionDetails";
+import CropDetailUpdate from "../components/authScreens/Home/tabContainers/CropDetailUpdate";
 
 const Stack = createNativeStackNavigator();
 
@@ -124,6 +125,11 @@ const RootNavigation = () => {
             name="InteractionDetails"
             component={InteractionDetails}
             options={{ headerShown: false }}
+          />
+          <Stack.Screen 
+          name="CropDetailUpdate"
+          component={CropDetailUpdate}
+          options={{headerShown:false}}
           />
         </>
       ) : (

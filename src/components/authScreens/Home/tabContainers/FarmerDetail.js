@@ -24,10 +24,12 @@ import {
   villageItems,
   talukaItems,
   clusterItems,
+  cropItems,
+  conservationMeasureItems,
+  sourceIrrigationItems,
 } from "../../Forms/data/Constant";
- 
-const FarmerDetail = ({ route, navigation }) => {
 
+const FarmerDetail = ({ route, navigation }) => {
   const id = route.params.farmerId;
   const [farmerData, setFarmerData] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -74,21 +76,21 @@ const FarmerDetail = ({ route, navigation }) => {
     { label: "Sandy", value: "Sandy" },
   ]);
 
-  const [conservationMeasureItems, setConservationMeasureItems] = useState([
-    { label: "Trenching", value: "Trenching" },
-    { label: "Farm Pond", value: "Farm Pond" },
-    { label: "Bunding", value: "Bunding" },
-  ]);
+  // const [conservationMeasureItems, setConservationMeasureItems] = useState([
+  //   { label: "Trenching", value: "Trenching" },
+  //   { label: "Farm Pond", value: "Farm Pond" },
+  //   { label: "Bunding", value: "Bunding" },
+  // ]);
 
   const [microIrrigationItems, setMicroIrrigationItems] = useState([
     { label: "Drip", value: "Drip" },
     { label: "Sprinklers", value: "Sprinklers" },
   ]);
 
-  const [sourceIrrigationItems, setSourceIrrigationItems] = useState([
-    { label: "Well", value: "Well" },
-    { label: "Canal", value: "Canal" },
-  ]);
+  // const [sourceIrrigationItems, setSourceIrrigationItems] = useState([
+  //   { label: "Well", value: "Well" },
+  //   { label: "Canal", value: "Canal" },
+  // ]);
 
   const [districtItems, setDistrictItems] = useState([
     { label: "Yavatmal", value: "Yavatmal" },
@@ -107,48 +109,9 @@ const FarmerDetail = ({ route, navigation }) => {
     { label: "Natural Unirrigated", value: "natural_unirrigated" },
   ]);
 
-  const [cropItems] = useState([
-    { label: "Rice", value: "Rice" },
-    { label: "Wheat", value: "Wheat" },
-    { label: "Maize", value: "Maize" },
-    { label: "Cotton", value: "Cotton" },
-  ]);
-
   const [cropSown, setCropSown] = useState([
-    { season: "", category: "", crop: "", land: "" },
+    { season: "", category: "", crop: "", land: "", isOther: false },
   ]);
-
-  // const handleCropSelection = () => {
-  //   let updatedCropsSown = { ...loginValue.cropsSown };
-
-  //   cropSown.forEach((entry) => {
-  //     const { season, category, crop, land } = entry;
-
-  //     if (season && category && crop && land) {
-  //       if (!updatedCropsSown[season]) {
-  //         updatedCropsSown[season] = {
-  //           chemical_irrigated: [],
-  //           chemical_unirrigated: [],
-  //           natural_irrigated: [],
-  //           natural_unirrigated: [],
-  //         };
-  //       }
-
-  //       if (!updatedCropsSown[season][category]) {
-  //         updatedCropsSown[season][category] = [];
-  //       }
-
-  //       updatedCropsSown[season][category].push({ crop, cropLand: land });
-  //     }
-  //   });
-
-  //   setLoginValue((prevState) => ({
-  //     ...prevState,
-  //     cropsSown: updatedCropsSown,
-  //   }));
-
-  //   setIsCropsSownUpdated(true); // Flag to indicate update
-  // };
 
   const handleCropSelection = () => {
     let updatedCropsSown = {};
@@ -187,12 +150,24 @@ const FarmerDetail = ({ route, navigation }) => {
   const handleAddCropRow = () => {
     setCropSown([
       ...cropSown,
-      { season: "", category: "", crop: "", land: "" },
+      { season: "", category: "", crop: "", land: "", isOther: false },
     ]);
   };
 
   const handleRemoveCropRow = (index) => {
     setCropSown(cropSown.filter((_, idx) => idx !== index));
+  };
+
+  const handleCropChange = (item, index) => {
+    const isOther = item.value === "Other";
+
+    setCropSown((prev) =>
+      prev.map((row, idx) =>
+        idx === index
+          ? { ...row, crop: isOther ? "" : item.value, isOther }
+          : row
+      )
+    );
   };
 
   // validating errors
@@ -241,8 +216,8 @@ const FarmerDetail = ({ route, navigation }) => {
       cultivatedLand: parseFloat(loginValue.cultivatedLand),
       desiBreeds: loginValue.desiBreeds,
       typeOfLand: loginValue.typeOfLand,
-      sourceIrrigationItems: loginValue.irrigationSource.split(", "),
-      conservationMeasureItems: loginValue.soilConservationMeasures.split(", "),
+      irrigationSource: loginValue.irrigationSource,
+      soilConservationMeasures: loginValue.soilConservationMeasures,
       microIrrigation: loginValue.microIrrigation,
     };
 
@@ -282,12 +257,10 @@ const FarmerDetail = ({ route, navigation }) => {
     return payload;
   };
 
-  
-
   const handleSubmit = async () => {
     if (validateFields()) {
       try {
-        setLoading(true)
+        setLoading(true);
         const payload = prepareApiPayload();
 
         console.log(
@@ -297,22 +270,23 @@ const FarmerDetail = ({ route, navigation }) => {
 
         const response = await updateFarmerDetailsById(id, payload);
         console.log("udateFarmer-resp", JSON.stringify(response, null, 2));
-        setLoading(false)
-        Alert.alert("Success Message",`${response.message}.`,
-          [
-            {
-              text : "Ok",
-              onPress : () => navigation.navigate("Home"),
-              style:"default"
-            }
-          ]
-        );
+        setLoading(false);
+        Alert.alert("Success Message", `${response.message}.`, [
+          {
+            text: "Ok",
+            onPress: () => navigation.navigate("Home"),
+            style: "default",
+          },
+        ]);
         // navigation.navigate("Home");
       } catch (error) {
-        console.log("udateFarmer-resp-err", error.response.data);
-        Alert.alert("Error adding farmer information");
-      }finally {
-        setLoading(false)
+        console.log("udateFarmer-resp-err", error.response.data.message);
+        Alert.alert(
+          "Failed Message",
+          error.response?.data?.message || "Error updating farmer information."
+        );
+      } finally {
+        setLoading(false);
       }
     }
   };
@@ -330,7 +304,6 @@ const FarmerDetail = ({ route, navigation }) => {
       console.log("farmer-details", JSON.stringify(response, null, 2));
       setFarmerData(response.data);
       // setFarmerData({ ...farmerData, cropsSown: payload.cropsSown }); // last added
-
     } catch (error) {
       console.log("farmer-detail-err", error);
     }
@@ -360,11 +333,14 @@ const FarmerDetail = ({ route, navigation }) => {
       ["kharif", "rabi"].forEach((season) => {
         Object.keys(parsedCropsSown[season] || {}).forEach((category) => {
           (parsedCropsSown[season][category] || {}).forEach((crop) => {
+            const isOther =
+              crop.crop && !cropItems.find((item) => item.value === crop.crop);
             transformedCropSown.push({
               season,
               category,
               crop: crop.crop || "",
               land: crop.cropLand || "",
+              isOther,
             });
           });
         });
@@ -373,7 +349,7 @@ const FarmerDetail = ({ route, navigation }) => {
       const defaultCropSown =
         transformedCropSown.length > 0
           ? transformedCropSown
-          : [{ season: "", category: "", crop: "", land: "" }];
+          : [{ season: "", category: "", crop: "", land: "", isOther: false }];
 
       setCropSown(defaultCropSown);
 
@@ -498,6 +474,7 @@ const FarmerDetail = ({ route, navigation }) => {
             <View>
               <Text style={styles.label}> Village</Text>
               <Dropdown
+                mode="modal"
                 data={villageItems}
                 labelField={"label"}
                 valueField={"value"}
@@ -505,6 +482,12 @@ const FarmerDetail = ({ route, navigation }) => {
                 onChange={(item) =>
                   setLoginValue({ ...loginValue, villageName: item.value })
                 }
+                search
+                searchField="label"
+                searchPlaceholder="search village"
+                inputSearchStyle={styles.inputSearch}
+                containerStyle={styles.modalContainer}
+                itemTextStyle={{ fontFamily: "Poppins-Regular" }}
                 maxHeight={300}
                 style={styles.input}
                 placeholderStyle={styles.placeholderStyle}
@@ -527,6 +510,7 @@ const FarmerDetail = ({ route, navigation }) => {
             <View>
               <Text style={styles.label}>Taluka</Text>
               <Dropdown
+                mode="modal"
                 data={talukaItems}
                 labelField="label"
                 valueField="value"
@@ -534,6 +518,12 @@ const FarmerDetail = ({ route, navigation }) => {
                 onChange={(item) =>
                   setLoginValue({ ...loginValue, taluka: item.value })
                 }
+                search
+                searchField="label"
+                searchPlaceholder="search taluka"
+                inputSearchStyle={styles.inputSearch}
+                containerStyle={styles.modalContainer}
+                itemTextStyle={{ fontFamily: "Poppins-Regular" }}
                 maxHeight={300}
                 style={styles.input}
                 placeholderStyle={styles.placeholderStyle}
@@ -557,6 +547,7 @@ const FarmerDetail = ({ route, navigation }) => {
             <View>
               <Text style={styles.label}>Cluster</Text>
               <Dropdown
+                mode="modal"
                 data={clusterItems}
                 labelField="label"
                 valueField="value"
@@ -564,6 +555,12 @@ const FarmerDetail = ({ route, navigation }) => {
                 onChange={(item) =>
                   setLoginValue({ ...loginValue, cluster: item.value })
                 }
+                search
+                searchField="label"
+                searchPlaceholder="search cluster"
+                inputSearchStyle={styles.inputSearch}
+                containerStyle={styles.modalContainer}
+                itemTextStyle={{ fontFamily: "Poppins-Regular" }}
                 maxHeight={300}
                 style={styles.input}
                 placeholderStyle={styles.placeholderStyle}
@@ -587,6 +584,7 @@ const FarmerDetail = ({ route, navigation }) => {
             <View>
               <Text style={styles.label}>District</Text>
               <Dropdown
+                mode="modal"
                 data={districtItems}
                 labelField="label"
                 valueField="value"
@@ -594,6 +592,12 @@ const FarmerDetail = ({ route, navigation }) => {
                 onChange={(item) =>
                   setLoginValue({ ...loginValue, district: item.value })
                 }
+                search
+                searchField="label"
+                searchPlaceholder="search district"
+                inputSearchStyle={styles.inputSearch}
+                containerStyle={styles.modalContainer}
+                itemTextStyle={{ fontFamily: "Poppins-Regular" }}
                 maxHeight={300}
                 style={styles.input}
                 placeholderStyle={styles.placeholderStyle}
@@ -616,6 +620,7 @@ const FarmerDetail = ({ route, navigation }) => {
             <View>
               <Text style={styles.label}>Land type</Text>
               <Dropdown
+                mode="modal"
                 data={landItems}
                 labelField="label"
                 valueField="value"
@@ -623,6 +628,12 @@ const FarmerDetail = ({ route, navigation }) => {
                 onChange={(item) =>
                   setLoginValue({ ...loginValue, typeOfLand: item.value })
                 }
+                search
+                searchField="label"
+                searchPlaceholder="search land type"
+                inputSearchStyle={styles.inputSearch}
+                containerStyle={styles.modalContainer}
+                itemTextStyle={{ fontFamily: "Poppins-Regular" }}
                 maxHeight={300}
                 style={styles.input}
                 placeholderStyle={styles.placeholderStyle}
@@ -647,6 +658,7 @@ const FarmerDetail = ({ route, navigation }) => {
                 Soil and Water Conservation Measures
               </Text>
               <Dropdown
+                mode="modal"
                 data={conservationMeasureItems}
                 labelField="label"
                 valueField="value"
@@ -657,6 +669,12 @@ const FarmerDetail = ({ route, navigation }) => {
                     soilConservationMeasures: item.value,
                   })
                 }
+                search
+                searchField="label"
+                searchPlaceholder="search conservation"
+                inputSearchStyle={styles.inputSearch}
+                containerStyle={styles.modalContainer}
+                itemTextStyle={{ fontFamily: "Poppins-Regular" }}
                 maxHeight={300}
                 style={styles.input}
                 placeholderStyle={styles.placeholderStyle}
@@ -681,6 +699,7 @@ const FarmerDetail = ({ route, navigation }) => {
             <View>
               <Text style={styles.label}> Irrigation Source</Text>
               <Dropdown
+                mode="modal"
                 data={sourceIrrigationItems}
                 labelField="label"
                 valueField="value"
@@ -688,6 +707,12 @@ const FarmerDetail = ({ route, navigation }) => {
                 onChange={(item) =>
                   setLoginValue({ ...loginValue, irrigationSource: item.value })
                 }
+                search
+                searchField="label"
+                searchPlaceholder="search farmer"
+                inputSearchStyle={styles.inputSearch}
+                containerStyle={styles.modalContainer}
+                itemTextStyle={{ fontFamily: "Poppins-Regular" }}
                 maxHeight={300}
                 style={styles.input}
                 placeholderStyle={styles.placeholderStyle}
@@ -710,6 +735,7 @@ const FarmerDetail = ({ route, navigation }) => {
             <View>
               <Text style={styles.label}>Micro Irrigation</Text>
               <Dropdown
+                mode="modal"
                 data={microIrrigationItems}
                 labelField="label"
                 valueField="value"
@@ -717,6 +743,12 @@ const FarmerDetail = ({ route, navigation }) => {
                 onChange={(item) =>
                   setLoginValue({ ...loginValue, microIrrigation: item.value })
                 }
+                search
+                searchField="label"
+                searchPlaceholder="search micro irrigation"
+                inputSearchStyle={styles.inputSearch}
+                containerStyle={styles.modalContainer}
+                itemTextStyle={{ fontFamily: "Poppins-Regular" }}
                 maxHeight={300}
                 style={styles.input}
                 placeholderStyle={styles.placeholderStyle}
@@ -749,6 +781,7 @@ const FarmerDetail = ({ route, navigation }) => {
                 <View>
                   <Text style={styles.label}>Season</Text>
                   <Dropdown
+                    mode="modal"
                     data={seasonItems}
                     labelField={"label"}
                     valueField={"value"}
@@ -760,6 +793,12 @@ const FarmerDetail = ({ route, navigation }) => {
                         )
                       )
                     }
+                    search
+                    searchField="label"
+                    searchPlaceholder="search season"
+                    inputSearchStyle={styles.inputSearch}
+                    containerStyle={styles.modalContainer}
+                    itemTextStyle={{ fontFamily: "Poppins-Regular" }}
                     style={styles.input}
                     maxHeight={300}
                   />
@@ -769,6 +808,7 @@ const FarmerDetail = ({ route, navigation }) => {
                 <View>
                   <Text style={styles.label}>Category</Text>
                   <Dropdown
+                    mode="modal"
                     data={categoryItems}
                     labelField={"label"}
                     valueField={"value"}
@@ -780,6 +820,12 @@ const FarmerDetail = ({ route, navigation }) => {
                         )
                       )
                     }
+                    search
+                    searchField="label"
+                    searchPlaceholder="search category"
+                    inputSearchStyle={styles.inputSearch}
+                    containerStyle={styles.modalContainer}
+                    itemTextStyle={{ fontFamily: "Poppins-Regular" }}
                     style={styles.input}
                     maxHeight={300}
                   />
@@ -789,20 +835,35 @@ const FarmerDetail = ({ route, navigation }) => {
                 <View>
                   <Text style={styles.label}>Crop</Text>
                   <Dropdown
+                    mode="modal"
                     data={cropItems}
                     labelField={"label"}
                     valueField={"value"}
-                    value={entry.crop}
-                    onChange={(item) =>
-                      setCropSown((prev) =>
-                        prev.map((row, idx) =>
-                          idx === index ? { ...row, crop: item.value } : row
-                        )
-                      )
-                    }
+                    value={entry.isOther ? "Other" : entry.crop}
+                    onChange={(item) => handleCropChange(item, index)}
+                    search
+                    searchField="label"
+                    searchPlaceholder="search crop"
+                    inputSearchStyle={styles.inputSearch}
+                    containerStyle={styles.modalContainer}
+                    itemTextStyle={{ fontFamily: "Poppins-Regular" }}
                     style={styles.input}
                     maxHeight={300}
                   />
+                  {entry.isOther && (
+                    <TextInput
+                      style={[styles.input, { marginTop: 15 }]}
+                      placeholder="Enter crop"
+                      value={entry.crop}
+                      onChangeText={(text) =>
+                        setCropSown((prev) =>
+                          prev.map((row, idx) =>
+                            idx === index ? { ...row, crop: text } : row
+                          )
+                        )
+                      }
+                    />
+                  )}
                 </View>
 
                 {/* cultivated land for the crop */}
@@ -848,19 +909,25 @@ const FarmerDetail = ({ route, navigation }) => {
             {/* //ending crops sown fields */}
 
             <View style={styles.btnContainer}>
-              <TouchableOpacity style={submitBtn} onPress={handleCropSelection} disabled={loading}>
+              <TouchableOpacity
+                style={submitBtn}
+                onPress={handleCropSelection}
+                disabled={loading}
+              >
                 <Text style={styles.inpText}>Update</Text>
               </TouchableOpacity>
             </View>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
-       {loading && (
-              <View style={styles.loaderOverlay}>
-                <ActivityIndicator size={50} color={"#ffffff"} />
-                <Text style={[styles.label, { fontSize: 14, color:"#fff" }]}>processing...</Text>
-              </View>
-            )}
+      {loading && (
+        <View style={styles.loaderOverlay}>
+          <ActivityIndicator size={50} color={"#ffffff"} />
+          <Text style={[styles.label, { fontSize: 14, color: "#fff" }]}>
+            processing...
+          </Text>
+        </View>
+      )}
     </SafeAreaView>
   );
 };
@@ -1019,5 +1086,22 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "rgba(0,0,0,0.5)",
     zIndex: 999,
+  },
+  inputSearch: {
+    borderRadius: 8,
+    borderColor: "#007AFF",
+    paddingHorizontal: 10,
+    backgroundColor: "#F0F0F0",
+    fontFamily: "Poppins-Regular",
+  },
+  modalContainer: {
+    backgroundColor: "#fff",
+    borderRadius: 16,
+    padding: 10,
+    elevation: 5,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
   },
 });

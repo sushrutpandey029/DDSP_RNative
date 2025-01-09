@@ -242,6 +242,7 @@ export const conservationMeasureItems = [
   { label: "Trenching", value: "Trenching" },
   { label: "Farm Pond", value: "Farm Pond" },
   { label: "Bunding", value: "Bunding" },
+  { label: "none", value: "none" },
 ];
 
 export const microIrrigationItems = [
@@ -252,28 +253,30 @@ export const microIrrigationItems = [
 export const sourceIrrigationItems = [
   { label: "Well", value: "Well" },
   { label: "Canal", value: "Canal" },
+  { label: "none", value: "none" },
 ];
 
 export const districtItems = [
   { label: "Yavatmal", value: "Yavatmal" },
-    { label: "Washim", value: "Washim" },
-]
+  { label: "Washim", value: "Washim" },
+];
 
 export const seasonItems = [
   { label: "Kharif", value: "kharif" },
-    { label: "Rabi", value: "rabi" },
-]
+  { label: "Rabi", value: "rabi" },
+];
 
 export const categoryItems = [
   { label: "Chemical Irrigated", value: "chemical_irrigated" },
-    { label: "Chemical Unirrigated", value: "chemical_unirrigated" },
-    { label: "Natural Irrigated", value: "natural_irrigated" },
-    { label: "Natural Unirrigated", value: "natural_unirrigated" },
-]
+  { label: "Chemical Unirrigated", value: "chemical_unirrigated" },
+  { label: "Natural Irrigated", value: "natural_irrigated" },
+  { label: "Natural Unirrigated", value: "natural_unirrigated" },
+];
 
 export const cropItems = [
   { label: "Rice", value: "Rice" },
-    { label: "Wheat", value: "Wheat" },
-    { label: "Maize", value: "Maize" },
-    { label: "Cotton", value: "Cotton" },
-]
+  { label: "Wheat", value: "Wheat" },
+  { label: "Maize", value: "Maize" },
+  { label: "Cotton", value: "Cotton" },
+  { label: "Other", value: "Other" },
+];

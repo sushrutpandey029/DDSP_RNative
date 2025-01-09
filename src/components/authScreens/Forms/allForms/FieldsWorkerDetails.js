@@ -45,9 +45,14 @@ const FieldsWorkerDetails = ({ navigation }) => {
   const [consultancyTelephone, setConsultancyTelephone] = useState("");
   const [consultancyWhatsApp, setConsultancyWhatsApp] = useState("");
   const [observationinbrif, setobservationinbrif] = useState("");
+  const [totalcostinputsuplied, setTotalCostInputSupplied] = useState(0);
 
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
+
+  const today = new Date();
+  const threeDaysAgo = new Date();
+  threeDaysAgo.setDate(today.getDate() - 4);
 
   const filterFarmerName = farmerList?.data.map((farmer) => ({
     label: farmer.name.trim(),
@@ -92,12 +97,31 @@ const FieldsWorkerDetails = ({ navigation }) => {
   const handleRemoveInputSupplied = (index) => {
     const updatedInputs = inputSupplied.filter((_, i) => i !== index);
     setInputSupplied(updatedInputs);
+
+    // recalculating the total cost
+    const total = updatedInputs.reduce((acc,item) => {
+      const price = parseFloat(item.quantity) || 0;
+      return acc + price;
+    }, 0);
+
+    setTotalCostInputSupplied(total);
+
   };
 
   const handleInputSuppliedChange = (index, field, value) => {
     const updatedInputs = [...inputSupplied];
     updatedInputs[index][field] = value;
     setInputSupplied(updatedInputs);
+
+    // calculating the total cost
+    if(field === "quantity") {
+      const total = updatedInputs.reduce((acc, item) => {
+        const price = parseFloat(item.quantity) || 0;
+        return acc + price
+      },0);
+      setTotalCostInputSupplied(total);
+    }
+
   };
 
   const validateFields = () => {
@@ -154,6 +178,7 @@ const FieldsWorkerDetails = ({ navigation }) => {
         clusterTrainingPlace: trainingPlace,
         farmersAttendedTraining: parseInt(farmersInTraining),
         inputSupplied,
+        totalcostinputsuplied,
         consultancyTelephone: parseInt(consultancyTelephone),
         consultancyWhatsApp: parseInt(consultancyWhatsApp),
         observationinbrif: observationinbrif,
@@ -251,25 +276,7 @@ const FieldsWorkerDetails = ({ navigation }) => {
             // onChangeText={setClusterID}
             editable={false}
             />
-            {/* <Dropdown
-              mode="modal"
-              data={ownLandCultivatedItems}
-              labelField={"label"}
-              valueField={"value"}
-              value={ownLandCultivated}
-              onChange={(item) => setOwnLandCultivated(item.value)}
-              style={styles.input}
-              maxHeight={300}
-              renderLeftIcon={() => (
-                <AntDesign
-                  style={styles.icon}
-                  name="Safety"
-                  size={20}
-                  color={"black"}
-                />
-              )}
-            /> */}
-
+    
             {errors.ownLandCultivated && (
               <Text style={{ color: "red" }}>{errors.ownLandCultivated}</Text>
             )}
@@ -306,6 +313,12 @@ const FieldsWorkerDetails = ({ navigation }) => {
               value={villagesVisited}
               onChange={(item) => setVillagesVisited(item.value)}
               style={styles.input}
+              search
+              searchField="label"
+              searchPlaceholder="search village"
+              inputSearchStyle={styles.inputSearch}
+              containerStyle={styles.modalContainer}
+              itemTextStyle={{fontFamily:"Poppins-Regular"}}
               renderLeftIcon={() => (
                 <AntDesign
                   name="Safety"
@@ -338,18 +351,20 @@ const FieldsWorkerDetails = ({ navigation }) => {
           {/* // calendra modal */}
           <Modal animationType="slide" transparent={true} visible={open}>
             <View style={styles.centeredView}>
-              <View style={[styles.modalView, { backgroundColor: "#9ac6ca" }]}>
+              <View style={[styles.modalView]}>
                 <DatePicker
                   modal
                   mode="single"
                   open={open}
-                  selectedItemColor="#637e76"
+                  // selectedItemColor="#637e76"
                   date={date} // Ensure this is a valid Date object
+                  minDate={threeDaysAgo}
+                  maxDate={today}
                   onChange={(event) => handleDateChange(event.date)} // Handle date change
                   placeholder="Select a date"
-                  monthContainerStyle={styles.monthStyle}
-                  yearContainerStyle={styles.monthStyle}
-                  dayContainerStyle={styles.monthStyle}
+                  // monthContainerStyle={styles.monthStyle}
+                  // yearContainerStyle={styles.monthStyle}
+                  // dayContainerStyle={styles.monthStyle}
                 />
 
                 {/* Close Button */}
@@ -510,6 +525,12 @@ const FieldsWorkerDetails = ({ navigation }) => {
                     onChange={(item) =>
                       handleInputSuppliedChange(index, "farmerName", item.value)
                     }
+                    search
+                    searchField="label"
+                    searchPlaceholder="search farmer"
+                    inputSearchStyle={styles.inputSearch}
+                    containerStyle={styles.modalContainer}
+                    itemTextStyle={{fontFamily:"Poppins-Regular"}}
                     style={styles.input}
                     placeholderStyle={styles.placeholderStyle}
                     iconStyle={styles.iconStyle}
@@ -537,9 +558,9 @@ const FieldsWorkerDetails = ({ navigation }) => {
                   />
                 </View>
                 <View>
-                  {/* quantity is changed into price */}
+                  {/* quantity is changed into price*/}
                   <Text style={styles.label}>
-                    Quantity <Text style={{ fontSize: 12 }}>(L)</Text>
+                    Price <Text style={{ fontSize: 12 }}>(Rs.)</Text>
                   </Text>
                   <TextInput
                     style={[styles.input]}
@@ -560,14 +581,15 @@ const FieldsWorkerDetails = ({ navigation }) => {
                 )}
               </View>
             ))}
-            {inputSupplied.length < 5 && (
+            <Text style={[styles.label, {color: "#428d60"}]}>Total Cost : {totalcostinputsuplied}</Text>
+            {/* {inputSupplied.length < 5 && ( */}
               <TouchableOpacity
                 onPress={handleAddInputSupplied}
                 style={styles.addButton}
               >
                 <Text style={styles.addButtonText}>Add Input</Text>
               </TouchableOpacity>
-            )}
+            {/* )} */}
           </View>
 
           <View style={styles.btnContainer}>
@@ -615,7 +637,7 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   formContainer: {
-    marginBottom: 20,
+    marginBottom: "25%",
   },
   img: {
     height: 130,
@@ -688,7 +710,8 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    marginTop: 22,
+    // marginTop: 22,
+    backgroundColor:"rgba(0,0,0,0.5)"
   },
   modalView: {
     margin: 20,
@@ -758,5 +781,21 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "rgba(0,0,0,0.5)",
     zIndex: 999,
+  },
+  inputSearch: {
+    borderRadius: 8,
+    borderColor: "#007AFF",
+    paddingHorizontal: 10,
+    backgroundColor: "#F0F0F0",
+  },
+  modalContainer: {
+    backgroundColor: "#fff",
+    borderRadius: 16, 
+    padding: 10,
+    elevation: 5, 
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 }, 
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
   },
 });

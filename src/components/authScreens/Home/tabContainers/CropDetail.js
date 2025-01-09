@@ -8,56 +8,68 @@ import {
   FlatList,
   Modal,
   ScrollView,
-  Animated,
+  RefreshControl,
 } from "react-native";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import FormHeader from "../../Forms/FormHeader";
 import { globalContainer } from "../../.../../../../globals/style";
 import { detailOfProductionandCultivation } from "../../../services/ApiFile";
-import { TabBar, TabView, SceneMap } from "react-native-tab-view";
+import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect } from "@react-navigation/native";
 
-const CropTab = ({ data, type }) => {
+const CropTab = ({ data, type, refreshing, handleOnRefresh }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectCrop, setSelectedCrop] = useState(null);
-  // const slideAnim = useRef(new Animated.Value(500)).current;
+  const navigation = useNavigation();
+  console.log("refreshing", refreshing);
 
   const openModal = (item) => {
     setSelectedCrop(item);
     setModalVisible(true);
-
-    // Animated.timing(slideAnim, {
-    //   toValue: 0,
-    //   duration: 300,
-    //   useNativeDriver: true,
-    // }).start();
   };
 
   const closeModal = () => {
     setModalVisible(false);
     setSelectedCrop(null);
-    // Animated.timing(slideAnim, {
-    //   toValue: 500,
-    //   duration: 300,
-    //   useNativeDriver: true,
-    // }).start(() => {
-
-    // });
   };
 
   const renderItem = ({ item }) => {
+    console.log("item", JSON.stringify(item, null, 2));
     const crop = type === "cultivationCosts" ? item.crops : item.cropName;
 
+    console.log("type", type);
+    console.log("crop", crop);
+
     return (
-      <TouchableOpacity style={styles.listItem} onPress={() => openModal(crop)}>
-        <Text style={styles.listText}>Season : {crop.season}</Text>
-        <Text style={styles.listText}>
-          Category :{" "}
-          {type === "cultivationCosts" ? crop.category : crop.irrigationType}
-        </Text>
-        <Text style={styles.listText}>
-          Crop : {type === "cultivationCosts" ? crop.crop : crop.name}
-        </Text>
-      </TouchableOpacity>
+      <View style={styles.listItem}>
+        <View>
+          <Text style={styles.listText}>Season: {crop.season}</Text>
+          <Text style={styles.listText}>
+            Category:{" "}
+            {type === "cultivationCosts" ? crop.category : crop.irrigationType}
+          </Text>
+          <Text style={styles.listText}>
+            Crop: {type === "cultivationCosts" ? crop.crop : crop.name}
+          </Text>
+        </View>
+        <View style={styles.btnContainer}>
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate("CropDetailUpdate", {
+                type,
+                crop,
+                id: item.id,
+                farmerID: item.farmerID,
+              })
+            }
+          >
+            <Text style={styles.btnText}>Edit</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => openModal(crop)}>
+            <Text style={styles.btnText}>View</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
     );
   };
 
@@ -68,6 +80,12 @@ const CropTab = ({ data, type }) => {
           data={data}
           renderItem={renderItem}
           keyExtractor={(item) => item.id.toString()}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={handleOnRefresh}
+            />
+          }
         />
       ) : (
         <Text style={styles.noDataText}>No data available.</Text>
@@ -80,8 +98,6 @@ const CropTab = ({ data, type }) => {
         onRequestClose={closeModal}
       >
         <View style={styles.modalContainer}>
-          {/* <Animated.View 
-          style={[styles.modalContainer,{transform:[{translateX: slideAnim}]}]}> */}
           <ScrollView style={styles.modalContent}>
             {selectCrop && (
               <>
@@ -91,8 +107,7 @@ const CropTab = ({ data, type }) => {
                       Seed Cost: {selectCrop.costs.seedCost}
                     </Text>
                     <Text style={styles.modalTitle}>
-                    {/* //land cost is changed into landPreparaitoncost */}
-                      Land Cost: {selectCrop.costs.landCost} 
+                      Land Preparation Cost: {selectCrop.costs.landCost}
                     </Text>
                     <Text style={styles.modalTitle}>
                       Fertilizer Cost: {selectCrop.costs.fertilizerCost}
@@ -114,16 +129,16 @@ const CropTab = ({ data, type }) => {
                 {type === "productionDetails" && (
                   <>
                     <Text style={styles.modalTitle}>
+                      Surplus: {selectCrop.surplus}
+                    </Text>
+                    <Text style={styles.modalTitle}>
                       Total Yield: {selectCrop.totalYield}
                     </Text>
                     <Text style={styles.modalTitle}>
                       Total Sale Value: {selectCrop.totalSaleValue}
                     </Text>
                     <Text style={styles.modalTitle}>
-                      Surplus: {selectCrop.surplus}
-                    </Text>
-                    <Text style={styles.modalTitle}>
-                      Sale Value Per Quintal: {selectCrop.saleValuePerQuintal}
+                      Sale Value Per Quintal : {selectCrop.saleValuePerQuintal}
                     </Text>
                   </>
                 )}
@@ -136,26 +151,22 @@ const CropTab = ({ data, type }) => {
               <Text style={styles.closeButtonText}>Close</Text>
             </TouchableOpacity>
           </ScrollView>
-          {/* </Animated.View> */}
         </View>
       </Modal>
     </SafeAreaView>
   );
 };
 
-const CropDetail = ({ route }) => {
+const CropDetail = ({ route, navigation }) => {
   const fId = route.params.fId;
-  const [index, setIndex] = useState(0);
-  const [routes] = useState([
-    { key: "cultivationCosts", title: "Cultivation Costs" },
-    { key: "productionDetails", title: "Production Details" },
-  ]);
 
+  const [selectedTab, setSelectedTab] = useState("cultivationCosts");
   const [data, setData] = useState({
     cultivationCosts: [],
     productionDetails: [],
   });
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
   const getDetails = async () => {
     try {
@@ -169,18 +180,21 @@ const CropDetail = ({ route }) => {
     }
   };
 
+  const handleOnRefresh = async () => {
+    setRefreshing(true);
+    await getDetails();
+    setRefreshing(false);
+  };
+
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     getDetails();
+  //   }, [])
+  // );
+  
   useEffect(() => {
     getDetails();
   }, []);
-
-  const renderScene = SceneMap({
-    cultivationCosts: () => (
-      <CropTab data={data.cultivationCosts} type="cultivationCosts" />
-    ),
-    productionDetails: () => (
-      <CropTab data={data.productionDetails} type="productionDetails" />
-    ),
-  });
 
   if (loading) {
     return (
@@ -193,18 +207,43 @@ const CropDetail = ({ route }) => {
   return (
     <SafeAreaView style={globalContainer}>
       <FormHeader title="CROP DETAIL" />
-      <TabView
-        navigationState={{ index, routes }}
-        renderScene={renderScene}
-        onIndexChange={setIndex}
-        renderTabBar={(props) => (
-          <TabBar
-            {...props}
-            style={styles.tabBar}
-            indicatorStyle={styles.indicator}
-          />
-        )}
-      />
+      <View style={styles.tabBar}>
+        <TouchableOpacity
+          style={[
+            styles.tabButton,
+            selectedTab === "cultivationCosts" && styles.activeTab,
+          ]}
+          onPress={() => setSelectedTab("cultivationCosts")}
+        >
+          <Text style={styles.tabText}>Cultivation Costs</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[
+            styles.tabButton,
+            selectedTab === "productionDetails" && styles.activeTab,
+          ]}
+          onPress={() => setSelectedTab("productionDetails")}
+        >
+          <Text style={styles.tabText}>Production Details</Text>
+        </TouchableOpacity>
+      </View>
+
+      {selectedTab === "cultivationCosts" && (
+        <CropTab
+          data={data.cultivationCosts}
+          type="cultivationCosts"
+          refreshing={refreshing}
+          handleOnRefresh={handleOnRefresh}
+        />
+      )}
+      {selectedTab === "productionDetails" && (
+        <CropTab
+          data={data.productionDetails}
+          type="productionDetails"
+          refreshing={refreshing}
+          handleOnRefresh={handleOnRefresh}
+        />
+      )}
     </SafeAreaView>
   );
 };
@@ -217,7 +256,23 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  // container: { flex: 1 },
+  tabBar: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    backgroundColor: "#5B8A39",
+    padding: 10,
+  },
+  tabButton: {
+    padding: 10,
+  },
+  activeTab: {
+    borderBottomWidth: 2,
+    borderBottomColor: "#fff",
+  },
+  tabText: {
+    color: "#fff",
+    fontSize: 16,
+  },
   tabContainer: {
     flex: 1,
     padding: 10,
@@ -235,14 +290,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     backgroundColor: "rgba(0,0,0,0.5)",
   },
-  // modalContainer: {
-  //   width: '70%', // Adjust the modal width
-  //   backgroundColor: 'white',
-  //   padding: 20,
-  //   borderTopLeftRadius: 10,
-  //   borderBottomLeftRadius: 10,
-  //   elevation: 5,
-  // },
   modalContent: {
     backgroundColor: "#fff",
     margin: 20,
@@ -260,26 +307,18 @@ const styles = StyleSheet.create({
   closeButtonText: {
     color: "#fff",
   },
-  tabBar: {
-    backgroundColor: "#5B8A39",
-  },
-  indicator: {
-    backgroundColor: "#fff",
-  },
-  loaderContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
   noDataText: {
     textAlign: "center",
     fontSize: 16,
     marginTop: 20,
   },
-  modalBackdrop: {
-    flex: 1,
-    justifyContent: "flex-end",
-    alignItems: "flex-end",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  btnContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 6,
+  },
+  btnText: {
+    color: "blue",
+    fontSize: 16,
   },
 });

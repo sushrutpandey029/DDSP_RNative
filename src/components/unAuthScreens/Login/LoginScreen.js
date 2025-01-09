@@ -49,13 +49,14 @@ const LoginScreen = ({ navigation }) => {
         source={loginImage}
         style={styles.background}
         resizeMode="cover"
+        
       >
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <KeyboardAvoidingView
             style={styles.overlay}
             behavior={Platform.OS === "ios" ? "padding" : "height"}
           >
-            <ScrollView contentContainerStyle={{ flexGrow: 1, marginTop:'20%' }}>
+            <ScrollView contentContainerStyle={{ flexGrow: 1, marginTop:'80%' }}>
               
               <View style={styles.header}>
                 <Text style={styles.text}>
@@ -99,23 +100,26 @@ export default LoginScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    
   },
   background: {
     flex: 1,
+    
   },
   overlay: {
     flex: 1,
     justifyContent: "center",
     paddingHorizontal: 20,
     backgroundColor: "rgba(0, 0, 0, 0.5)", // Add a semi-transparent overlay
+    // marginpTop:30
   },
   header: {
     marginBottom: 30,
     alignItems: "center",
   },
   text: {
-    fontFamily: "Poppins-Bold",
-    fontSize: 24,
+    fontFamily: "Poppins-SemiBold",
+    fontSize: 25,
     color: "#fff",
     textAlign: "center",
   },
@@ -123,8 +127,7 @@ const styles = StyleSheet.create({
     // backgroundColor: "rgba(255, 255, 255, 0.9)",
     borderRadius: 12,
     padding: 20,
-    paddingTop: "80%",
-  },
+   },
   label: {
     fontFamily: "Poppins-SemiBold",
     fontSize: 16,

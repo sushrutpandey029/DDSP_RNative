@@ -28,9 +28,12 @@ const InteractionWithFarmer = ({ navigation }) => {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  console.log("farmer-inter-form", farmerList);
+  // date for calendar
+  const today = new Date();
+  const threeDaysAgo = new Date();
+  threeDaysAgo.setDate(today.getDate() - 4);
 
-  // console.log("user-interact", user);
+  console.log("farmer-inter-form", farmerList);
 
   const formatDate = (selectedDate) => {
     if (!selectedDate) return "";
@@ -70,8 +73,6 @@ const InteractionWithFarmer = ({ navigation }) => {
       setOpen(false);
     }
   };
-
-  
 
   const handleSubmit = async () => {
     console.log("payload", payload);
@@ -125,18 +126,16 @@ const InteractionWithFarmer = ({ navigation }) => {
 
           <Modal animationType="slide" transparent={true} visible={open}>
             <View style={styles.centeredView}>
-              <View style={[styles.modalView, { backgroundColor: "#9ac6ca" }]}>
+              <View style={[styles.modalView]}>
                 <DatePicker
                   modal
                   mode="single"
                   open={open}
-                  selectedItemColor="#637e76"
-                  date={date} // Ensure this is a valid Date object
+                  date={date}
+                  minDate={threeDaysAgo}
+                  maxDate={today}
                   onChange={(event) => handleDateChange(event.date)} // Handle date change
                   placeholder="Select a date"
-                  monthContainerStyle={styles.monthStyle}
-                  yearContainerStyle={styles.monthStyle}
-                  dayContainerStyle={styles.monthStyle}
                 />
                 <TouchableOpacity
                   onPress={() => setOpen(false)}
@@ -160,8 +159,13 @@ const InteractionWithFarmer = ({ navigation }) => {
               labelField={"label"}
               valueField={"value"}
               value={payload.village}
+              search
+              searchField="label"
+              searchPlaceholder="search village"
+              inputSearchStyle={styles.inputSearch}
               onChange={(item) => handleChange("village", item.value)}
               maxHeight={300}
+              style={styles.input}
               placeholderStyle={styles.placeholderStyle}
               selectedTextStyle={styles.selectedTextStyle}
               iconStyle={styles.iconStyle}
@@ -173,7 +177,6 @@ const InteractionWithFarmer = ({ navigation }) => {
                   color={"black"}
                 />
               )}
-              style={styles.input}
             />
           </View>
 
@@ -181,17 +184,18 @@ const InteractionWithFarmer = ({ navigation }) => {
             <Text style={styles.label}>Farmer</Text>
             {/* <TextInput style={styles.input} /> */}
             <Dropdown
-            mode="modal"
+              mode="modal"
               style={styles.input}
-              // data={filterFarmerName.map((farmer) => ({
-              //   label: farmer,
-              //   value: farmer,
-              // }))}
-
               data={filterFarmerName}
               labelField={"label"}
               valueField={"value"}
               value={payload.farmer}
+              search
+              searchField="label"
+              searchPlaceholder="search farmer"
+              inputSearchStyle={styles.inputSearch}
+              containerStyle={styles.modalContainer}
+              itemTextStyle={{ fontFamily: "Poppins-Regular" }}
               maxHeight={300}
               onChange={(item) => handleChange("farmer", item.value)}
               placeholderStyle={styles.placeholderStyle}
@@ -278,7 +282,8 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    marginTop: 22,
+    // marginTop: 22,
+    backgroundColor: "rgba(0,0,0,0.5)",
   },
   modalView: {
     marginTop: 20,
@@ -328,5 +333,22 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "rgba(0,0,0,0.5)",
     zIndex: 999,
+  },
+  inputSearch: {
+    borderRadius: 8,
+    borderColor: "#007AFF",
+    paddingHorizontal: 10,
+    backgroundColor: "#F0F0F0",
+    fontFamily: "Poppins-Regular",
+  },
+  modalContainer: {
+    backgroundColor: "#fff",
+    borderRadius: 16,
+    padding: 10,
+    elevation: 5,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
   },
 });

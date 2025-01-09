@@ -19,7 +19,14 @@ import { addFarmerInfo } from "../../../services/ApiFile";
 import { Dropdown } from "react-native-element-dropdown";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { useSelector, useDispatch } from "react-redux";
-import { villageItems, talukaItems, clusterItems } from "../data/Constant";
+import {
+  villageItems,
+  talukaItems,
+  clusterItems,
+  cropItems,
+  conservationMeasureItems,
+  sourceIrrigationItems
+} from "../data/Constant";
 import { getFarmerById } from "../../../redux/slices/FarmerSlice";
 
 const FarmerInformation = ({ navigation }) => {
@@ -67,20 +74,9 @@ const FarmerInformation = ({ navigation }) => {
     { label: "Sandy", value: "Sandy" },
   ]);
 
-  const [conservationMeasureItems, setConservationMeasureItems] = useState([
-    { label: "Trenching", value: "Trenching" },
-    { label: "Farm Pond", value: "Farm Pond" },
-    { label: "Bunding", value: "Bunding" },
-  ]);
-
   const [microIrrigationItems, setMicroIrrigationItems] = useState([
     { label: "Drip", value: "Drip" },
     { label: "Sprinklers", value: "Sprinklers" },
-  ]);
-
-  const [sourceIrrigationItems, setSourceIrrigationItems] = useState([
-    { label: "Well", value: "Well" },
-    { label: "Canal", value: "Canal" },
   ]);
 
   const [districtItems, setDistrictItems] = useState([
@@ -100,15 +96,8 @@ const FarmerInformation = ({ navigation }) => {
     { label: "Natural Unirrigated", value: "natural_unirrigated" },
   ]);
 
-  const [cropItems] = useState([
-    { label: "Rice", value: "Rice" },
-    { label: "Wheat", value: "Wheat" },
-    { label: "Maize", value: "Maize" },
-    { label: "Cotton", value: "Cotton" },
-  ]);
-
   const [cropSown, setCropSown] = useState([
-    { season: "", category: "", crop: "", land: "" },
+    { season: "", category: "", crop: "", land: "", isOther: false },
   ]);
 
   const handleCropSelection = () => {
@@ -162,12 +151,24 @@ const FarmerInformation = ({ navigation }) => {
   const handleAddCropRow = () => {
     setCropSown([
       ...cropSown,
-      { season: "", category: "", crop: "", land: "" },
+      { season: "", category: "", crop: "", land: "", isOther: false },
     ]);
   };
 
   const handleRemoveCropRow = (index) => {
     setCropSown(cropSown.filter((_, idx) => idx !== index));
+  };
+
+  const handleCropChange = (item, index) => {
+    const isOther = item.value === "Other";
+
+    setCropSown((prev) =>
+      prev.map((row, idx) =>
+        idx === index
+          ? { ...row, crop: isOther ? "" : item.value, isOther }
+          : row
+      )
+    );
   };
 
   // validating errors
@@ -345,17 +346,23 @@ const FarmerInformation = ({ navigation }) => {
             </View>
 
             <View>
-              <Text style={styles.label}> Village</Text>
+              <Text style={styles.label}>District</Text>
               <Dropdown
                 mode="modal"
-                data={villageItems}
-                labelField={"label"}
-                valueField={"value"}
-                value={loginValue.villageName}
+                data={districtItems}
+                labelField="label"
+                valueField="value"
+                value={loginValue.district}
+                itemTextStyle={{fontFamily:"Poppins-Regular"}}
                 onChange={(item) =>
-                  setLoginValue({ ...loginValue, villageName: item.value })
+                  setLoginValue({ ...loginValue, district: item.value })
                 }
                 maxHeight={300}
+                search
+                searchField="label"
+                searchPlaceholder="search district"
+                inputSearchStyle={styles.inputSearch}
+                containerStyle={styles.modalContainer}
                 style={styles.input}
                 placeholderStyle={styles.placeholderStyle}
                 selectedTextStyle={styles.selectedTextStyle}
@@ -363,14 +370,14 @@ const FarmerInformation = ({ navigation }) => {
                 renderLeftIcon={() => (
                   <AntDesign
                     style={styles.icon}
-                    color={"black"}
+                    color="black"
                     name="Safety"
                     size={20}
                   />
                 )}
               />
-              {errors.villageName && (
-                <Text style={{ color: "red" }}>{errors.villageName}</Text>
+              {errors.district && (
+                <Text style={{ color: "red" }}>{errors.district}</Text>
               )}
             </View>
 
@@ -382,10 +389,16 @@ const FarmerInformation = ({ navigation }) => {
                 labelField="label"
                 valueField="value"
                 value={loginValue.taluka}
+                search
+                searchField="label"
+                searchPlaceholder="search taluka"
+                inputSearchStyle={styles.inputSearch}
+                itemTextStyle={{fontFamily:"Poppins-Regular"}}
                 onChange={(item) =>
                   setLoginValue({ ...loginValue, taluka: item.value })
                 }
                 maxHeight={300}
+                containerStyle={styles.modalContainer}
                 style={styles.input}
                 placeholderStyle={styles.placeholderStyle}
                 selectedTextStyle={styles.selectedTextStyle}
@@ -399,6 +412,7 @@ const FarmerInformation = ({ navigation }) => {
                     size={20}
                   />
                 )}
+                
               />
               {errors.taluka && (
                 <Text style={{ color: "red" }}>{errors.taluka}</Text>
@@ -413,6 +427,12 @@ const FarmerInformation = ({ navigation }) => {
                 labelField="label"
                 valueField="value"
                 value={loginValue.cluster}
+                search
+                searchField="label"
+                searchPlaceholder="search cluster"
+                inputSearchStyle={styles.inputSearch}
+                containerStyle={styles.modalContainer}
+                itemTextStyle={{fontFamily:"Poppins-Regular"}}
                 onChange={(item) =>
                   setLoginValue({ ...loginValue, cluster: item.value })
                 }
@@ -437,15 +457,21 @@ const FarmerInformation = ({ navigation }) => {
             </View>
 
             <View>
-              <Text style={styles.label}>District</Text>
+              <Text style={styles.label}> Village</Text>
               <Dropdown
                 mode="modal"
-                data={districtItems}
-                labelField="label"
-                valueField="value"
-                value={loginValue.district}
+                data={villageItems}
+                labelField={"label"}
+                valueField={"value"}
+                value={loginValue.villageName}
+                search
+                searchField="label"
+                searchPlaceholder="search village"
+                inputSearchStyle={styles.inputSearch}
+                containerStyle={styles.modalContainer}
+                itemTextStyle={{fontFamily:"Poppins-Regular"}}
                 onChange={(item) =>
-                  setLoginValue({ ...loginValue, district: item.value })
+                  setLoginValue({ ...loginValue, villageName: item.value })
                 }
                 maxHeight={300}
                 style={styles.input}
@@ -455,14 +481,14 @@ const FarmerInformation = ({ navigation }) => {
                 renderLeftIcon={() => (
                   <AntDesign
                     style={styles.icon}
-                    color="black"
+                    color={"black"}
                     name="Safety"
                     size={20}
                   />
                 )}
               />
-              {errors.district && (
-                <Text style={{ color: "red" }}>{errors.district}</Text>
+              {errors.villageName && (
+                <Text style={{ color: "red" }}>{errors.villageName}</Text>
               )}
             </View>
 
@@ -474,6 +500,12 @@ const FarmerInformation = ({ navigation }) => {
                 labelField="label"
                 valueField="value"
                 value={loginValue.typeOfLand}
+                search
+                searchField="label"
+                searchPlaceholder="search land type"
+                inputSearchStyle={styles.inputSearch}
+                containerStyle={styles.modalContainer}
+                itemTextStyle={{fontFamily:"Poppins-Regular"}}
                 onChange={(item) =>
                   setLoginValue({ ...loginValue, typeOfLand: item.value })
                 }
@@ -506,6 +538,12 @@ const FarmerInformation = ({ navigation }) => {
                 labelField="label"
                 valueField="value"
                 value={loginValue.soilConservationMeasures}
+                search
+                searchField="label"
+                searchPlaceholder="search conservation"
+                inputSearchStyle={styles.inputSearch}
+                containerStyle={styles.modalContainer}
+                itemTextStyle={{fontFamily:"Poppins-Regular"}}
                 onChange={(item) =>
                   setLoginValue({
                     ...loginValue,
@@ -541,6 +579,12 @@ const FarmerInformation = ({ navigation }) => {
                 labelField="label"
                 valueField="value"
                 value={loginValue.irrigationSource}
+                search
+                searchField="label"
+                searchPlaceholder="search irrigation source"
+                inputSearchStyle={styles.inputSearch}
+                containerStyle={styles.modalContainer}
+                itemTextStyle={{fontFamily:"Poppins-Regular"}}
                 onChange={(item) =>
                   setLoginValue({ ...loginValue, irrigationSource: item.value })
                 }
@@ -571,6 +615,12 @@ const FarmerInformation = ({ navigation }) => {
                 labelField="label"
                 valueField="value"
                 value={loginValue.microIrrigation}
+                search
+                searchField="label"
+                searchPlaceholder="search micro irrigation"
+                inputSearchStyle={styles.inputSearch}
+                containerStyle={styles.modalContainer}
+                itemTextStyle={{fontFamily:"Poppins-Regular"}}
                 onChange={(item) =>
                   setLoginValue({ ...loginValue, microIrrigation: item.value })
                 }
@@ -611,6 +661,12 @@ const FarmerInformation = ({ navigation }) => {
                     labelField={"label"}
                     valueField={"value"}
                     value={entry.season}
+                    search
+                    searchField="label"
+                    searchPlaceholder="search season"
+                    inputSearchStyle={styles.inputSearch}
+                    containerStyle={styles.modalContainer}
+                    itemTextStyle={{fontFamily:"Poppins-Regular"}}
                     onChange={(item) =>
                       setCropSown((prev) =>
                         prev.map((row, idx) =>
@@ -637,6 +693,12 @@ const FarmerInformation = ({ navigation }) => {
                     labelField={"label"}
                     valueField={"value"}
                     value={entry.category}
+                    search
+                    searchField="label"
+                    searchPlaceholder="search category"
+                    inputSearchStyle={styles.inputSearch}
+                    containerStyle={styles.modalContainer}
+                    itemTextStyle={{fontFamily:"Poppins-Regular"}}
                     onChange={(item) =>
                       setCropSown((prev) =>
                         prev.map((row, idx) =>
@@ -647,7 +709,7 @@ const FarmerInformation = ({ navigation }) => {
                     style={styles.input}
                     maxHeight={300}
                   />
-                   {errors[`cropSown[${index}].category`] && (
+                  {errors[`cropSown[${index}].category`] && (
                     <Text style={{ color: "red" }}>
                       {errors[`cropSown[${index}].category`]}
                     </Text>
@@ -662,18 +724,34 @@ const FarmerInformation = ({ navigation }) => {
                     data={cropItems}
                     labelField={"label"}
                     valueField={"value"}
-                    value={entry.crop}
-                    onChange={(item) =>
-                      setCropSown((prev) =>
-                        prev.map((row, idx) =>
-                          idx === index ? { ...row, crop: item.value } : row
-                        )
-                      )
+                    value={entry.isOther ? "Other" : entry.crop}
+                    onChange={
+                      (item) => handleCropChange(item, index)
                     }
+                    search
+                    searchField="label"
+                    searchPlaceholder="search crop"
+                    inputSearchStyle={styles.inputSearch}
+                    containerStyle={styles.modalContainer}
+                    itemTextStyle={{fontFamily:"Poppins-Regular"}}
                     style={styles.input}
                     maxHeight={300}
                   />
-                   {errors[`cropSown[${index}].crop`] && (
+                  {entry.isOther && (
+                    <TextInput
+                      style={[styles.input,{marginTop:15}]}
+                      placeholder="Enter crop"
+                      value={entry.crop}
+                      onChangeText={(text) =>
+                        setCropSown((prev) =>
+                          prev.map((row, idx) =>
+                            idx === index ? { ...row, crop: text } : row
+                          )
+                        )
+                      }
+                    />
+                  )}
+                  {errors[`cropSown[${index}].crop`] && (
                     <Text style={{ color: "red" }}>
                       {errors[`cropSown[${index}].crop`]}
                     </Text>
@@ -697,7 +775,7 @@ const FarmerInformation = ({ navigation }) => {
                     }
                     style={styles.input}
                   />
-                   {errors[`cropSown[${index}].land`] && (
+                  {errors[`cropSown[${index}].land`] && (
                     <Text style={{ color: "red" }}>
                       {errors[`cropSown[${index}].land`]}
                     </Text>
@@ -756,7 +834,7 @@ const styles = StyleSheet.create({
   //   paddingBottom: 30,
   // },
   formContainer: {
-    marginBottom: 30,
+    marginBottom: "60%",
   },
   label: {
     fontFamily: "Poppins-Medium",
@@ -894,5 +972,21 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "rgba(0,0,0,0.5)",
     zIndex: 999,
+  },
+  inputSearch: {
+    borderRadius: 8,
+    borderColor: "#007AFF",
+    paddingHorizontal: 10,
+    backgroundColor: "#F0F0F0",
+  },
+  modalContainer: {
+    backgroundColor: "#fff",
+    borderRadius: 16, 
+    padding: 10,
+    elevation: 5, 
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 }, 
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
   },
 });

@@ -25,7 +25,6 @@ import AntDesign from "@expo/vector-icons/AntDesign";
 import { villageItems } from "../../Forms/data/Constant";
 
 const FieldWorkerDetailUpdate = ({ route, navigation }) => {
-
   const id = route.params.id;
   console.log("fwdu-id", id);
 
@@ -54,10 +53,11 @@ const FieldWorkerDetailUpdate = ({ route, navigation }) => {
   const [consultancyTelephone, setConsultancyTelephone] = useState("");
   const [consultancyWhatsApp, setConsultancyWhatsApp] = useState("");
   const [observationinbrif, setobservationinbrif] = useState("");
+  const [totalcostinputsuplied, setTotalCostInputSupplied] = useState(0);
 
   const [errors, setErrors] = useState({});
   const [apiWorkData, setApiWorkData] = useState([]);
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
 
   const [inputSupplied, setInputSupplied] = useState([
     { farmerName: "", name: "", quantity: "" },
@@ -98,19 +98,34 @@ const FieldWorkerDetailUpdate = ({ route, navigation }) => {
   const handleRemoveInputSupplied = (index) => {
     const updatedInputs = inputSupplied.filter((_, i) => i !== index);
     setInputSupplied(updatedInputs);
+
+    // recalculating the total cost
+    const total = updatedInputs.reduce((acc, item) => {
+      const price = parseFloat(item.quantity) || 0;
+      return acc + price;
+    }, 0);
+    setTotalCostInputSupplied(total);
   };
 
   const handleInputSuppliedChange = (index, field, value) => {
     const updatedInputs = [...inputSupplied];
     updatedInputs[index][field] = value;
     setInputSupplied(updatedInputs);
+
+    // calculating the total cost
+    if (field === "quantity") {
+      const total = updatedInputs.reduce((acc, item) => {
+        const price = parseFloat(item.quantity) || 0;
+        return acc + price;
+      }, 0);
+      setTotalCostInputSupplied(total);
+    }
   };
 
   const validateFields = () => {
     let validateErrors = {};
 
-    if(!date)
-      validateErrors.date = "required"
+    if (!date) validateErrors.date = "required";
 
     // if (!villagesVisited)
     //   validateErrors.villagesVisited = "Village is required";
@@ -170,7 +185,8 @@ const FieldWorkerDetailUpdate = ({ route, navigation }) => {
         consultancyWhatsApp: parseInt(consultancyWhatsApp),
         totatotalConsultancy:
           parseInt(consultancyTelephone) + parseInt(consultancyWhatsApp),
-          observationinbrif:observationinbrif
+        observationinbrif: observationinbrif,
+        totalcostinputsuplied,
       };
 
       console.log("requested-data", requestData);
@@ -180,7 +196,6 @@ const FieldWorkerDetailUpdate = ({ route, navigation }) => {
       );
 
       try {
-
         setLoading(true);
 
         const response = await updateWorkDetailsById(id, requestData);
@@ -194,8 +209,8 @@ const FieldWorkerDetailUpdate = ({ route, navigation }) => {
         ]);
       } catch (error) {
         console.log("updateWorkDetail-resp-err:", error.response.data);
-        Alert.alert("Error Message",error.response.data.message);
-      } finally{
+        Alert.alert("Error Message", error.response.data.message);
+      } finally {
         setLoading(false);
       }
     }
@@ -233,7 +248,8 @@ const FieldWorkerDetailUpdate = ({ route, navigation }) => {
       setFarmersInTraining(apiWorkData.farmersAttendedTraining?.toString());
       setConsultancyTelephone(apiWorkData.consultancyTelephone?.toString());
       setConsultancyWhatsApp(apiWorkData.consultancyWhatsApp?.toString());
-      setobservationinbrif(apiWorkData.observationinbrif)
+      setobservationinbrif(apiWorkData.observationinbrif);
+      setTotalCostInputSupplied(apiWorkData.totalcostinputsuplied);
       // setDate(apiWorkData.workDate)
       if (apiWorkData.inputSupplied) {
         try {
@@ -269,22 +285,18 @@ const FieldWorkerDetailUpdate = ({ route, navigation }) => {
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.formContainer}>
           {/* <View style={styles.twoField}> */}
-            <View style={styles.field}>
-              <Text style={styles.label}>Name</Text>
-              <TextInput
-                style={styles.input}
-                value={user.fullname}
-                editable={false}
-              />
-            </View>
-            <View style={styles.field}>
-              <Text style={styles.label}>Village Name</Text>
-              <TextInput
-                style={styles.input}
-                value={village}
-                editable={false}
-              />
-            </View>
+          <View style={styles.field}>
+            <Text style={styles.label}>Name</Text>
+            <TextInput
+              style={styles.input}
+              value={user.fullname}
+              editable={false}
+            />
+          </View>
+          <View style={styles.field}>
+            <Text style={styles.label}>Village Name</Text>
+            <TextInput style={styles.input} value={village} editable={false} />
+          </View>
           {/* </View> */}
           <View style={styles.field}>
             <Text style={styles.label}>Email id</Text>
@@ -323,23 +335,6 @@ const FieldWorkerDetailUpdate = ({ route, navigation }) => {
               // onChangeText={setClusterID}
               editable={false}
             />
-            {/* <Dropdown
-              data={ownLandCultivatedItems}
-              labelField={"label"}
-              valueField={"value"}
-              value={ownLandCultivated}
-              onChange={(item) => setOwnLandCultivated(item.value)}
-              style={styles.input}
-              maxHeight={300}
-              renderLeftIcon={() => (
-                <AntDesign
-                  style={styles.icon}
-                  name="Safety"
-                  size={20}
-                  color={"black"}
-                />
-              )}
-            /> */}
 
             {errors.ownLandCultivated && (
               <Text style={{ color: "red" }}>{errors.ownLandCultivated}</Text>
@@ -370,12 +365,18 @@ const FieldWorkerDetailUpdate = ({ route, navigation }) => {
           <View style={styles.field}>
             <Text style={styles.label}>Visited village name</Text>
             <Dropdown
-            mode="modal"
+              mode="modal"
               data={villageItems}
               labelField={"label"}
               valueField={"value"}
               value={villagesVisited}
               onChange={(item) => setVillagesVisited(item.value)}
+              search
+              searchField="label"
+              searchPlaceholder="search village"
+              inputSearchStyle={styles.inputSearch}
+              containerStyle={styles.modalContainer}
+              itemTextStyle={{ fontFamily: "Poppins-Regular" }}
               style={styles.input}
               renderLeftIcon={() => (
                 <AntDesign
@@ -398,23 +399,19 @@ const FieldWorkerDetailUpdate = ({ route, navigation }) => {
             >
               <Text>{date ? formatDate(date) : "Select a date"}</Text>
             </TouchableOpacity>
-            {errors.date && (<Text style={{ color: "red" }}>{errors.date}</Text>)}
+            {errors.date && <Text style={{ color: "red" }}>{errors.date}</Text>}
           </View>
 
           {/* // calendra modal */}
           <Modal animationType="slide" transparent={true} visible={open}>
             <View style={styles.centeredView}>
-              <View style={[styles.modalView, { backgroundColor: "#9ac6ca" }]}>
+              <View style={[styles.modalView]}>
                 <DatePicker
                   mode="single"
                   open={open}
-                  selectedItemColor="#637e76"
-                  date={date} // Ensure this is a valid Date object
-                  onChange={(event) => handleDateChange(event.date)} // Handle date change
+                  date={date}
+                  onChange={(event) => handleDateChange(event.date)}
                   placeholder="Select a date"
-                  monthContainerStyle={styles.monthStyle}
-                  yearContainerStyle={styles.monthStyle}
-                  dayContainerStyle={styles.monthStyle}
                 />
 
                 {/* Close Button */}
@@ -567,6 +564,7 @@ const FieldWorkerDetailUpdate = ({ route, navigation }) => {
                 <View>
                   <Text style={styles.label}>Farmer Name</Text>
                   <Dropdown
+                    mode="modal"
                     data={filterFarmerName}
                     labelField={"label"}
                     valueField={"value"}
@@ -574,6 +572,12 @@ const FieldWorkerDetailUpdate = ({ route, navigation }) => {
                     onChange={(item) =>
                       handleInputSuppliedChange(index, "farmerName", item.value)
                     }
+                    search
+                    searchField="label"
+                    searchPlaceholder="search farmer"
+                    inputSearchStyle={styles.inputSearch}
+                    containerStyle={styles.modalContainer}
+                    itemTextStyle={{ fontFamily: "Poppins-Regular" }}
                     style={styles.input}
                     placeholderStyle={styles.placeholderStyle}
                     iconStyle={styles.iconStyle}
@@ -601,15 +605,17 @@ const FieldWorkerDetailUpdate = ({ route, navigation }) => {
                   />
                 </View>
                 <View>
+                  {/* quantity is changed into price */}
                   <Text style={styles.label}>
-                    Quantity <Text style={{ fontSize: 12 }}>(L)</Text>
+                    Price <Text style={{ fontSize: 12 }}>(Rs)</Text>
                   </Text>
                   <TextInput
                     style={[styles.input]}
-                     value={item.quantity}
+                    value={item.quantity}
                     onChangeText={(value) =>
                       handleInputSuppliedChange(index, "quantity", value)
                     }
+                    keyboardType="numeric"
                   />
                 </View>
                 {inputSupplied.length > 1 && (
@@ -623,14 +629,16 @@ const FieldWorkerDetailUpdate = ({ route, navigation }) => {
                 )}
               </View>
             ))}
-            {inputSupplied.length < 5 && (
-              <TouchableOpacity
-                onPress={handleAddInputSupplied}
-                style={styles.addButton}
-              >
-                <Text style={styles.addButtonText}>Add Input</Text>
-              </TouchableOpacity>
-            )}
+            <View>
+              <Text>Total Cost : {totalcostinputsuplied}</Text>
+            </View>
+
+            <TouchableOpacity
+              onPress={handleAddInputSupplied}
+              style={styles.addButton}
+            >
+              <Text style={styles.addButtonText}>Add Input</Text>
+            </TouchableOpacity>
           </View>
 
           <View style={styles.btnContainer}>
@@ -642,8 +650,8 @@ const FieldWorkerDetailUpdate = ({ route, navigation }) => {
       </ScrollView>
       {loading && (
         <View style={styles.loaderOverlay}>
-          <ActivityIndicator size={50} color={"#ffffff"}/>
-          <Text style={[styles.inpText, {fontSize: 14}]}>processing...</Text>
+          <ActivityIndicator size={50} color={"#ffffff"} />
+          <Text style={[styles.inpText, { fontSize: 14 }]}>processing...</Text>
         </View>
       )}
     </SafeAreaView>
@@ -747,7 +755,8 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    marginTop: 22,
+    // marginTop: 22,
+    backgroundColor: "rgba(0,0,0,0.5)",
   },
   modalView: {
     margin: 20,
@@ -819,5 +828,22 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "rgba(0,0,0,0.5)",
     zIndex: 999,
+  },
+  inputSearch: {
+    borderRadius: 8,
+    borderColor: "#007AFF",
+    paddingHorizontal: 10,
+    backgroundColor: "#F0F0F0",
+    fontFamily: "Poppins-Regular",
+  },
+  modalContainer: {
+    backgroundColor: "#fff",
+    borderRadius: 16,
+    padding: 10,
+    elevation: 5,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
   },
 });

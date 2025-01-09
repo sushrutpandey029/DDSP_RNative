@@ -29,7 +29,7 @@ const SplashScreen = ({ navigation }) => {
         translucent
         backgroundColor="transparent"
       />
-      <SafeAreaView style={globalContainer}>
+      <SafeAreaView style={styles.container}>
         <View style={styles.textContainer}>
           <View style={styles.textContainerIn}>
             <View>
@@ -41,7 +41,6 @@ const SplashScreen = ({ navigation }) => {
           </View>
           <View>
             <Text style={styles.text}>
-              {" "}
               Natural farming for farmers’ prosperity
             </Text>
           </View>
@@ -54,12 +53,6 @@ const SplashScreen = ({ navigation }) => {
             </TouchableOpacity>
           </View>
         </View>
-        {/* <View style={styles.imageContainer} >
-        <View style={styles.imageContainerIn}>
-           <Image source={splash_img} style={styles.image1} />
-        </View>
-       
-      </View> */}
       </SafeAreaView>
     </ImageBackground>
   );
@@ -69,27 +62,28 @@ export default SplashScreen;
 
 const styles = StyleSheet.create({
   container: {
-    // flex: 1,
-    // paddingHorizontal: "3%",
+    margin: 20,
+    marginTop: 150,
+    backgroundColor: "rgba(255, 255, 255, 0.72)", // Semi-transparent white background
+    borderRadius: 20,
+    padding: 20,
+    // Shadow for iOS
+    shadowColor: "rgb(0, 0, 0)", // Red shadow color for iOS
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.5,
+    shadowRadius: 10,
   },
+
   backgroundImage: {
     flex: 1,
-    // justifyContent: 'center', // Aligns children vertically
-    // alignItems: 'center', // Aligns children horizontally
-    //  width: '100%',
-    // height: '100%',
   },
   textContainer: {
-    // flex : 1,
+     // top:50
   },
   textContainerIn: {
-    marginTop: "30%",
-  },
+   },
   imageContainer: {
     flex: 1,
-    //  alignItems :'center',
-    // backgroundColor: 'grey',
-    // justifyContent : 'flex-end',
   },
   imageContainerIn: {},
   image1: {
@@ -98,19 +92,18 @@ const styles = StyleSheet.create({
     resizeMode: "contain",
   },
   welcomeText: {
-    fontSize: 25,
-    fontWeight: "600",
-    fontFamily: "Poppins-Bold",
-  },
+    fontSize: 30,
+    // fontWeight: "600",
+    fontFamily: "Poppins-SemiBold",
+   },
   farmingText: {
-    color: "#5B8A39",
+    color: "#ff9935",
     fontSize: 25,
-    fontWeight: "600",
-    fontFamily: "Poppins-Bold",
-  },
+     fontFamily: "Poppins-Bold",
+   },
   startButton: {
-    height: 34,
-    width: 141,
+    // height: 34,
+    width: 200,
     backgroundColor: "#5B8A39",
     borderRadius: 10,
     alignItems: "center",
@@ -118,14 +111,16 @@ const styles = StyleSheet.create({
   },
   btnText: {
     fontFamily: "Poppins-Regular",
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: "400",
     color: "#fff",
+    padding:10
   },
   btnContainer: {
     marginVertical: "4%",
   },
   text: {
     fontFamily: "Poppins-Regular",
+    fontSize:16
   },
 });

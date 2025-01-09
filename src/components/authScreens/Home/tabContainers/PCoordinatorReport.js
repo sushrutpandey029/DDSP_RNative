@@ -6,6 +6,7 @@ import {
   ActivityIndicator,
   StyleSheet,
   RefreshControl,
+  TouchableOpacity,
 } from "react-native";
 import { useSelector } from "react-redux";
 import { getCoordinatorDetailsByID } from "../../../services/ApiFile";
@@ -16,6 +17,7 @@ const PCoordinatorReport = () => {
   const [apiData, setApiData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [tabValue, setTabValue] = useState("TP");
 
   const fetchCoordinatoreDetailsById = async () => {
     try {
@@ -73,80 +75,91 @@ const PCoordinatorReport = () => {
 
   const renderCoordinator = ({ item }) => (
     <View style={styles.itemContainer}>
-      {renderSubItem({
-        title: "Training Programmes",
-        data: item.trainingProgrammes,
-        renderItem: ({ item }) => (
-          <View style={styles.subItemContainer}>
-            <Text style={styles.label}>Date: {item.date}</Text>
-            <Text style={styles.label}>Name: {item.name}</Text>
-            <Text style={styles.label}>Village: {item.villageName}</Text>
-            <Text style={styles.label}>Participants: {item.participants}</Text>
-          </View>
-        ),
-        keyExtractor: (training, index) => `${item.id}-training-${index}`,
-      })}
+      {tabValue === "TP" &&
+        renderSubItem({
+          title: "Training Programmes",
+          data: item.trainingProgrammes,
+          renderItem: ({ item }) => (
+            <View style={styles.subItemContainer}>
+              <Text style={styles.label}>Date: {item.date}</Text>
+              <Text style={styles.label}>Name: {item.name}</Text>
+              <Text style={styles.label}>Village: {item.villageName}</Text>
+              <Text style={styles.label}>
+                Participants: {item.participants}
+              </Text>
+            </View>
+          ),
+          keyExtractor: (training, index) => `${item.id}-training-${index}`,
+        })}
 
-      {renderSubItem({
-        title: "Review Meetings",
-        data: item.reviewMeetings,
-        renderItem: ({ item }) => (
-          <View style={styles.subItemContainer}>
-            <Text style={styles.label}>Date: {item.date}</Text>
-            <Text style={styles.label}>
-              Field Officers: {item.fieldOfficer.join(", ")}
-            </Text>
-            <Text style={styles.label}>
-              Assistant Coordinators: {item.asstProjectCoordinator.join(", ")}
-            </Text>
-            <Text style={styles.label}>Participants: {item.participants}</Text>
-          </View>
-        ),
-        keyExtractor: (review, index) => `${item.id}-review-${index}`,
-      })}
+      {tabValue === "RM" &&
+        renderSubItem({
+          title: "Review Meetings",
+          data: item.reviewMeetings,
+          renderItem: ({ item }) => (
+            <View style={styles.subItemContainer}>
+              <Text style={styles.label}>Date: {item.date}</Text>
+              <Text style={styles.label}>
+                Field Officers: {item.fieldOfficer.join(", ")}
+              </Text>
+              <Text style={styles.label}>
+                Assistant Coordinators: {item.asstProjectCoordinator.join(", ")}
+              </Text>
+              <Text style={styles.label}>
+                Participants: {item.participants}
+              </Text>
+            </View>
+          ),
+          keyExtractor: (review, index) => `${item.id}-review-${index}`,
+        })}
 
-      {renderSubItem({
-        title: "Monitoring Visits",
-        data: item.monitoringVisits,
-        renderItem: ({ item }) => (
-          <View style={styles.subItemContainer}>
-            <Text style={styles.label}>Date: {item.date}</Text>
-            <Text style={styles.label}>Cluster: {item.cluster}</Text>
-            <Text style={styles.label}>Observations: {item.observations}</Text>
-          </View>
-        ),
-        keyExtractor: (monitoring, index) => `${item.id}-monitoring-${index}`,
-      })}
+      {tabValue === "MV" &&
+        renderSubItem({
+          title: "Monitoring Visits",
+          data: item.monitoringVisits,
+          renderItem: ({ item }) => (
+            <View style={styles.subItemContainer}>
+              <Text style={styles.label}>Date: {item.date}</Text>
+              <Text style={styles.label}>Cluster: {item.cluster}</Text>
+              <Text style={styles.label}>
+                Observations: {item.observations}
+              </Text>
+            </View>
+          ),
+          keyExtractor: (monitoring, index) => `${item.id}-monitoring-${index}`,
+        })}
 
-      {renderSubItem({
-        title: "Reports",
-        data: item.reports,
-        renderItem: ({ item }) => (
-          <View style={styles.subItemContainer}>
-            <Text style={styles.label}>Details: {item.details}</Text>
-            <Text style={styles.label}>
-              Submitted Date: {item.submittedDate || "N/A"}
-            </Text>
-          </View>
-        ),
-        keyExtractor: (report, index) => `${item.id}-report-${index}`,
-      })}
+      {tabValue === "RP" &&
+        renderSubItem({
+          title: "Reports",
+          data: item.reports,
+          renderItem: ({ item }) => (
+            <View style={styles.subItemContainer}>
+              <Text style={styles.label}>Details: {item.details}</Text>
+              <Text style={styles.label}>
+                Submitted Date: {item.submittedDate || "N/A"}
+              </Text>
+            </View>
+          ),
+          keyExtractor: (report, index) => `${item.id}-report-${index}`,
+        })}
     </View>
   );
 
-  
-
   return (
     <View >
-      {/* <TabButton/> */}
-      {apiData?.length  ? (
+      <TabButton setTabValue={setTabValue} />
+      {apiData?.length ? (
         <FlatList
           data={apiData}
           renderItem={renderCoordinator}
           keyExtractor={(item) => item.id.toString()}
           contentContainerStyle={{ paddingBottom: 20 }}
           refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={handleOnRefresh} />
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={handleOnRefresh}
+            />
           }
           showsVerticalScrollIndicator={false}
         />
@@ -158,8 +171,7 @@ const PCoordinatorReport = () => {
 };
 
 const styles = StyleSheet.create({
-
-   loaderContainer: {
+  loaderContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
@@ -175,7 +187,7 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     // marginHorizontal: 15,
     padding: 15,
-    backgroundColor: "#e1e8e7",
+    // backgroundColor: "#e1e8e7",
     borderRadius: 10,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
@@ -214,37 +226,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#f5f5f5",
     paddingHorizontal: 10,
   },
-
-
-  // loaderContainer: {
-  //   flex: 1,
-  //   justifyContent: "center",
-  //   alignItems: "center",
-  // },
-  // itemContainer: {
-  //   marginVertical: 10,
-  //   padding: 10,
-  //   borderWidth: 1,
-  //   borderRadius: 8,
-  //   borderColor: "#ccc",
-  //   backgroundColor: "#f9f9f9",
-  // },
-  // subItemContainer: {
-  //   marginVertical: 5,
-  //   padding: 8,
-  //   borderWidth: 1,
-  //   borderRadius: 8,
-  //   borderColor: "#eee",
-  // },
-  // label: {
-  //   fontSize: 14,
-  //   color: "#333",
-  // },
-  // subHeader: {
-  //   fontSize: 16,
-  //   fontWeight: "bold",
-  //   marginTop: 10,
-  // },
   emptyStateContainer: {
     justifyContent: "center",
     alignItems: "center",
@@ -254,28 +235,41 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#888",
   },
+  tabContainer: {
+    // flex:1,
+    flexDirection: "row",
+    justifyContent: "space-around",
+  },
+  tab: {
+    backgroundColor: "#d4dad6",
+    width: 70,
+    borderWidth: 1,
+    borderColor: "black",
+    alignItems: "center",
+    borderRadius: 8,
+  },
+  tabText: {
+    padding: 10,
+  },
 });
 
 export default PCoordinatorReport;
 
-// const TabButton = () => {
-//   return (
-//     <View>
-//       <View>
-//         <Text>TP</Text>
-//       </View>
-//       <View>
-//         <Text>RM</Text>
-//       </View>
-//       <View>
-//         <Text>MV</Text>
-//       </View>
-//       <View>
-//         <Text>RP</Text>
-//       </View>
-//     </View>
-//   )
-// }
-
-
-
+const TabButton = ({ setTabValue }) => {
+  return (
+    <View style={styles.tabContainer}>
+      <TouchableOpacity onPress={() => setTabValue("TP")} style={styles.tab}>
+        <Text style={styles.tabText}>TP</Text>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={() => setTabValue("RM")} style={styles.tab}>
+        <Text style={styles.tabText}>RM</Text>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={() => setTabValue("MV")} style={styles.tab}>
+        <Text style={styles.tabText}>MV</Text>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={() => setTabValue("RP")} style={styles.tab}>
+        <Text style={styles.tabText}>RP</Text>
+      </TouchableOpacity>
+    </View>
+  );
+};

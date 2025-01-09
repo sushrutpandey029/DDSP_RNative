@@ -7,7 +7,8 @@ import {
   ScrollView,
   TouchableOpacity,
   Alert,
-  Modal
+  Modal,
+  ActivityIndicator,
 } from "react-native";
 import React, { useState } from "react";
 import FormHeader from "../Forms/FormHeader";
@@ -17,19 +18,17 @@ import { useSelector, useDispatch } from "react-redux";
 import { BaseUrl } from "../../api/Api";
 import { adminUserUpdate } from "../../services/ApiFile";
 import { updateUser } from "../../redux/slices/AuthSlice";
-// import DatePicker from "react-native-ui-datepicker";
-import DatePicker from "react-native-ui-datepicker"
-
+import DatePicker from "react-native-ui-datepicker";
 
 const ProfilePage = ({ navigation }) => {
   const dispatch = useDispatch();
   const userData = useSelector((state) => state.auth.user.user);
   const userId = userData.id;
-  console.log("userDatas",userData)
-
+  console.log("userDatas", userData);
 
   const [open, setOpen] = useState(false);
   const [date, setDate] = useState(new Date());
+  const [loading, setLoading] = useState(false);
 
   const [inputValue, setInputValue] = useState({
     fullname: userData.fullname,
@@ -60,22 +59,23 @@ const ProfilePage = ({ navigation }) => {
   };
 
   const handleSumbit = async () => {
-    // console.warn("inp-val", inputValue);
     try {
+      setLoading(true);
       const response = await adminUserUpdate(userId, inputValue);
       console.warn("profile-resp", response.user);
 
-      // Check if the response contains user data
       if (response?.user) {
         dispatch(updateUser(response.user)); // Update Redux state
         console.log("User updated:", response.user);
-        Alert.alert("Success Message",`${response.message}.`);
+        Alert.alert("Success Message", `${response.message}.`);
       } else {
         console.log("User data is missing in the response:", response);
-        Alert.alert("Error", "Failed to update user data.");
+        Alert.alert("Failed Message", "Failed to update user data.");
       }
     } catch (error) {
       console.log("pr-err", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -117,67 +117,46 @@ const ProfilePage = ({ navigation }) => {
               editable={false}
             />
           </View>
-             <View >
-              <Text style={styles.label}>Phone Number</Text>
-              <TextInput
-                style={styles.input2}
-                value={inputValue.phonenumber}
-                onChangeText={(text) =>
-                  setInputValue({ ...inputValue, phonenumber: text })
-                }
-              />
-            </View>
-            <View >
-              <Text style={styles.label}>Role</Text>
-              <TextInput
-                style={styles.input}
-                value={userData.role}
-                editable={false}
-              />
-            </View>
- 
-          {/* <View>
-            <Text style={styles.label}>Address</Text>
+          <View>
+            <Text style={styles.label}>Phone Number</Text>
             <TextInput
-              style={styles.input}
-              value={inputValue.address}
+              style={styles.input2}
+              value={inputValue.phonenumber}
               onChangeText={(text) =>
-                setInputValue({ ...inputValue, address: text })
+                setInputValue({ ...inputValue, phonenumber: text })
               }
             />
-          </View> */}
+          </View>
           <View>
-            <Text style={styles.label}>DOB</Text>
-            {/* <TextInput
+            <Text style={styles.label}>Role</Text>
+            <TextInput
               style={styles.input}
-              value={inputValue.dob}
-              onChangeText={(text) =>
-                setInputValue({ ...inputValue, dob: text })
-              }
-            /> */}
-             <TouchableOpacity
-                style={[styles.input,{justifyContent : 'center'}]}
-                onPress={() => setOpen(true)}
-              >
-                <Text>{date ? formatDate(date) : "Select a date"}</Text>
-              </TouchableOpacity>
+              value={userData.role}
+              editable={false}
+            />
           </View>
 
-             {/* // calendra modal */}
+          <View>
+            <Text style={styles.label}>DOB</Text>
+            <TouchableOpacity
+              style={[styles.input, { justifyContent: "center" }]}
+              onPress={() => setOpen(true)}
+            >
+              <Text>{inputValue.dob ? inputValue.dob : "Select a date"}</Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* // calendra modal */}
           <Modal animationType="slide" transparent={true} visible={open}>
             <View style={styles.centeredView}>
-              <View style={[styles.modalView, { backgroundColor: "#9ac6ca" }]}>
+              <View style={[styles.modalView]}>
                 <DatePicker
                   modal
                   mode="single"
                   open={open}
-                  selectedItemColor="#637e76"
-                  date={inputValue.dob} // Ensure this is a valid Date object
-                  onChange={(event) => handleDateChange(event.date)} // Handle date change
+                  date={inputValue.dob}
+                  onChange={(event) => handleDateChange(event.date)}
                   placeholder="Select a date"
-                  monthContainerStyle={styles.monthStyle}
-                  yearContainerStyle={styles.monthStyle}
-                  dayContainerStyle={styles.monthStyle}
                 />
 
                 {/* Close Button */}
@@ -205,17 +184,23 @@ const ProfilePage = ({ navigation }) => {
               }
             />
           </View>
-          {/* <View>
-            <Text style={styles.label}>Password</Text>
-            <TextInput style={styles.input} />
-          </View> */}
           <View style={styles.btnContainer}>
-            <TouchableOpacity style={submitBtn} onPress={handleSumbit}>
+            <TouchableOpacity
+              style={submitBtn}
+              onPress={handleSumbit}
+              disabled={loading}
+            >
               <Text style={styles.inpText}>Update</Text>
             </TouchableOpacity>
           </View>
         </View>
       </ScrollView>
+      {loading && (
+        <View style={styles.loaderOverlay}>
+          <ActivityIndicator size={50} color={"#ffffff"} />
+          <Text style={[styles.inpText, { fontSize: 14 }]}>processing...</Text>
+        </View>
+      )}
     </SafeAreaView>
   );
 };
@@ -242,12 +227,11 @@ const styles = StyleSheet.create({
     top: "9%",
     alignItems: "center",
     width: "100%",
-   
   },
   img: {
     height: 130,
     width: 130,
-     borderRadius : 100
+    borderRadius: 100,
   },
   label: {
     fontFamily: "Poppins-Medium",
@@ -309,7 +293,8 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    marginTop: 22,
+    // marginTop: 22,
+    backgroundColor: "rgba(0,0,0,0.5)",
   },
   modalView: {
     margin: 20,
@@ -326,5 +311,15 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5,
+  },
+  monthStyle: {
+    backgroundColor: "#cde1e3",
+    borderColor: "#fff",
+  },
+  loaderOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
   },
 });

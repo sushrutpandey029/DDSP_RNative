@@ -27,7 +27,9 @@ import {
   getAllFieldOfficerApi,
   getCoordinatorDetailsByIDApi,
   getFarmerInteractionApi,
-  getInteractionDetailsApi
+  getInteractionDetailsApi,
+  updateCultivationDetailsApi,
+  updateProductionDetailsApi
 } from "../api/Api";
 import axios from "axios";
 
@@ -314,6 +316,28 @@ export const getInteractionDetails = async (village,farmer) => {
   try{
     const response = await axios.get(api);
     return response.data;
+  }catch(err) {
+    throw err;
+  }
+}
+
+//api to update the production details of a farmer
+export const updateProductionDetails = async (id, request) => {
+  const api = `${BaseUrl}/${updateProductionDetailsApi}/${id}`;
+  try{
+    const response = await axios.put(api,request);
+    return response.data
+  }catch(err){
+    throw err;
+  }
+}
+
+// api to update the cultivation details of a farmer
+export const updateCultivationDetails = async (id, request) => {
+  const api = `${BaseUrl}/${updateCultivationDetailsApi}/${id}`;
+  try{
+    const response = await axios.put(api,request);
+    return response.data
   }catch(err) {
     throw err;
   }

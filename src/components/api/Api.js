@@ -1,4 +1,4 @@
-export const BaseUrl = "https://7dcd-2401-4900-8847-66f9-5896-b90a-34fa-6d7d.ngrok-free.app";
+export const BaseUrl = "https://3ad5-2401-4900-8844-fee8-c9c3-7217-a15c-3c5c.ngrok-free.app";
 // export const BaseUrl = "https://ddsp-backend.onrender.com";
 
 
@@ -31,3 +31,5 @@ export const getAllAsstPCApi = "api/user/allasstpc";
 export const getCoordinatorDetailsByIDApi = "api/user/getCoordinatorDetailsByID";
 export const getFarmerInteractionApi = "api/user/getfarmerintration"
 export const getInteractionDetailsApi = "api/user/interaction_details"
+export const updateProductionDetailsApi = "api/user/updateproductiondetails";
+export const updateCultivationDetailsApi = "api/user/updatecultivationdetail";

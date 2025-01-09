@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   Modal,
   Alert,
-  ActivityIndicator
+  ActivityIndicator,
 } from "react-native";
 import React, { useState, useEffect, useMemo } from "react";
 import { submitBtn } from "../../../../globals/style";
@@ -34,6 +34,10 @@ const ProjectCoordinationWork = ({ navigation }) => {
     FO: false,
     APC: false,
   });
+
+  const today = new Date();
+  const threeDaysAgo = new Date();
+  threeDaysAgo.setDate(today.getDate() - 4);
 
   const formatDate = (selectedDate) => {
     if (!selectedDate) return "";
@@ -125,7 +129,6 @@ const ProjectCoordinationWork = ({ navigation }) => {
     // );
 
     try {
-
       setLoading(true);
 
       const response = await addworkdetails(userDetails.id, formData);
@@ -144,9 +147,7 @@ const ProjectCoordinationWork = ({ navigation }) => {
       console.log("addWork-err", error.response.data);
       Alert("Failed Message", error.response.data.message);
     } finally {
-
       setLoading(false);
-
     }
   };
 
@@ -224,10 +225,6 @@ const ProjectCoordinationWork = ({ navigation }) => {
               <Text style={styles.label}>Place</Text>
               <Dropdown
                 mode="modal"
-                searchField={"String"}
-                search
-                searchPlaceholder="search..."
-                // searchQuery
                 data={villageItems}
                 labelField={"label"}
                 valueField={"value"}
@@ -240,6 +237,12 @@ const ProjectCoordinationWork = ({ navigation }) => {
                     )
                   )
                 }
+                search
+                searchField="label"
+                searchPlaceholder="search place"
+                inputSearchStyle={styles.inputSearch}
+                containerStyle={styles.modalContainer}
+                itemTextStyle={{ fontFamily: "Poppins-Regular" }}
                 placeholderStyle={styles.placeholderStyle}
                 selectedTextStyle={styles.selectedTextStyle}
                 iconStyle={styles.iconStyle}
@@ -331,6 +334,12 @@ const ProjectCoordinationWork = ({ navigation }) => {
                   );
                   setDropdownVisible({ ...dropdownVisible, FO: false });
                 }}
+                search
+                searchField="label"
+                searchPlaceholder="search field officer"
+                inputSearchStyle={styles.inputSearch}
+                containerStyle={styles.modalContainer}
+                itemTextStyle={{ fontFamily: "Poppins-Regular" }}
                 placeholderStyle={styles.placeholderStyle}
                 selectedTextStyle={styles.selectedTextStyle}
                 iconStyle={styles.iconStyle}
@@ -344,16 +353,6 @@ const ProjectCoordinationWork = ({ navigation }) => {
                     style={styles.icon}
                   />
                 )}
-                // renderFooter={() => (
-                //   <View style={styles.footer}>
-                //     <TouchableOpacity
-                //       style={styles.confirmButton}
-                //       onPress={() => setDropdownVisible({...dropdownVisible, FO : false})} // Close modal on confirm
-                //     >
-                //       <Text style={styles.confirmButtonText}>Confirm</Text>
-                //     </TouchableOpacity>
-                //   </View>
-                // )}
               />
 
               <Text style={styles.label}>Assistant Project Coordinator</Text>
@@ -366,12 +365,12 @@ const ProjectCoordinationWork = ({ navigation }) => {
                 value={meeting.asstProjectCoordinator}
                 visible={dropdownVisible.APC}
                 fontFamily="Poppins-Regular"
-                onFocus={() =>
-                  setDropdownVisible({ ...dropdownVisible, APC: true })
-                }
-                onBlur={() =>
-                  setDropdownVisible({ ...dropdownVisible, APC: false })
-                }
+                // onFocus={() =>
+                //   setDropdownVisible({ ...dropdownVisible, APC: true })
+                // }
+                // onBlur={() =>
+                //   setDropdownVisible({ ...dropdownVisible, APC: false })
+                // }
                 onChange={(selectedItem) => {
                   setReviewMeetings((prev) =>
                     prev.map((row, idx) =>
@@ -387,6 +386,12 @@ const ProjectCoordinationWork = ({ navigation }) => {
                   );
                   setDropdownVisible({ ...dropdownVisible, APC: false });
                 }}
+                search
+                searchField="label"
+                searchPlaceholder="search assistant project coordinator"
+                inputSearchStyle={styles.inputSearch}
+                containerStyle={styles.modalContainer}
+                itemTextStyle={{ fontFamily: "Poppins-Regular" }}
                 placeholderStyle={styles.placeholderStyle}
                 selectedTextStyle={styles.selectedTextStyle}
                 iconStyle={styles.iconStyle}
@@ -450,6 +455,12 @@ const ProjectCoordinationWork = ({ navigation }) => {
                     )
                   )
                 }
+                search
+                searchField="label"
+                searchPlaceholder="search cluster / village"
+                inputSearchStyle={styles.inputSearch}
+                containerStyle={styles.modalContainer}
+                itemTextStyle={{ fontFamily: "Poppins-Regular" }}
                 renderLeftIcon={() => (
                   <AntDesign
                     name="Safety"
@@ -560,21 +571,23 @@ const ProjectCoordinationWork = ({ navigation }) => {
         visible={datePickerVisible}
       >
         <View style={styles.centeredView}>
-          <View style={[styles.modalView, { backgroundColor: "#9ac6ca" }]}>
+          <View style={[styles.modalView]}>
             <DatePicker
               // modal
               mode="single"
               // open={open}
               open={datePickerVisible}
-              selectedItemColor="#637e76"
-              // date={date} // Ensure this is a valid Date object
+              minDate={threeDaysAgo}
+              maxDate={today}
+              // selectedItemColor="#637e76"
+              date={today} // Ensure this is a valid Date object
               onChange={(event) => handleDateChange(event.date)} // Handle date change
               onConfirm={handleDateChange}
               // onCancel={() => setDatePickerVisible(false)}
               // placeholder="Select a date"
-              monthContainerStyle={styles.monthStyle}
-              yearContainerStyle={styles.monthStyle}
-              dayContainerStyle={styles.monthStyle}
+              // monthContainerStyle={styles.monthStyle}
+              // yearContainerStyle={styles.monthStyle}
+              // dayContainerStyle={styles.monthStyle}
             />
 
             {/* Close Button */}
@@ -592,7 +605,9 @@ const ProjectCoordinationWork = ({ navigation }) => {
       {loading && (
         <View style={styles.loaderOverlay}>
           <ActivityIndicator size={50} color={"#ffffff"} />
-          <Text style={[styles.title, { fontSize: 14, color:"#fff" }]}>processing...</Text>
+          <Text style={[styles.title, { fontSize: 14, color: "#fff" }]}>
+            processing...
+          </Text>
         </View>
       )}
     </SafeAreaView>
@@ -678,7 +693,8 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    marginTop: 22,
+    // marginTop: 22,
+    backgroundColor: "rgba(0,0,0,0.5)",
   },
   modalView: {
     margin: 20,
@@ -722,6 +738,10 @@ const styles = StyleSheet.create({
     width: 20,
     height: 20,
   },
+  monthStyle: {
+    backgroundColor: "#cde1e3",
+    borderColor: "#fff",
+  },
   footer: {
     padding: 10,
     alignItems: "center",
@@ -745,6 +765,22 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "rgba(0,0,0,0.5)",
     zIndex: 999,
+  },
+  inputSearch: {
+    borderRadius: 8,
+    borderColor: "#007AFF",
+    paddingHorizontal: 10,
+    backgroundColor: "#F0F0F0",
+  },
+  modalContainer: {
+    backgroundColor: "#fff",
+    borderRadius: 16,
+    padding: 10,
+    elevation: 5,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
   },
 });
 

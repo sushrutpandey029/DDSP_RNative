@@ -120,11 +120,11 @@ const LocationFetcher = () => {
       <ScrollView  contentContainerStyle={styles.contentContainer}>
         <TouchableOpacity
           onPress={getLocation}
-          disabled={isSubmitting}
-          style={[styles.button, isSubmitting && styles.disabledButton]}
+          disabled={loading}
+          style={[styles.button, loading && styles.disabledButton]}
         >
           <Text style={styles.buttonText}>
-            {isSubmitting ? "Processing..." : "Fetch Location"}
+            {loading ? "Processing..." : "Fetch Location"}
           </Text>
         </TouchableOpacity>
 
@@ -180,6 +180,7 @@ const styles = StyleSheet.create({
     backgroundColor: "grey",
   },
   loaderOverlay: {
+    // flex:1,
     ...StyleSheet.absoluteFillObject,
     justifyContent: "center",
     alignItems: "center",
