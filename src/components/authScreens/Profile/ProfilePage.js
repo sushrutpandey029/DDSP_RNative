@@ -9,11 +9,20 @@ import {
   Alert,
   Modal,
   ActivityIndicator,
+  RefreshControl,
 } from "react-native";
 import React, { useState } from "react";
 import FormHeader from "../Forms/FormHeader";
 import { TextInput } from "react-native-gesture-handler";
-import { submitBtn, customMargin } from "../../../globals/style";
+import {
+  submitBtn,
+  customMargin,
+  centeredView,
+  modalView,
+  closeButton,
+  semibold,
+  globalContainer,
+} from "../../../globals/style";
 import { useSelector, useDispatch } from "react-redux";
 import { BaseUrl } from "../../api/Api";
 import { adminUserUpdate } from "../../services/ApiFile";
@@ -29,12 +38,20 @@ const ProfilePage = ({ navigation }) => {
   const [open, setOpen] = useState(false);
   const [date, setDate] = useState(new Date());
   const [loading, setLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   const [inputValue, setInputValue] = useState({
     fullname: userData.fullname,
     emailid: userData.emailid,
     phonenumber: userData.phonenumber,
-    // address: userData.address,
+    dob: userData.dob,
+    qualification: userData.qualification,
+  });
+
+  const [initialValue, setInitialValue] = useState({
+    fullname: userData.fullname,
+    emailid: userData.emailid,
+    phonenumber: userData.phonenumber,
     dob: userData.dob,
     qualification: userData.qualification,
   });
@@ -58,32 +75,55 @@ const ProfilePage = ({ navigation }) => {
     }
   };
 
+  const handleOnRefresh = () => {
+    setRefreshing(true);
+    setInputValue(initialValue);
+    setRefreshing(false);
+  };
+
   const handleSumbit = async () => {
     try {
       setLoading(true);
+      console.log("input-value",inputValue)
       const response = await adminUserUpdate(userId, inputValue);
       console.warn("profile-resp", response.user);
 
       if (response?.user) {
         dispatch(updateUser(response.user)); // Update Redux state
         console.log("User updated:", response.user);
+        setInitialValue({
+          fullname: response.user.fullname,
+          emailid: response.user.emailid,
+          phonenumber: response.user.phonenumber,
+          dob: response.user.dob,
+          qualification: response.user.qualification,
+        });
         Alert.alert("Success Message", `${response.message}.`);
       } else {
         console.log("User data is missing in the response:", response);
         Alert.alert("Failed Message", "Failed to update user data.");
       }
     } catch (error) {
-      console.log("pr-err", error);
+      console.log("pr-err", error.response);
+      Alert.alert(
+        "Failed Message",
+        error.response.data.message || "failed to update information."
+      );
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      {/* <FormHeader title="Profile"/> */}
-      <ScrollView>
-        <View style={styles.bgContianer}></View>
+    <SafeAreaView style={globalContainer}>
+      <FormHeader title="Profile" />
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={handleOnRefresh} />
+        }
+      >
+        {/* <View style={styles.bgContianer}></View> */}
         <View style={styles.imgContainer}>
           <Image
             source={{
@@ -125,6 +165,7 @@ const ProfilePage = ({ navigation }) => {
               onChangeText={(text) =>
                 setInputValue({ ...inputValue, phonenumber: text })
               }
+              keyboardType="numeric"
             />
           </View>
           <View>
@@ -138,18 +179,23 @@ const ProfilePage = ({ navigation }) => {
 
           <View>
             <Text style={styles.label}>DOB</Text>
-            <TouchableOpacity
+            {/* <TouchableOpacity
               style={[styles.input, { justifyContent: "center" }]}
               onPress={() => setOpen(true)}
-            >
-              <Text>{inputValue.dob ? inputValue.dob : "Select a date"}</Text>
-            </TouchableOpacity>
+            > */}
+            <TextInput
+              value={inputValue.dob}
+              editable={false}
+              style={styles.input}
+            />
+            {/* <Text>{inputValue.dob ? inputValue.dob : "Select a date"}</Text> */}
+            {/* </TouchableOpacity> */}
           </View>
 
           {/* // calendra modal */}
-          <Modal animationType="slide" transparent={true} visible={open}>
-            <View style={styles.centeredView}>
-              <View style={[styles.modalView]}>
+          {/* <Modal animationType="slide" transparent={true} visible={open}>
+            <View style={centeredView}>
+              <View style={[modalView]}>
                 <DatePicker
                   modal
                   mode="single"
@@ -157,22 +203,19 @@ const ProfilePage = ({ navigation }) => {
                   date={inputValue.dob}
                   onChange={(event) => handleDateChange(event.date)}
                   placeholder="Select a date"
+                  headerButtonsPosition="right"
+                  editable={false}
                 />
 
-                {/* Close Button */}
                 <TouchableOpacity
                   onPress={() => setOpen(false)}
-                  style={styles.closeButton}
+                  style={closeButton}
                 >
-                  <Text
-                    style={{ fontSize: 19, fontWeight: "bold", color: "red" }}
-                  >
-                    Close
-                  </Text>
+                  <Text style={semibold}>Close</Text>
                 </TouchableOpacity>
               </View>
             </View>
-          </Modal>
+          </Modal> */}
 
           <View>
             <Text style={styles.label}>Qualification</Text>
@@ -186,7 +229,7 @@ const ProfilePage = ({ navigation }) => {
           </View>
           <View style={styles.btnContainer}>
             <TouchableOpacity
-              style={submitBtn}
+              style={[submitBtn, { marginTop: 60 }]}
               onPress={handleSumbit}
               disabled={loading}
             >
@@ -210,28 +253,23 @@ export default ProfilePage;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // paddingHorizontal : '3%'
-  },
-  bgContianer: {
-    width: "100%",
-    height: "18%",
-    backgroundColor: "#5B8A39",
-    // borderRadius : '100%'
-    borderBottomEndRadius: 800,
-    borderBottomStartRadius: 800,
-    top: 0,
-    position: "absolute",
   },
   imgContainer: {
-    position: "absolute",
-    top: "9%",
     alignItems: "center",
-    width: "100%",
+    marginBottom: 20,
   },
   img: {
-    height: 130,
     width: 130,
+    height: 130,
     borderRadius: 100,
+    alignSelf: "center",
+    marginBottom: 10,
+    shadowColor: "rgba(0,0,0,0.5)",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.5,
+    shadowRadius: 10,
+    elevation: 6,
+    backgroundColor: "rgba(0,0,0,0.5)",
   },
   label: {
     fontFamily: "Poppins-Medium",
@@ -264,12 +302,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   fieldContainer: {
-    marginTop: "70%",
-    marginBottom: "6%",
-    marginHorizontal: "3%",
+    // marginTop: 20,
+    marginBottom: "40%",
+    // marginHorizontal: "3%",
   },
   subBtn: {
-    width: "70%",
+    // width: "70%",
   },
   inpText: {
     color: "#fff",
@@ -288,33 +326,6 @@ const styles = StyleSheet.create({
   inBtn: {
     flex: 1,
     marginHorizontal: 4,
-  },
-  centeredView: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    // marginTop: 22,
-    backgroundColor: "rgba(0,0,0,0.5)",
-  },
-  modalView: {
-    margin: 20,
-    backgroundColor: "white",
-    borderRadius: 20,
-    width: "90%",
-    padding: 35,
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  monthStyle: {
-    backgroundColor: "#cde1e3",
-    borderColor: "#fff",
   },
   loaderOverlay: {
     ...StyleSheet.absoluteFillObject,

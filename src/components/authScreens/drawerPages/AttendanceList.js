@@ -98,18 +98,18 @@ const AttendanceList = () => {
           {apiAttendanceList.length ? (
             apiAttendanceList.map((item, index) => (
               <View style={styles.list} key={index}>
-                <View>
-                  <Text style={styles.txtName}>Name : {item.fullname}</Text>
-                  <Text style={styles.txtLat}>Latitude : {item.latitude}</Text>
-                  <Text style={styles.txtLong}>
+                <View style={{flex:10}}>
+                  <Text style={styles.txt}>Name : {item.fullname}</Text>
+                  <Text style={styles.txt}>Latitude : {item.latitude}</Text>
+                  <Text style={styles.txt}>
                     Longitude : {item.longitude}
                   </Text>
-                  <Text style={styles.txtAdress}>Address : {item.address}</Text>
+                  <Text style={styles.txt}>Address : {item.address}</Text>
                 </View>
 
-                <View>
+                <View style={{flex:1}}>
                   <TouchableOpacity onPress={() => showConfirmation(item.id)}>
-                    <Icon name="close" color={"red"} size={25} />
+                    <Icon name="close-circle" color={"#dd4545"} size={28}/>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -137,11 +137,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   list: {
+    flex:1,
     flexDirection: "row",
     justifyContent: "space-between",
     margin: 6,
     padding: 6,
-    backgroundColor: "#f5f7fa",
+    backgroundColor: "#d7e6f4",
     borderRadius: 10,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
@@ -150,18 +151,9 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
   },
   outView: {},
-  txtName: {
-    fontFamily: "Poppins-Regular",
-  },
-  txtLat: {
-    fontFamily: "Poppins-Regular",
-  },
-  txtLong: {
-    fontFamily: "Poppins-Regular",
-  },
-  txtAdress: {
-    fontFamily: "Poppins-Regular",
-    paddingRight: 11,
+  txt: {
+    fontFamily: "Poppins-Medium",
+
   },
   noData:{
     // justifyContent: 'center',

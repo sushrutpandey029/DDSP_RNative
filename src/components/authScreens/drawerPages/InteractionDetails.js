@@ -93,10 +93,9 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     padding: 6,
     margin: 6,
-    backgroundColor: "#f5f7fa",
+    backgroundColor: "#d7e6f4",
     borderRadius: 10,
-    // borderWidth: 1,
-    shadowColor: "#000",
+     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 4,
@@ -104,7 +103,7 @@ const styles = StyleSheet.create({
     borderColor: "#d3d3d3",
   },
   text: {
-    fontFamily: "Poppins-Regular",
+    fontFamily: "Poppins-Medium",
   },
   noData: {
     flex: 1,

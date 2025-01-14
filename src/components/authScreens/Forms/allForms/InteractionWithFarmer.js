@@ -12,7 +12,14 @@ import {
   ActivityIndicator,
 } from "react-native";
 import FormHeader from "../FormHeader";
-import { globalContainer, submitBtn } from "../../../../globals/style";
+import {
+  globalContainer,
+  submitBtn,
+  centeredView,
+  modalView,
+  closeButton,
+  semibold,
+} from "../../../../globals/style";
 import { villageItems } from "../data/Constant";
 import { useSelector } from "react-redux";
 import { Dropdown } from "react-native-element-dropdown";
@@ -125,8 +132,8 @@ const InteractionWithFarmer = ({ navigation }) => {
           </View>
 
           <Modal animationType="slide" transparent={true} visible={open}>
-            <View style={styles.centeredView}>
-              <View style={[styles.modalView]}>
+            <View style={centeredView}>
+              <View style={[modalView]}>
                 <DatePicker
                   modal
                   mode="single"
@@ -136,16 +143,13 @@ const InteractionWithFarmer = ({ navigation }) => {
                   maxDate={today}
                   onChange={(event) => handleDateChange(event.date)} // Handle date change
                   placeholder="Select a date"
+                  headerButtonsPosition="right"
                 />
                 <TouchableOpacity
                   onPress={() => setOpen(false)}
-                  style={styles.closeButton}
+                  style={closeButton}
                 >
-                  <Text
-                    style={{ fontSize: 19, color: "red", fontWeight: "bold" }}
-                  >
-                    Close
-                  </Text>
+                  <Text style={semibold}>Close</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -230,7 +234,7 @@ const InteractionWithFarmer = ({ navigation }) => {
               style={submitBtn}
               disabled={loading}
             >
-              <Text style={styles.btnText}>Submit</Text>
+              <Text style={[styles.btnText, semibold]}>Submit</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -278,26 +282,6 @@ const styles = StyleSheet.create({
     textAlignVertical: "top",
     fontSize: 16,
   },
-  centeredView: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    // marginTop: 22,
-    backgroundColor: "rgba(0,0,0,0.5)",
-  },
-  modalView: {
-    marginTop: 20,
-    backgroundColor: "white",
-    borderRadius: 20,
-    width: "90%",
-    padding: 35,
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-  },
   btnContainer: {
     alignItems: "center",
     marginTop: 40,
@@ -318,14 +302,6 @@ const styles = StyleSheet.create({
   iconStyle: {
     width: 20,
     height: 20,
-  },
-  monthStyle: {
-    backgroundColor: "#cde1e3",
-    borderColor: "#fff",
-  },
-  closeButton: {
-    marginTop: 6,
-    padding: 10,
   },
   loaderOverlay: {
     ...StyleSheet.absoluteFillObject,

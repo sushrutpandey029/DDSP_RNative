@@ -1,12 +1,19 @@
 import { View, Text, SafeAreaView, StyleSheet } from "react-native";
 import React from "react";
+import Icon from "react-native-vector-icons/Ionicons";
 
 const ReportCard = (props) => {
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.txtName}>Name : {props.name}</Text>
-      <Text style={styles.txtVillage}>Visited Village : {props.village}</Text>
-      <Text style={styles.txtDate}>Date : {props.workdate}</Text>
+      <View>
+        <Text style={styles.txt}>Name : {props.name}</Text>
+        <Text style={styles.txt}>Visited Village : {props.village}</Text>
+        <Text style={styles.txt}>Date : {props.workdate}</Text>
+      </View>
+
+      <View>
+        <Icon name="chevron-forward-outline" size={23} />
+      </View>
     </SafeAreaView>
   );
 };
@@ -15,25 +22,16 @@ export default ReportCard;
 
 const styles = StyleSheet.create({
   container: {
+    flexDirection:"row",
+    justifyContent:"space-between",
     padding: 6,
     margin: 6,
-    backgroundColor: "#f5f7fa",
+    backgroundColor: "#d7e6f4",
     borderRadius: 10,
-    // borderWidth: 1,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 3,
+    borderWidth: 1,
     borderColor: "#d3d3d3",
   },
-  txtName: {
-    fontFamily: "Poppins-Regular",
-  },
-  txtVillage: {
-    fontFamily: "Poppins-Regular",
-  },
-  txtDate: {
-    fontFamily: "Poppins-Regular",
+  txt: {
+    fontFamily: "Poppins-Medium",
   },
 });

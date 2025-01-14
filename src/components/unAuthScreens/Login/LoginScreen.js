@@ -49,15 +49,16 @@ const LoginScreen = ({ navigation }) => {
         source={loginImage}
         style={styles.background}
         resizeMode="cover"
-        
       >
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-          <KeyboardAvoidingView
-            style={styles.overlay}
-            behavior={Platform.OS === "ios" ? "padding" : "height"}
-          >
-            <ScrollView contentContainerStyle={{ flexGrow: 1, marginTop:'80%' }}>
-              
+        <KeyboardAvoidingView
+          style={styles.overlay}
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+        >
+          <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+            <ScrollView
+              contentContainerStyle={styles.scrollView}
+              keyboardShouldPersistTaps="handled"
+            >
               <View style={styles.header}>
                 <Text style={styles.text}>
                   Welcome to RNFP Regenerative Natural Farming Project
@@ -86,10 +87,9 @@ const LoginScreen = ({ navigation }) => {
                   <Text style={styles.lText}>Login</Text>
                 </TouchableOpacity>
               </View>
-
             </ScrollView>
-          </KeyboardAvoidingView>
-        </TouchableWithoutFeedback>
+          </TouchableWithoutFeedback>
+        </KeyboardAvoidingView>
       </ImageBackground>
     </SafeAreaView>
   );
@@ -100,18 +100,19 @@ export default LoginScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    
   },
   background: {
     flex: 1,
-    
   },
   overlay: {
     flex: 1,
     justifyContent: "center",
     paddingHorizontal: 20,
-    backgroundColor: "rgba(0, 0, 0, 0.5)", // Add a semi-transparent overlay
-    // marginpTop:30
+    backgroundColor: "rgba(0, 0, 0, 0.5)", 
+  },
+  scrollView: {
+    flexGrow: 1,
+    justifyContent: "center",
   },
   header: {
     marginBottom: 30,
@@ -124,10 +125,9 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   formContainer: {
-    // backgroundColor: "rgba(255, 255, 255, 0.9)",
     borderRadius: 12,
     padding: 20,
-   },
+  },
   label: {
     fontFamily: "Poppins-SemiBold",
     fontSize: 16,
@@ -160,27 +160,28 @@ const styles = StyleSheet.create({
   },
 });
 
+
+
+
 // import React, { useEffect, useState } from "react";
 // import {
 //   View,
 //   Text,
 //   SafeAreaView,
-//   Image,
 //   TextInput,
 //   TouchableOpacity,
 //   StyleSheet,
-//   ScrollView,
-//   Alert,
 //   StatusBar,
-//   ImageBackground
+//   ImageBackground,
+//   TouchableWithoutFeedback,
+//   KeyboardAvoidingView,
+//   ScrollView,
+//   Keyboard,
+//   Platform,
 // } from "react-native";
 // import loginImage from "../../../../assets/images/login3.jpg";
-// import axios from "axios";
-// import { authLogin } from "../../services/AuthService";
-// import AsyncStorage from "@react-native-async-storage/async-storage";
 // import { useSelector, useDispatch } from "react-redux";
 // import { loginUser } from "../../redux/slices/AuthSlice";
-// import { globalContainer } from "../../../globals/style";
 
 // const LoginScreen = ({ navigation }) => {
 //   const [loginValue, setLoginValue] = useState({
@@ -191,7 +192,6 @@ const styles = StyleSheet.create({
 //   const dispatch = useDispatch();
 //   const authState = useSelector((state) => state.auth);
 //   const error = authState.error;
-//   const [customError, setCustomError] = useState("");
 
 //   const handleLogin = async () => {
 //     dispatch(loginUser(loginValue));
@@ -204,102 +204,101 @@ const styles = StyleSheet.create({
 //   }, [authState.isLoggedIn]);
 
 //   return (
-
+//     <SafeAreaView style={styles.container}>
+//       <StatusBar
+//         translucent
+//         backgroundColor="transparent"
+//         barStyle="light-content"
+//       />
 //       <ImageBackground
-//       source={loginImage}
-//       style={styles.background}
-//       resizeMode="stretch"
+//         source={loginImage}
+//         style={styles.background}
+//         resizeMode="cover"
+        
 //       >
+       
+//           {/* <KeyboardAvoidingView
+//             style={styles.overlay}
+//             behavior={Platform.OS === "ios" ? "padding" : "height"}
+//           > */}
+//             <ScrollView contentContainerStyle={{ flexGrow: 1, marginTop:'80%' }}>
+              
+//               <View style={styles.header}>
+//                 <Text style={styles.text}>
+//                   Welcome to RNFP Regenerative Natural Farming Project
+//                 </Text>
+//               </View>
+//               <View style={styles.formContainer}>
+//                 {error && (
+//                   <Text style={[styles.label, { color: "red" }]}>{error}</Text>
+//                 )}
+//                 <Text style={styles.label}>User ID</Text>
+//                 <TextInput
+//                   style={styles.input}
+//                   onChangeText={(text) =>
+//                     setLoginValue({ ...loginValue, emailid: text })
+//                   }
+//                 />
+//                 <Text style={styles.label}>Password</Text>
+//                 <TextInput
+//                   style={styles.input}
+//                   secureTextEntry={true}
+//                   onChangeText={(text) =>
+//                     setLoginValue({ ...loginValue, password: text })
+//                   }
+//                 />
+//                 <TouchableOpacity style={styles.lBtn} onPress={handleLogin}>
+//                   <Text style={styles.lText}>Login</Text>
+//                 </TouchableOpacity>
+//               </View>
 
-//       {/* <ScrollView>
-//         <View style={styles.container}>
-//           <View style={styles.tagContainer}>
-//             <Text style={styles.text}>
-//               Welcome to DDSP Regenerative Natural Farming Project
-//             </Text>
-//           </View>
-//           <View style={styles.imageContainer}>
-//             <View>
-//               <Image source={loginImage} style={styles.logImage} />
-//             </View>
-//           </View>
-//           <View style={styles.fieldContainer}>
-//             <View>
-//               {error && (
-//                 <Text style={[styles.label, { color: "red" }]}>{error}</Text>
-//               )}
-//               <Text style={styles.label}>User Id</Text>
-//               <TextInput
-//                 style={styles.input}
-//                 onChangeText={(text) =>
-//                   setLoginValue({ ...loginValue, emailid: text })
-//                 }
-//               />
-//             </View>
-//             <View>
-//               <Text style={styles.label}>Password</Text>
-//               <TextInput
-//                 style={styles.input}
-//                 onChangeText={(text) =>
-//                   setLoginValue({ ...loginValue, password: text })
-//                 }
-//                 secureTextEntry={true}
-//               />
-//             </View>
-//             <View style={styles.btnContainer}>
-//               <TouchableOpacity style={styles.lBtn} onPress={handleLogin}>
-//                 <Text style={styles.lText}>Login</Text>
-//               </TouchableOpacity>
-//             </View>
-//           </View>
-//         </View>
-//       </ScrollView> */}
-//        </ImageBackground>
-
+//             </ScrollView>
+//           {/* </KeyboardAvoidingView> */}
+        
+//       </ImageBackground>
+//     </SafeAreaView>
 //   );
 // };
-
+// {/* <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+// </TouchableWithoutFeedback> */}
 // export default LoginScreen;
 
 // const styles = StyleSheet.create({
 //   container: {
-//     // marginBottom: 30,
-//   },
-//   imageContainer: {
 //     flex: 1,
-//     justifyContent: "flex-end",
+    
+//   },
+//   background: {
+//     flex: 1,
+    
+//   },
+//   overlay: {
+//     flex: 1,
+//     justifyContent: "center",
+//     paddingHorizontal: 20,
+//     backgroundColor: "rgba(0, 0, 0, 0.5)", // Add a semi-transparent overlay
+//     // marginpTop:30
+//   },
+//   header: {
+//     marginBottom: 30,
 //     alignItems: "center",
 //   },
-//   fieldContainer: {
-//     flex: 1,
-//     paddingTop: "10%",
+//   text: {
+//     fontFamily: "Poppins-SemiBold",
+//     fontSize: 25,
+//     color: "#fff",
+//     textAlign: "center",
 //   },
-//   btnContainer: {
-//     alignItems: "center",
-//     marginTop: "10%",
-//   },
-//   logImage: {
-//     // resizeMode:'contain'
-//   },
+//   formContainer: {
+//     // backgroundColor: "rgba(255, 255, 255, 0.9)",
+//     borderRadius: 12,
+//     padding: 20,
+//    },
 //   label: {
-//     fontFamily: "Poppins-Bold",
-//     fontSize: 16,
-//     // marginBottom : 4,
-//     marginTop: 9,
-//     // fontWeight: '500'
-//   },
-//   lText: {
-//     fontFamily: "Poppins-Bold",
+//     fontFamily: "Poppins-SemiBold",
 //     fontSize: 16,
 //     color: "#fff",
-//   },
-//   lBtn: {
-//     height: 49,
-//     width: 110,
-//     backgroundColor: "#5B8A39",
-//     borderRadius: 10,
-//     alignItems: "center",
-//     justifyContent: "center",
+//     marginTop: 10,
 //   },
 //   input: {
 //     height: 49,
@@ -307,19 +306,22 @@ const styles = StyleSheet.create({
 //     borderColor: "#CBD5E1",
 //     borderRadius: 12,
 //     paddingHorizontal: 15,
-//     fontSize: 18,
+//     fontSize: 16,
 //     fontFamily: "Poppins-Regular",
 //     backgroundColor: "#F8FAFC",
-//     // color : '#000'
+//     marginTop: 5,
 //   },
-//   tagContainer: {
-//     marginVertical: 10,
-//     paddingHorizontal: 30,
+//   lBtn: {
+//     height: 49,
+//     backgroundColor: "#5B8A39",
+//     borderRadius: 10,
+//     alignItems: "center",
+//     justifyContent: "center",
+//     marginTop: 20,
 //   },
-//   text: {
-//     fontFamily: "Poppins-Regular",
+//   lText: {
+//     fontFamily: "Poppins-Bold",
+//     fontSize: 16,
+//     color: "#fff",
 //   },
-//   background:{
-//     flex:1
-//   }
 // });

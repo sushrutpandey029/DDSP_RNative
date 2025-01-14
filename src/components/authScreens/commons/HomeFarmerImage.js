@@ -1,12 +1,11 @@
 import { View, Text, Image, StyleSheet } from "react-native";
 import React from "react";
 import MainImage from "../../../../assets/images/banner5.jpg";
-// import MainImage from "../../../../assets/images/mainImage.png"
 
 const HomeFarmerImage = () => {
   return (
-    <View>
-      <Image source={MainImage} style={styles.img} />
+    <View style={styles.container}>
+      <Image source={MainImage} style={styles.img} resizeMode="contain"/>
     </View>
   );
 };
@@ -14,7 +13,14 @@ const HomeFarmerImage = () => {
 export default HomeFarmerImage;
 
 const styles = StyleSheet.create({
+  container:{
+    // flex:1
+    maxWidth:"100%",
+    
+  },
   img: {
     width: "100%",
+    
+    
   },
 });

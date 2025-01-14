@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import React, { useState } from "react";
 import FormHeader from "../../Forms/FormHeader";
-import { globalContainer } from "../../../../globals/style";
+import { globalContainer, semibold } from "../../../../globals/style";
 import {
   updateProductionDetails,
   updateCultivationDetails,
@@ -79,11 +79,11 @@ const CultivationForm = ({ crop, id, farmerID }) => {
 
   const handleSubmit = async () => {
     try {
-      setLoading(true)
+      setLoading(true);
       const response = await updateCultivationDetails(id, payload);
       console.log("cultivation-resp", JSON.stringify(response, null, 2));
       if (response.success === true) {
-        setLoading(false)
+        setLoading(false);
         Alert.alert("Success Message", response.message, [
           {
             text: "Ok",
@@ -96,9 +96,12 @@ const CultivationForm = ({ crop, id, farmerID }) => {
       }
     } catch (err) {
       console.log("cultivation-err", err.response.data.message);
-      Alert.alert("Failed Message", `${err.response.data.message}.` || "failed to update information.");
-    }finally{
-      setLoading(false)
+      Alert.alert(
+        "Failed Message",
+        `${err.response.data.message}.` || "failed to update information."
+      );
+    } finally {
+      setLoading(false);
     }
   };
   return (
@@ -106,10 +109,12 @@ const CultivationForm = ({ crop, id, farmerID }) => {
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={{ marginBottom: "60%" }}>
           <View>
-            <Text>Season : {payload.crops.season}</Text>
-            <Text>category : {payload.crops.category}</Text>
-            <Text>crop : {payload.crops.crop}</Text>
-            <Text>Cultivated Land : {payload.crops.cropLand}</Text>
+            <Text style={semibold}>Season : {payload.crops.season}</Text>
+            <Text style={semibold}>category : {payload.crops.category}</Text>
+            <Text style={semibold}>crop : {payload.crops.crop}</Text>
+            <Text style={semibold}>
+              Cultivated Land : {payload.crops.cropLand}
+            </Text>
           </View>
           <View>
             <Text style={styles.label}>Seed Cost</Text>
@@ -176,7 +181,7 @@ const CultivationForm = ({ crop, id, farmerID }) => {
           </View>
 
           <View>
-            <Text style={styles.label}>Total Cost : {totalCost}</Text>
+            <Text style={[styles.label,{color:"green"}]}>Total Cost : {totalCost}</Text>
           </View>
 
           <View>
@@ -186,14 +191,12 @@ const CultivationForm = ({ crop, id, farmerID }) => {
           </View>
         </View>
       </ScrollView>
-      {
-        loading && (
-          <View style={styles.loaderOverlay}>
-            <ActivityIndicator size={50} color={"#ffffff"}/> 
-            <Text style={[styles.inpText, { fontSize: 14 }]}>processing...</Text>
-          </View>
-        )
-      }
+      {loading && (
+        <View style={styles.loaderOverlay}>
+          <ActivityIndicator size={50} color={"#ffffff"} />
+          <Text style={[styles.inpText, { fontSize: 14 }]}>processing...</Text>
+        </View>
+      )}
     </View>
   );
 };
@@ -210,7 +213,7 @@ const ProductionForm = ({ crop, id, farmerID }) => {
     crop.saleValuePerQuintal
   );
 
-  const [loading , setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const [payload, setPayload] = useState({
     farmerID: farmerID,
@@ -228,27 +231,27 @@ const ProductionForm = ({ crop, id, farmerID }) => {
 
   const updatePayload = (key, value) => {
     const numericValue = parseFloat(value) || 0;
-  
+
     setPayload((prevPayload) => {
       const updatedCropName = {
         ...prevPayload.cropName,
         [key]: numericValue,
       };
-  
+
       const newTotalCost = [
         updatedCropName.totalYield || 0,
         updatedCropName.surplus || 0,
         updatedCropName.totalSaleValue || 0,
       ].reduce((sum, val) => sum + val, 0);
-  
+
       const newSaleValuePerQuintal = (
         (updatedCropName.totalSaleValue || 0) /
         (updatedCropName.totalYield || 1)
       ).toFixed(2);
-  
+
       setTotalCost(newTotalCost);
       setSaleValuePerQuintal(newSaleValuePerQuintal);
-  
+
       // Update payload with new calculations
       return {
         ...prevPayload,
@@ -260,24 +263,28 @@ const ProductionForm = ({ crop, id, farmerID }) => {
       };
     });
   };
-  
+
   const handleSubmit = async () => {
     try {
-      setLoading(true)
+      setLoading(true);
       console.log("updateProduction-payload", payload);
       const response = await updateProductionDetails(id, payload);
       if (response.success === true) {
         console.log("updateProduction-resp", response);
-        setLoading(false)
-        Alert.alert("Success Message", response.message || "data updated successfully.", [
-          {
-            text: "Ok",
-            onPress: () => {
-              navigation.navigate("CropDetail", { fId: farmerID });
+        setLoading(false);
+        Alert.alert(
+          "Success Message",
+          response.message || "data updated successfully.",
+          [
+            {
+              text: "Ok",
+              onPress: () => {
+                navigation.navigate("CropDetail", { fId: farmerID });
+              },
+              style: "default",
             },
-            style: "default",
-          },
-        ]);
+          ]
+        );
       }
     } catch (err) {
       console.log("updateProduction-err", err.response.data.message);
@@ -286,8 +293,8 @@ const ProductionForm = ({ crop, id, farmerID }) => {
         "Failed Message",
         err.response?.data?.message || "failed to update information."
       );
-    }finally{
-      setLoading(false)
+    } finally {
+      setLoading(false);
     }
   };
   return (
@@ -295,9 +302,9 @@ const ProductionForm = ({ crop, id, farmerID }) => {
       <ScrollView>
         <View style={{ marginBottom: "60%" }}>
           <View>
-            <Text>Season : {crop.season}</Text>
-            <Text>Category : {crop.irrigationType}</Text>
-            <Text>Crop : {crop.name}</Text>
+            <Text style={semibold}>Season : {crop.season}</Text>
+            <Text style={semibold}>Category : {crop.irrigationType}</Text>
+            <Text style={semibold}>Crop : {crop.name}</Text>
           </View>
           <View>
             <Text style={styles.label}>Surplus</Text>
@@ -327,13 +334,13 @@ const ProductionForm = ({ crop, id, farmerID }) => {
           </View>
 
           <View>
-            <Text style={styles.label}>
+            <Text style={[styles.label,{color:"green"}]}>
               Total Sale Value Per Quintal :{saleValuePerQuintal}
             </Text>
           </View>
 
           <View>
-            <Text style={styles.label}>Total Cost : {totalCost}</Text>
+            <Text style={[styles.label,{color:"green"}]}>Total Cost : {totalCost}</Text>
           </View>
 
           <View>
@@ -343,14 +350,12 @@ const ProductionForm = ({ crop, id, farmerID }) => {
           </View>
         </View>
       </ScrollView>
-      {
-        loading && (
-          <View style={styles.loaderOverlay}>
-            <ActivityIndicator size={50} color={"#ffffff"}/> 
-            <Text style={[styles.inpText, { fontSize: 14 }]}>processing...</Text>
-          </View>
-        )
-      }
+      {loading && (
+        <View style={styles.loaderOverlay}>
+          <ActivityIndicator size={50} color={"#ffffff"} />
+          <Text style={[styles.inpText, { fontSize: 14 }]}>processing...</Text>
+        </View>
+      )}
     </View>
   );
 };

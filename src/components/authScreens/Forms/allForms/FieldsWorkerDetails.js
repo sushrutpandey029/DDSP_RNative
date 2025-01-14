@@ -12,7 +12,18 @@ import {
   ActivityIndicator,
 } from "react-native";
 import React, { useState } from "react";
-import { submitBtn } from "../../../../globals/style";
+import {
+  submitBtn,
+  addButton,
+  addButtonText,
+  removeButton,
+  removeButtonText,
+  regular,
+  semibold,
+  modalView,
+  centeredView,
+  closeButton
+} from "../../../../globals/style";
 import FormHeader from "../FormHeader";
 import DatePicker from "react-native-ui-datepicker";
 import { globalContainer } from "../../../../globals/style";
@@ -21,6 +32,7 @@ import { addFieldOfficerWorkDetail } from "../../../services/ApiFile";
 import { Dropdown } from "react-native-element-dropdown";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { villageItems } from "../data/Constant";
+import { Ionicons } from "@expo/vector-icons";
 
 const FieldsWorkerDetails = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -34,7 +46,9 @@ const FieldsWorkerDetails = ({ navigation }) => {
   const [open, setOpen] = useState(false);
   const [date, setDate] = useState(new Date());
   const [villagesVisited, setVillagesVisited] = useState("");
-  const [ownLandCultivated, setOwnLandCultivated] = useState(user.cultivatedland);
+  const [ownLandCultivated, setOwnLandCultivated] = useState(
+    user.cultivatedland
+  );
   const [clusterID, setClusterID] = useState(user.clusterid);
   const [travelInKms, setTravelInKms] = useState("");
   const [farmersContacted, setFarmersContacted] = useState("");
@@ -99,13 +113,12 @@ const FieldsWorkerDetails = ({ navigation }) => {
     setInputSupplied(updatedInputs);
 
     // recalculating the total cost
-    const total = updatedInputs.reduce((acc,item) => {
+    const total = updatedInputs.reduce((acc, item) => {
       const price = parseFloat(item.quantity) || 0;
       return acc + price;
     }, 0);
 
     setTotalCostInputSupplied(total);
-
   };
 
   const handleInputSuppliedChange = (index, field, value) => {
@@ -114,41 +127,19 @@ const FieldsWorkerDetails = ({ navigation }) => {
     setInputSupplied(updatedInputs);
 
     // calculating the total cost
-    if(field === "quantity") {
+    if (field === "quantity") {
       const total = updatedInputs.reduce((acc, item) => {
         const price = parseFloat(item.quantity) || 0;
-        return acc + price
-      },0);
+        return acc + price;
+      }, 0);
       setTotalCostInputSupplied(total);
     }
-
   };
 
   const validateFields = () => {
     let validateErrors = {};
 
     if (!date) validateErrors.date = "required";
-
-    // if (!villagesVisited)
-    //   validateErrors.villagesVisited = "Village is required";
-    // if (!ownLandCultivated)
-    //   validateErrors.ownLandCultivated = "Own Land Cultivated is required";
-    // if (!clusterID) validateErrors.clusterID = "Cluster is required";
-    // if (!travelInKms) validateErrors.travelInKms = "Distance is required";
-    // if (!farmersContacted)
-    //   validateErrors.farmersContacted = "No. of farmers is required";
-    // if (!groupMeetings)
-    //   validateErrors.groupMeetings = "Group meeting is required";
-    // if (!farmersInGroup)
-    //   validateErrors.farmersInGroup = "Farmers in group is required";
-    // if (!trainingPlace)
-    //   validateErrors.trainingPlace = "Training place is required";
-    // if (!farmersInTraining)
-    //   validateErrors.farmersInTraining = "Farmers in training is required";
-    // if (!consultancyTelephone)
-    //   validateErrors.consultancyTelephone = "Telephone is required";
-    // if (!consultancyWhatsApp)
-    //   validateErrors.consultancyWhatsApp = "Whatsapp is required";
 
     setErrors(validateErrors);
 
@@ -168,7 +159,7 @@ const FieldsWorkerDetails = ({ navigation }) => {
         mobileNumber: user.phonenumber,
         emailID: user.emailid,
         ownLandCultivatedUnderNaturalFarming: ownLandCultivated,
-        clusterID : user.clusterid,
+        clusterID: user.clusterid,
         workDate: formatDate(date),
         villagesVisited,
         travelInKms: parseInt(travelInKms),
@@ -207,7 +198,7 @@ const FieldsWorkerDetails = ({ navigation }) => {
         ]);
       } catch (error) {
         console.log("fldWrkDetls-Error submitting form:", error.response.data);
-        Alert.alert("Error Message",error.response.data.message);
+        Alert.alert("Error Message", error.response.data.message);
       } finally {
         setLoading(false);
       }
@@ -220,23 +211,23 @@ const FieldsWorkerDetails = ({ navigation }) => {
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.formContainer}>
           {/* <View > */}
-            <View >
-              <Text style={styles.label}>Name</Text>
-              <TextInput
-                style={styles.input}
-                value={user.fullname}
-                editable={false}
-              />
-            </View>
-            <View style={styles.field}>
-              {/* village is associated with address in database or keyname */}
-              <Text style={styles.label}>Village Name</Text>
-              <TextInput
-                style={styles.input}
-                value={user.village}
-                editable={false}
-              />
-            </View>
+          <View>
+            <Text style={styles.label}>Name</Text>
+            <TextInput
+              style={styles.input}
+              value={user.fullname}
+              editable={false}
+            />
+          </View>
+          <View style={styles.field}>
+            {/* village is associated with address in database or keyname */}
+            <Text style={styles.label}>Village Name</Text>
+            <TextInput
+              style={styles.input}
+              value={user.village}
+              editable={false}
+            />
+          </View>
           {/* </View> */}
 
           <View style={styles.field}>
@@ -270,13 +261,13 @@ const FieldsWorkerDetails = ({ navigation }) => {
             <Text style={styles.label}>
               Land cultivated under Natural Farming ?
             </Text>
-            <TextInput 
-            style={styles.input}
-            value={ownLandCultivated}
-            // onChangeText={setClusterID}
-            editable={false}
+            <TextInput
+              style={styles.input}
+              value={ownLandCultivated}
+              // onChangeText={setClusterID}
+              editable={false}
             />
-    
+
             {errors.ownLandCultivated && (
               <Text style={{ color: "red" }}>{errors.ownLandCultivated}</Text>
             )}
@@ -318,7 +309,7 @@ const FieldsWorkerDetails = ({ navigation }) => {
               searchPlaceholder="search village"
               inputSearchStyle={styles.inputSearch}
               containerStyle={styles.modalContainer}
-              itemTextStyle={{fontFamily:"Poppins-Regular"}}
+              itemTextStyle={{ fontFamily: "Poppins-Regular" }}
               renderLeftIcon={() => (
                 <AntDesign
                   name="Safety"
@@ -350,31 +341,26 @@ const FieldsWorkerDetails = ({ navigation }) => {
 
           {/* // calendra modal */}
           <Modal animationType="slide" transparent={true} visible={open}>
-            <View style={styles.centeredView}>
-              <View style={[styles.modalView]}>
+            <View style={centeredView}>
+              <View style={[modalView]}>
                 <DatePicker
                   modal
                   mode="single"
                   open={open}
-                  // selectedItemColor="#637e76"
-                  date={date} // Ensure this is a valid Date object
+                  date={date}
                   minDate={threeDaysAgo}
                   maxDate={today}
-                  onChange={(event) => handleDateChange(event.date)} // Handle date change
+                  onChange={(event) => handleDateChange(event.date)}
                   placeholder="Select a date"
-                  // monthContainerStyle={styles.monthStyle}
-                  // yearContainerStyle={styles.monthStyle}
-                  // dayContainerStyle={styles.monthStyle}
+                  headerButtonsPosition="right"
                 />
 
                 {/* Close Button */}
                 <TouchableOpacity
                   onPress={() => setOpen(false)}
-                  style={styles.closeButton}
+                  style={closeButton}
                 >
-                  <Text
-                    style={{ fontSize: 19, fontWeight: "bold", color: "red" }}
-                  >
+                  <Text style={[semibold]}>
                     Close
                   </Text>
                 </TouchableOpacity>
@@ -511,7 +497,7 @@ const FieldsWorkerDetails = ({ navigation }) => {
             {inputSupplied.map((item, index) => (
               <View key={index} style={{ marginBottom: 20 }}>
                 <View style={{ alignSelf: "flex-end" }}>
-                  <Text>Entry {index + 1}</Text>
+                  <Text style={semibold}>{index + 1}</Text>
                 </View>
 
                 <View>
@@ -530,7 +516,7 @@ const FieldsWorkerDetails = ({ navigation }) => {
                     searchPlaceholder="search farmer"
                     inputSearchStyle={styles.inputSearch}
                     containerStyle={styles.modalContainer}
-                    itemTextStyle={{fontFamily:"Poppins-Regular"}}
+                    itemTextStyle={{ fontFamily: "Poppins-Regular" }}
                     style={styles.input}
                     placeholderStyle={styles.placeholderStyle}
                     iconStyle={styles.iconStyle}
@@ -568,27 +554,33 @@ const FieldsWorkerDetails = ({ navigation }) => {
                     onChangeText={(value) =>
                       handleInputSuppliedChange(index, "quantity", value)
                     }
+                    keyboardType="numeric"
                   />
                 </View>
                 {inputSupplied.length > 1 && (
-                  <View style={styles.removeButton}>
+                  <View style={removeButton}>
                     <TouchableOpacity
                       onPress={() => handleRemoveInputSupplied(index)}
+                      style={{flexDirection:"row"}}
                     >
-                      <Text style={styles.removeButtonText}>Remove</Text>
+                      <Ionicons name="close" size={23} color={"red"}/>
+                      <Text style={[removeButtonText, semibold]}>Remove</Text>
                     </TouchableOpacity>
                   </View>
                 )}
               </View>
             ))}
-            <Text style={[styles.label, {color: "#428d60"}]}>Total Cost : {totalcostinputsuplied}</Text>
+            <Text style={[styles.label, { color: "#428d60" }]}>
+              Total Cost : {totalcostinputsuplied}
+            </Text>
             {/* {inputSupplied.length < 5 && ( */}
-              <TouchableOpacity
-                onPress={handleAddInputSupplied}
-                style={styles.addButton}
-              >
-                <Text style={styles.addButtonText}>Add Input</Text>
-              </TouchableOpacity>
+            <TouchableOpacity
+              onPress={handleAddInputSupplied}
+              style={[addButton,{flexDirection:"row"}]}
+            >
+              <Ionicons name="add" size={23} color={"#fff"}/>
+              <Text style={[addButtonText, semibold]}>Add More</Text>
+            </TouchableOpacity>
             {/* )} */}
           </View>
 
@@ -598,7 +590,7 @@ const FieldsWorkerDetails = ({ navigation }) => {
               onPress={handleSubmit}
               disabled={loading}
             >
-              <Text style={styles.inpText}>Submit</Text>
+              <Text style={[styles.inpText, semibold]}>Submit</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -706,62 +698,6 @@ const styles = StyleSheet.create({
     flex: 1,
     marginHorizontal: 4,
   },
-  centeredView: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    // marginTop: 22,
-    backgroundColor:"rgba(0,0,0,0.5)"
-  },
-  modalView: {
-    margin: 20,
-    backgroundColor: "white",
-    borderRadius: 20,
-    width: "90%",
-    padding: 35,
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  closeButton: {
-    marginTop: 6,
-    padding: 10,
-  },
-  monthStyle: {
-    backgroundColor: "#cde1e3",
-    borderColor: "#fff",
-  },
-  removeButton: {
-    backgroundColor: "#FF5C5C",
-    padding: 6,
-    borderRadius: 10,
-    width: "25%",
-    marginTop: 10,
-  },
-  removeButtonText: {
-    color: "#FFF",
-    textAlign: "center",
-    fontFamily: "Poppins-Regular",
-  },
-  addButton: {
-    backgroundColor: "#70ccb2",
-    padding: 10,
-    borderRadius: 10,
-    marginBottom: 20,
-    width: "30%",
-    marginTop: 10,
-  },
-  addButtonText: {
-    color: "white",
-    textAlign: "center",
-    fontFamily: "Poppins-Regular",
-  },
   icon: {
     marginRight: 5,
   },
@@ -790,11 +726,11 @@ const styles = StyleSheet.create({
   },
   modalContainer: {
     backgroundColor: "#fff",
-    borderRadius: 16, 
+    borderRadius: 16,
     padding: 10,
-    elevation: 5, 
+    elevation: 5,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 }, 
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
   },

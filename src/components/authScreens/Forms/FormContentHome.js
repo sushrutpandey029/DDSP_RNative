@@ -19,25 +19,20 @@ export default FormContentHome;
 
 const styles = StyleSheet.create({
   container: {
-    padding: 12,
+    padding: 10,
     margin: 6,
     borderRadius: 10,
-    backgroundColor: "#f5f7fa",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 3,
+    backgroundColor: "#e9f0e6",
     borderWidth: 1,
-    borderColor: "#d3d3d3",
+    borderColor: "#f5f5e2",
   },
   title: {
-    fontFamily: "Poppins-Medium",
-    fontSize: 14,
+    fontFamily: "Poppins-SemiBold",
+    fontSize: 16,
   },
   content: {
-    fontFamily: "Poppins-Regular",
-    fontSize: 11,
+    fontFamily: "Poppins-Medium",
+    fontSize: 12,
     marginLeft: 22,
   },
   iconTitle: {

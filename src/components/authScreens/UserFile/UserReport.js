@@ -48,12 +48,6 @@ const UserReport = ({ navigation }) => {
     getUserDetails();
   }, []);
 
-  // useFocusEffect(
-  //   React.useCallback(() => {
-  //     getUserDetails(); // Call API when component is focused
-  //   }, [])
-  // );
-
   const onRefresh = async () => {
     setRefreshing(true);
     await getUserDetails();

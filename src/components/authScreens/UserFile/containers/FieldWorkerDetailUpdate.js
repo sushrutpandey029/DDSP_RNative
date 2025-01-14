@@ -13,7 +13,7 @@ import {
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import FormHeader from "../../Forms/FormHeader";
-import { globalContainer, submitBtn } from "../../../../globals/style";
+import { globalContainer, submitBtn, addButton, addButtonText,removeButton, removeButtonText,semibold } from "../../../../globals/style";
 import {
   getWorkDetailById,
   updateWorkDetailsById,
@@ -23,6 +23,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Dropdown } from "react-native-element-dropdown";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { villageItems } from "../../Forms/data/Constant";
+import { Ionicons } from "@expo/vector-icons";
 
 const FieldWorkerDetailUpdate = ({ route, navigation }) => {
   const id = route.params.id;
@@ -558,7 +559,7 @@ const FieldWorkerDetailUpdate = ({ route, navigation }) => {
             {inputSupplied.map((item, index) => (
               <View key={index} style={{ marginBottom: 20 }}>
                 <View style={{ alignSelf: "flex-end" }}>
-                  <Text>Entry {index + 1}</Text>
+                  <Text style={semibold}> {index + 1}</Text>
                 </View>
 
                 <View>
@@ -619,25 +620,28 @@ const FieldWorkerDetailUpdate = ({ route, navigation }) => {
                   />
                 </View>
                 {inputSupplied.length > 1 && (
-                  <View style={styles.removeButton}>
+                  <View style={removeButton}>
                     <TouchableOpacity
                       onPress={() => handleRemoveInputSupplied(index)}
+                      style={{flexDirection:"row"}}
                     >
-                      <Text style={styles.removeButtonText}>Remove</Text>
+                      <Ionicons name="close" size={23} color={"red"} />
+                      <Text style={removeButtonText}>Remove</Text>
                     </TouchableOpacity>
                   </View>
                 )}
               </View>
             ))}
             <View>
-              <Text>Total Cost : {totalcostinputsuplied}</Text>
+              <Text style={[semibold,{alignSelf:"center",fontSize:16}]}>Total Cost : {totalcostinputsuplied}</Text>
             </View>
 
             <TouchableOpacity
               onPress={handleAddInputSupplied}
-              style={styles.addButton}
+              style={[addButton,{flexDirection:"row"}]}
             >
-              <Text style={styles.addButtonText}>Add Input</Text>
+              <Ionicons name="add" size={23} color={"#fff"} />
+              <Text style={addButtonText}>Add more</Text>
             </TouchableOpacity>
           </View>
 

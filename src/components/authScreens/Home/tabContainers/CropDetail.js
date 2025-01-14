@@ -16,6 +16,8 @@ import { globalContainer } from "../../.../../../../globals/style";
 import { detailOfProductionandCultivation } from "../../../services/ApiFile";
 import { useNavigation } from "@react-navigation/native";
 import { useFocusEffect } from "@react-navigation/native";
+import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
+import { Ionicons } from "@expo/vector-icons";
 
 const CropTab = ({ data, type, refreshing, handleOnRefresh }) => {
   const [modalVisible, setModalVisible] = useState(false);
@@ -63,10 +65,16 @@ const CropTab = ({ data, type, refreshing, handleOnRefresh }) => {
               })
             }
           >
-            <Text style={styles.btnText}>Edit</Text>
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <FontAwesome6 name="edit" size={16} color="blue" />
+              <Text style={[styles.btnText, { marginLeft: 3 }]}>Edit</Text>
+            </View>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => openModal(crop)}>
-            <Text style={styles.btnText}>View</Text>
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <Ionicons name="eye" size={20} color={"blue"} />
+              <Text style={[styles.btnText, { marginLeft: 3 }]}>View</Text>
+            </View>
           </TouchableOpacity>
         </View>
       </View>
@@ -186,12 +194,6 @@ const CropDetail = ({ route, navigation }) => {
     setRefreshing(false);
   };
 
-  // useFocusEffect(
-  //   useCallback(() => {
-  //     getDetails();
-  //   }, [])
-  // );
-  
   useEffect(() => {
     getDetails();
   }, []);
@@ -259,11 +261,12 @@ const styles = StyleSheet.create({
   tabBar: {
     flexDirection: "row",
     justifyContent: "space-around",
-    backgroundColor: "#5B8A39",
+    backgroundColor: "#5b6964",
     padding: 10,
+    borderRadius: 8,
   },
   tabButton: {
-    padding: 10,
+    // padding: 10,
   },
   activeTab: {
     borderBottomWidth: 2,
@@ -271,7 +274,8 @@ const styles = StyleSheet.create({
   },
   tabText: {
     color: "#fff",
-    fontSize: 16,
+    fontSize: 14,
+    fontFamily: "Poppins-Medium",
   },
   tabContainer: {
     flex: 1,
@@ -281,6 +285,9 @@ const styles = StyleSheet.create({
     padding: 15,
     borderBottomWidth: 1,
     borderBottomColor: "#ccc",
+    backgroundColor: "#d7e6f4",
+    marginBottom: 12,
+    borderRadius: 8,
   },
   listText: {
     fontSize: 16,
@@ -288,6 +295,7 @@ const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,
     justifyContent: "center",
+    alignContent:"center",
     backgroundColor: "rgba(0,0,0,0.5)",
   },
   modalContent: {
@@ -295,17 +303,24 @@ const styles = StyleSheet.create({
     margin: 20,
     padding: 20,
     borderRadius: 10,
+    
+    
+    
   },
-  modalTitle: { fontSize: 18, marginVertical: 5 },
+  modalTitle: { fontSize: 14, fontFamily:"Poppins-Medium" },
   closeButton: {
     marginTop: 20,
     alignSelf: "center",
-    padding: 10,
+    paddingHorizontal: 12,
+    paddingVertical:4,
     backgroundColor: "#f00",
     borderRadius: 5,
+    // width:"20%"
   },
   closeButtonText: {
     color: "#fff",
+    fontFamily:"Poppins-Medium",
+    fontSize:16
   },
   noDataText: {
     textAlign: "center",
@@ -315,10 +330,10 @@ const styles = StyleSheet.create({
   btnContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginTop: 6,
+    marginTop: 10,
   },
   btnText: {
     color: "blue",
-    fontSize: 16,
+    fontSize: 15,
   },
 });

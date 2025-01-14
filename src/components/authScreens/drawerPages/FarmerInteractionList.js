@@ -12,6 +12,7 @@ import FormHeader from "../Forms/FormHeader";
 import { globalContainer } from "../../../globals/style";
 import { getFarmerInteraction } from "../../services/ApiFile";
 import { useSelector } from "react-redux";
+import { Ionicons } from "@expo/vector-icons";
 
 const FarmerInteractionList = ({ navigation }) => {
   const { user } = useSelector((state) => state.auth.user);
@@ -39,7 +40,7 @@ const FarmerInteractionList = ({ navigation }) => {
   const filteredData =
     user.role === "Project Coordinator"
       ? apiData
-      : apiData.filter((item) => item.user_id == user.id);
+      : apiData?.filter((item) => item.user_id == user.id);
 
   console.log("flterdata", filteredData);
 
@@ -52,16 +53,16 @@ const FarmerInteractionList = ({ navigation }) => {
 
   const renderItem = ({ item }) => (
     <View style={styles.container}>
-      <View>
+      <View style={{flex:11}}>
         <Text style={styles.text}>Name : {item.fullname}</Text>
         <Text style={styles.text}>Role : {item.userrole}</Text>
         <Text style={styles.text}>Village : {item.village}</Text>
         <Text style={styles.text}>Farmer : {item.farmer}</Text>
         <Text style={styles.text}>Count : {item.count}</Text>
       </View>
-      <View>
+      <View style={{flex:1}}>
         <TouchableOpacity onPress={() => handleViewClick(item)}>
-          <Text style={[styles.view, styles.text]}>view</Text>
+          <Ionicons name="eye" size={28} color={"#6774d5"}/>
         </TouchableOpacity>
       </View>
     </View>
@@ -123,7 +124,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     padding: 6,
     margin: 6,
-    backgroundColor: "#f5f7fa",
+    backgroundColor: "#d7e6f4",
     borderRadius: 10,
     // borderWidth: 1,
     shadowColor: "#000",
@@ -134,7 +135,7 @@ const styles = StyleSheet.create({
     borderColor: "#d3d3d3",
   },
   text: {
-    fontFamily: "Poppins-Regular",
+    fontFamily: "Poppins-Medium",
   },
   view: {
     color: "blue",

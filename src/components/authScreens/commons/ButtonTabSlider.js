@@ -83,24 +83,22 @@ export default ButtonTabSlider;
 
 const styles = StyleSheet.create({
   container: {
-    // flex: 1,
     flexDirection: "row",
-    marginTop: "4%",
-    marginBottom: "4%",
+    marginTop: "2%",
     marginHorizontal: 10,
+    backgroundColor: "#e7eae1",
+    marginLeft: 0,
+    width: "100%",
   },
   btnContainer: {
-    marginHorizontal: 10,
+    padding: 10,
   },
   activeButton: {
-    // backgroundColor: "#5B8A39",
-    backgroundColor: "#e7eae1",
+     backgroundColor: "#81a989",
   },
   acBtnText: {
-    color: "#000",
+    color: "#fff",
     fontFamily: "Poppins-SemiBold",
-    // fontWeight : '600',
-    // fontSize : 14
   },
   btnText: {
     fontSize: 14,

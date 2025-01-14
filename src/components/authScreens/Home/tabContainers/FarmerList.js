@@ -8,13 +8,14 @@ import {
   Button,
   ActivityIndicator,
   SafeAreaView,
-  RefreshControl
+  RefreshControl,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { getFarmerDetails } from "../../../services/ApiFile";
 import axios from "axios";
 import { useNavigation } from "@react-navigation/native";
 import { useFocusEffect } from "@react-navigation/native";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 const FarmerList = () => {
   const [farmerDetails, setFarmerDetails] = useState([]);
@@ -22,16 +23,21 @@ const FarmerList = () => {
   const [farmerId, setFarmerId] = useState("");
   const [fId, setFId] = useState("");
   const [refreshing, setRefreshing] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const navigation = useNavigation();
 
   const getFarmerList = async () => {
     try {
+      setLoading(true);
       const response = await getFarmerDetails();
       // console.log("frmlst-resp-farmer", response.farmers);
       setFarmerDetails(response.farmers);
     } catch (error) {
+      setLoading(false);
       console.warn("frmlst-err", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -55,17 +61,17 @@ const FarmerList = () => {
     }
   };
 
-  const handleOnRefresh  = async() => {
+  const handleOnRefresh = async () => {
     setRefreshing(true);
     await getFarmerList();
     setRefreshing(false);
-  }
+  };
 
   useEffect(() => {
     getFarmerList();
   }, []);
 
-  if (farmerDetails.length < 1) {
+  if (loading) {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size={50} style={{ marginTop: "50%" }} />
@@ -74,20 +80,33 @@ const FarmerList = () => {
   }
 
   return (
-    <View >
+    <View style={{ marginTop: 10 }}>
       <ScrollView
-      showsVerticalScrollIndicator={false}
-      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleOnRefresh}/>}
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={handleOnRefresh} />
+        }
       >
-        {farmerDetails.map((item) => (
-          <View style={styles.container} key={item.id}>
-            <TouchableOpacity onPress={() => openModal(item.id, item.farmerID)}>
-              <Text style={styles.txtName}>{item.name}</Text>
-              <Text style={styles.txtEmail}>{item.emailID}</Text>
-              <Text style={styles.txtId}>{item.farmerID}</Text>
-            </TouchableOpacity>
-          </View>
-        ))}
+        <View style={{marginBottom:40}}>
+        {farmerDetails.length ? (
+          farmerDetails.map((item) => (
+            <View style={styles.container} key={item.id}>
+              <View style={{ marginLeft: 4, flex: 11 }}>
+                <Text style={styles.txtName}>{item.name}</Text>
+                <Text style={styles.txtEmail}>{item.emailID}</Text>
+                <Text style={styles.txtId}>{item.farmerID}</Text>
+              </View>
+              <TouchableOpacity
+                onPress={() => openModal(item.id, item.farmerID)}
+                style={{ alignSelf: "center", flex: 1 }}
+              >
+                <MaterialCommunityIcons name="dots-vertical" size={26} />
+              </TouchableOpacity>
+            </View>
+          ))
+        ) : (
+          <Text style={styles.txtName}>no list available.</Text>
+        )}
         <Modal
           transparent={true}
           visible={modalVisible}
@@ -117,11 +136,20 @@ const FarmerList = () => {
               </TouchableOpacity>
 
               <TouchableOpacity onPress={closeModal} style={styles.closeButton}>
-                <Text style={[styles.txt, { color: "red" }]}>Close</Text>
+                <Text
+                  style={[
+                    styles.txt,
+                    { color: "red", fontFamily: "Poppins-SemiBold" },
+                  ]}
+                >
+                  Close
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
         </Modal>
+        </View>
+       
       </ScrollView>
     </View>
   );
@@ -131,10 +159,13 @@ export default FarmerList;
 
 const styles = StyleSheet.create({
   container: {
+    flexDirection: "row",
+    justifyContent: "space-between",
     padding: 6,
+    // marginLeft:5,
     margin: 6,
     borderRadius: 10,
-    backgroundColor: "#f5f7fa",
+    backgroundColor: "#d7e6f4",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
@@ -169,7 +200,7 @@ const styles = StyleSheet.create({
   },
   txt: {
     fontSize: 16,
-    fontWeight: "bold",
+    fontFamily: "Poppins-Medium",
     color: "#34495e",
     marginBottom: 15,
     textAlign: "center",
@@ -188,15 +219,14 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: "Poppins-SemiBold",
     color: "#2c3e50",
-    // marginBottom: 2,
   },
   txtEmail: {
     fontFamily: "Poppins-Regular",
-    color: "#7f8c8d",
-    // marginBottom: 2,
+    color: "#2c3e50",
+    fontSize: 12,
   },
   txtId: {
-    fontSize: 14,
-    color: "#95a5a6",
+    fontSize: 12,
+    color: "#2c3e50",
   },
 });

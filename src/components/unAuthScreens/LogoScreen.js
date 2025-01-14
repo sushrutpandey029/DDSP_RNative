@@ -51,7 +51,7 @@ const LogoScreen = ({ navigation }) => {
         if(navigation) {
           navigation.navigate('Splash')
         }
-      }, 5000);
+      }, 4000);
   
       return () =>{
         clearTimeout(timer);

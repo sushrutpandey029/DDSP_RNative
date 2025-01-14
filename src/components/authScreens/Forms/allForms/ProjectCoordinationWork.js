@@ -11,9 +11,19 @@ import {
   ActivityIndicator,
 } from "react-native";
 import React, { useState, useEffect, useMemo } from "react";
-import { submitBtn } from "../../../../globals/style";
 import FormHeader from "../FormHeader";
-import { globalContainer } from "../../../../globals/style";
+import {
+  globalContainer,
+  submitBtn,
+  addButton,
+  addButtonText,
+  removeButton,
+  removeButtonText,
+  semibold,
+  modalView,
+  centeredView,
+  closeButton
+} from "../../../../globals/style";
 import { useSelector } from "react-redux";
 import DatePicker from "react-native-ui-datepicker";
 import { addworkdetails } from "../../../services/ApiFile";
@@ -21,6 +31,7 @@ import { Dropdown } from "react-native-element-dropdown";
 import { MultiSelect } from "react-native-element-dropdown";
 import { villageItems } from "../data/Constant";
 import AntDesign from "@expo/vector-icons/AntDesign";
+import { Ionicons } from "@expo/vector-icons";
 
 const ProjectCoordinationWork = ({ navigation }) => {
   const userDetails = useSelector((state) => state.auth.user.user);
@@ -122,12 +133,6 @@ const ProjectCoordinationWork = ({ navigation }) => {
       reports,
     };
 
-    console.log("Form Submitted: ", JSON.stringify(formData, null, 2));
-    // console.log(
-    //   "Form Submitted-reviewMeetings: ",
-    //   JSON.stringify(formData.reviewMeetings, null, 2)
-    // );
-
     try {
       setLoading(true);
 
@@ -151,29 +156,43 @@ const ProjectCoordinationWork = ({ navigation }) => {
     }
   };
 
-  // const FOItems = FOlist?.data?.data?.map((item) => ({
-  //   label: item.fullname.trim(),
-  //   value: item.fullname.trim(),
-  // }));
-
   const FOItems = useMemo(() => {
-    return FOlist?.data?.data?.map((item) => ({
-      label: item.fullname,
-      value: item.fullname,
-    }));
-  }, [FOlist]);
+    if (FOlist?.data?.data) {
+        return FOlist.data.data.map((item) => ({
+            label: item.fullname,
+            value: item.fullname,
+        }));
+    }
+    return [];
+}, [FOlist?.data?.data]);
 
-  const APCItems = useMemo(() => {
-    return APClist?.data?.data?.map((item) => ({
-      label: item.fullname,
-      value: item.fullname,
-    }));
-  }, [APClist]);
+const APCItems = useMemo(() => {
+  if (APClist?.data?.data) {
+      return APClist.data.data.map((item) => ({
+          label: item.fullname,
+          value: item.fullname,
+      }));
+  }
+  return [];
+}, [APClist?.data?.data]);
 
-  // const APCItems = APClist?.data?.data?.map((item) => ({
-  //   label: item.fullname.trim(),
-  //   value: item.fullname.trim(),
-  // }));
+// const FOlistData = useMemo(() => FOlist?.data?.data || [], [FOlist?.data?.data]);
+// const FOItems = useMemo(() => {
+//     return FOlistData.map((item) => ({
+//         label: item.fullname,
+//         value: item.fullname,
+//     }));
+// }, [FOlistData]);
+
+// const APClistData = useMemo(() => APClist?.data?.data || [], [APClist?.data?.data]);
+// const APCItems = useMemo(() => {
+//     return APClistData.map((item) => ({
+//         label: item.fullname,
+//         value: item.fullname,
+//     }));
+// }, [APClistData]);
+
+
 
   console.log("FOItems", FOItems);
   console.log("APCItems", APCItems);
@@ -261,9 +280,10 @@ const ProjectCoordinationWork = ({ navigation }) => {
                     trainingProgrammes.filter((_, idx) => idx !== index)
                   )
                 }
-                style={styles.removeButton}
+                style={[removeButton,{flexDirection:"row"}]}
               >
-                <Text style={styles.removeButtonText}>Remove</Text>
+                <Ionicons name="close" size={23} color={"red"}/>
+                <Text style={removeButtonText}>Remove</Text>
               </TouchableOpacity>
             </View>
           ))}
@@ -274,9 +294,10 @@ const ProjectCoordinationWork = ({ navigation }) => {
                 { date: formatDate(date), name: "", participants: "" },
               ])
             }
-            style={styles.addButton}
+            style={[addButton,{flexDirection:"row"}]}
           >
-            <Text style={styles.addButtonText}>Add More</Text>
+             <Ionicons name="add" size={23} color={"#fff"}/>
+            <Text style={addButtonText}>Add More</Text>
           </TouchableOpacity>
 
           {/* Review Meetings */}
@@ -411,9 +432,10 @@ const ProjectCoordinationWork = ({ navigation }) => {
                     reviewMeetings.filter((_, idx) => idx !== index)
                   )
                 }
-                style={styles.removeButton}
+                style={[removeButton,{flexDirection:"row"}]}
               >
-                <Text style={styles.removeButtonText}>Remove</Text>
+                 <Ionicons name="close" size={23} color={"red"}/>
+                <Text style={removeButtonText}>Remove</Text>
               </TouchableOpacity>
             </View>
           ))}
@@ -424,9 +446,10 @@ const ProjectCoordinationWork = ({ navigation }) => {
                 { date: formatDate(date), participants: "" },
               ])
             }
-            style={styles.addButton}
+            style={[addButton,{flexDirection:"row"}]}
           >
-            <Text style={styles.addButtonText}>Add More</Text>
+             <Ionicons name="add" size={23} color={"#fff"}/>
+            <Text style={addButtonText}>Add More</Text>
           </TouchableOpacity>
 
           {/* Monitoring Visits */}
@@ -491,9 +514,10 @@ const ProjectCoordinationWork = ({ navigation }) => {
                     monitoringVisits.filter((_, idx) => idx !== index)
                   )
                 }
-                style={styles.removeButton}
+                style={[removeButton,{flexDirection:"row"}]}
               >
-                <Text style={styles.removeButtonText}>Remove</Text>
+                 <Ionicons name="close" size={23} color={"red"}/>
+                <Text style={removeButtonText}>Remove</Text>
               </TouchableOpacity>
             </View>
           ))}
@@ -504,9 +528,10 @@ const ProjectCoordinationWork = ({ navigation }) => {
                 { date: formatDate(date), cluster: "", observations: "" },
               ])
             }
-            style={styles.addButton}
+            style={[addButton,{flexDirection:"row"}]}
           >
-            <Text style={styles.addButtonText}>Add More</Text>
+             <Ionicons name="add" size={23} color={"#fff"}/>
+            <Text style={addButtonText}>Add More</Text>
           </TouchableOpacity>
 
           {/* Reports */}
@@ -536,9 +561,10 @@ const ProjectCoordinationWork = ({ navigation }) => {
                 onPress={() =>
                   setReports(reports.filter((_, idx) => idx !== index))
                 }
-                style={styles.removeButton}
+                style={[removeButton,{flexDirection:"row"}]}
               >
-                <Text style={styles.removeButtonText}>Remove</Text>
+                 <Ionicons name="close" size={23} color={"red"}/>
+                <Text style={removeButtonText}>Remove</Text>
               </TouchableOpacity>
             </View>
           ))}
@@ -549,9 +575,10 @@ const ProjectCoordinationWork = ({ navigation }) => {
                 { submittedDate: formatDate(date), details: "" },
               ])
             }
-            style={styles.addButton}
+            style={[addButton,{flexDirection:"row"}]}
           >
-            <Text style={styles.addButtonText}>Add More</Text>
+             <Ionicons name="add" size={23} color={"#fff"}/>
+            <Text style={addButtonText}>Add More</Text>
           </TouchableOpacity>
 
           <View style={styles.btnContainer}>
@@ -560,7 +587,7 @@ const ProjectCoordinationWork = ({ navigation }) => {
               onPress={handleSubmit}
               disabled={loading}
             >
-              <Text style={styles.submitText}>Submit</Text>
+              <Text style={[styles.submitText, semibold]}>Submit</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -570,24 +597,17 @@ const ProjectCoordinationWork = ({ navigation }) => {
         transparent={true}
         visible={datePickerVisible}
       >
-        <View style={styles.centeredView}>
-          <View style={[styles.modalView]}>
+        <View style={centeredView}>
+          <View style={[modalView]}>
             <DatePicker
-              // modal
-              mode="single"
-              // open={open}
-              open={datePickerVisible}
+               mode="single"
+               open={datePickerVisible}
               minDate={threeDaysAgo}
               maxDate={today}
-              // selectedItemColor="#637e76"
-              date={today} // Ensure this is a valid Date object
-              onChange={(event) => handleDateChange(event.date)} // Handle date change
+               date={today} 
+              onChange={(event) => handleDateChange(event.date)} 
               onConfirm={handleDateChange}
-              // onCancel={() => setDatePickerVisible(false)}
-              // placeholder="Select a date"
-              // monthContainerStyle={styles.monthStyle}
-              // yearContainerStyle={styles.monthStyle}
-              // dayContainerStyle={styles.monthStyle}
+              headerButtonsPosition="right"
             />
 
             {/* Close Button */}
@@ -595,7 +615,7 @@ const ProjectCoordinationWork = ({ navigation }) => {
               onPress={() => setDatePickerVisible(false)}
               style={styles.closeButton}
             >
-              <Text style={{ fontSize: 19, fontWeight: "bold", color: "red" }}>
+              <Text style={semibold}>
                 Close
               </Text>
             </TouchableOpacity>

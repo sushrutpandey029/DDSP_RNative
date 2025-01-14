@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import { useSelector } from "react-redux";
 import { getCoordinatorDetailsByID } from "../../../services/ApiFile";
-import { globalContainer } from "../../../../globals/style";
+import { globalContainer, semibold, regular } from "../../../../globals/style";
 
 const PCoordinatorReport = () => {
   const { user } = useSelector((state) => state.auth.user);
@@ -24,6 +24,7 @@ const PCoordinatorReport = () => {
       setLoading(true);
       const response = await getCoordinatorDetailsByID(user.id);
       if (response?.success) {
+        console.log("CD-resp", JSON.stringify(response.data, null, 2));
         setApiData(response.data);
       }
     } catch (err) {
@@ -40,8 +41,10 @@ const PCoordinatorReport = () => {
   };
 
   useEffect(() => {
-    fetchCoordinatoreDetailsById();
-  }, []);
+    if (user?.id) {
+      fetchCoordinatoreDetailsById();
+    }
+  }, [user?.id]);
 
   if (loading) {
     return (
@@ -74,10 +77,11 @@ const PCoordinatorReport = () => {
   );
 
   const renderCoordinator = ({ item }) => (
+    
     <View style={styles.itemContainer}>
       {tabValue === "TP" &&
         renderSubItem({
-          title: "Training Programmes",
+          title: <Text style={[semibold]}>Training Programmes</Text>,
           data: item.trainingProgrammes,
           renderItem: ({ item }) => (
             <View style={styles.subItemContainer}>
@@ -94,16 +98,17 @@ const PCoordinatorReport = () => {
 
       {tabValue === "RM" &&
         renderSubItem({
-          title: "Review Meetings",
+          title: <Text style={semibold}>Review Meetings</Text>,
           data: item.reviewMeetings,
           renderItem: ({ item }) => (
             <View style={styles.subItemContainer}>
               <Text style={styles.label}>Date: {item.date}</Text>
               <Text style={styles.label}>
-                Field Officers: {item.fieldOfficer.join(", ")}
+                Field Officers: {item.fieldOfficer?.join(", ")}
               </Text>
               <Text style={styles.label}>
-                Assistant Coordinators: {item.asstProjectCoordinator.join(", ")}
+                Assistant Coordinators:{" "}
+                {item.asstProjectCoordinator?.join(", ")}
               </Text>
               <Text style={styles.label}>
                 Participants: {item.participants}
@@ -115,7 +120,7 @@ const PCoordinatorReport = () => {
 
       {tabValue === "MV" &&
         renderSubItem({
-          title: "Monitoring Visits",
+          title: <Text style={semibold}>Monitoring Visits</Text>,
           data: item.monitoringVisits,
           renderItem: ({ item }) => (
             <View style={styles.subItemContainer}>
@@ -131,7 +136,7 @@ const PCoordinatorReport = () => {
 
       {tabValue === "RP" &&
         renderSubItem({
-          title: "Reports",
+          title: <Text style={semibold}>Reports</Text>,
           data: item.reports,
           renderItem: ({ item }) => (
             <View style={styles.subItemContainer}>
@@ -147,8 +152,8 @@ const PCoordinatorReport = () => {
   );
 
   return (
-    <View >
-      <TabButton setTabValue={setTabValue} />
+    <View style={{ marginBottom: "20%" }}>
+      <TabButton setTabValue={setTabValue} tabValue={tabValue} />
       {apiData?.length ? (
         <FlatList
           data={apiData}
@@ -184,42 +189,34 @@ const styles = StyleSheet.create({
     backgroundColor: "#f5f5f5",
   },
   itemContainer: {
-    marginVertical: 10,
-    // marginHorizontal: 15,
-    padding: 15,
-    // backgroundColor: "#e1e8e7",
+    marginBottom: 10,
+
+    padding: 8,
+    backgroundColor: "#d7e6f4",
     borderRadius: 10,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 3,
   },
   subItemContainer: {
-    marginVertical: 8,
-    padding: 12,
-    backgroundColor: "#ecf4f3",
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "#e0e0e0",
+    // backgroundColor:"red",
+    //  marginBottom
   },
   header: {
     fontSize: 18,
     fontWeight: "bold",
-    marginBottom: 10,
+    // marginBottom: 10,
     color: "#333333",
   },
   subHeader: {
     fontSize: 16,
     fontWeight: "600",
-    marginVertical: 10,
+    // marginVertical: 10,
     color: "#555555",
   },
   label: {
     fontSize: 14,
-    marginVertical: 4,
+
     color: "#666666",
-    lineHeight: 20,
+
+    fontFamily: "Poppins-Regular",
   },
   globalContainer: {
     flex: 1,
@@ -239,36 +236,75 @@ const styles = StyleSheet.create({
     // flex:1,
     flexDirection: "row",
     justifyContent: "space-around",
+    padding: 10,
+    // backgroundColor:"#000"
   },
   tab: {
-    backgroundColor: "#d4dad6",
+    backgroundColor: "#f4f7fa",
     width: 70,
     borderWidth: 1,
     borderColor: "black",
+    borderColor: "#f4f7fa",
     alignItems: "center",
     borderRadius: 8,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 3,
   },
   tabText: {
     padding: 10,
+    fontFamily: "Poppins-Regular",
+  },
+  activeButton: {
+    // backgroundColor: "#cdc9fa",
+    backgroundColor: "rgb(107, 186, 229)",
+  },
+  acBtnText: {
+    color: "#fff",
+    fontFamily: "Poppins-SemiBold",
+    // fontWeight : '600',
+    // fontSize : 14
   },
 });
 
 export default PCoordinatorReport;
 
-const TabButton = ({ setTabValue }) => {
+const TabButton = ({ setTabValue, tabValue }) => {
   return (
     <View style={styles.tabContainer}>
-      <TouchableOpacity onPress={() => setTabValue("TP")} style={styles.tab}>
-        <Text style={styles.tabText}>TP</Text>
+      <TouchableOpacity
+        onPress={() => setTabValue("TP")}
+        style={[styles.tab, tabValue === "TP" && styles.activeButton]}
+      >
+        <Text style={[styles.tabText, tabValue === "TP" && styles.acBtnText]}>
+          TP
+        </Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => setTabValue("RM")} style={styles.tab}>
-        <Text style={styles.tabText}>RM</Text>
+      <TouchableOpacity
+        onPress={() => setTabValue("RM")}
+        style={[styles.tab, tabValue === "RM" && styles.activeButton]}
+      >
+        <Text style={[styles.tabText, tabValue === "RM" && styles.acBtnText]}>
+          RM
+        </Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => setTabValue("MV")} style={styles.tab}>
-        <Text style={styles.tabText}>MV</Text>
+      <TouchableOpacity
+        onPress={() => setTabValue("MV")}
+        style={[styles.tab, tabValue === "MV" && styles.activeButton]}
+      >
+        <Text style={[styles.tabText, tabValue === "MV" && styles.acBtnText]}>
+          MV
+        </Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => setTabValue("RP")} style={styles.tab}>
-        <Text style={styles.tabText}>RP</Text>
+      <TouchableOpacity
+        onPress={() => setTabValue("RP")}
+        style={[styles.tab, tabValue === "RP" && styles.activeButton]}
+      >
+        <Text style={[styles.tabText, tabValue === "RP" && styles.acBtnText]}>
+          RP
+        </Text>
       </TouchableOpacity>
     </View>
   );

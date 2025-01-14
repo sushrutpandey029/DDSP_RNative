@@ -16,10 +16,19 @@ import {
   getFarmerById,
   updateFarmerDetailsById,
 } from "../../../services/ApiFile";
-import { submitBtn, globalContainer } from "../../../../globals/style";
+import {
+  submitBtn,
+  globalContainer,
+  addButton,
+  addButtonText,
+  removeButton,
+  removeButtonText,
+  semibold,
+} from "../../../../globals/style";
 import FormHeader from "../../Forms/FormHeader";
 import { Dropdown } from "react-native-element-dropdown";
 import AntDesign from "@expo/vector-icons/AntDesign";
+import { Ionicons } from "@expo/vector-icons";
 import {
   villageItems,
   talukaItems,
@@ -774,7 +783,7 @@ const FarmerDetail = ({ route, navigation }) => {
             {cropSown.map((entry, index) => (
               <View key={index} style={{ marginBottom: 20 }}>
                 <View style={styles.cropEntry}>
-                  <Text>Crop {index + 1}</Text>
+                  <Text style={semibold}>{index + 1}</Text>
                 </View>
 
                 {/* season dropdown */}
@@ -887,11 +896,13 @@ const FarmerDetail = ({ route, navigation }) => {
 
                 {/* remove button */}
                 {cropSown.length > 1 && (
-                  <View style={styles.removeButton}>
+                  <View style={removeButton}>
                     <TouchableOpacity
                       onPress={() => handleRemoveCropRow(index)}
+                      style={{ flexDirection: "row" }}
                     >
-                      <Text style={styles.removeButtonText}>Remove</Text>
+                      <Ionicons name="close" size={23} color={"red"} />
+                      <Text style={removeButtonText}>Remove</Text>
                     </TouchableOpacity>
                   </View>
                 )}
@@ -900,9 +911,13 @@ const FarmerDetail = ({ route, navigation }) => {
 
             {/* Add row button */}
 
-            <View style={styles.addButton}>
-              <TouchableOpacity onPress={handleAddCropRow}>
-                <Text style={styles.addButtonText}>Add more</Text>
+            <View style={addButton}>
+              <TouchableOpacity
+                onPress={handleAddCropRow}
+                style={{ flexDirection: "row" }}
+              >
+                <Ionicons name="add" size={23} color={"#fff"} />
+                <Text style={addButtonText}>Add more</Text>
               </TouchableOpacity>
             </View>
 
@@ -1052,28 +1067,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     marginBottom: 20,
-  },
-  removeButton: {
-    backgroundColor: "#ea8c8c",
-    padding: 10,
-    borderRadius: 10,
-    width: "30%",
-    marginTop: 20,
-  },
-  removeButtonText: {
-    color: "white",
-    textAlign: "center",
-  },
-  addButton: {
-    backgroundColor: "#70ccb2",
-    padding: 10,
-    borderRadius: 10,
-    marginBottom: 20,
-    width: "30%",
-  },
-  addButtonText: {
-    color: "white",
-    textAlign: "center",
   },
   cropEntry: {
     alignSelf: "flex-end",

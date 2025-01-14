@@ -101,7 +101,7 @@ const LocationFetcher = () => {
       };
 
       const response = await addUserLocation(payload);
-      console.log("addlocation-resp", response);
+      console.log("addlocation-resp",JSON.stringify(response,null,2) );
       if (response.success) {
         Alert.alert("Success", "Attendance marked successfully.");
       } else {
@@ -169,7 +169,17 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     width: "80%",
-    marginVertical: 10,
+    // marginVertical: 10,
+    margin:10,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 10,
+      height: 5,
+    },
+    shadowOpacity: 0.6,
+    shadowRadius: 10,
+
+    elevation: 3,
   },
   buttonText: {
     color: "#7b576d",
