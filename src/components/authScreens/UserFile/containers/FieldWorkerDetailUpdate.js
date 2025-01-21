@@ -13,7 +13,15 @@ import {
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import FormHeader from "../../Forms/FormHeader";
-import { globalContainer, submitBtn, addButton, addButtonText,removeButton, removeButtonText,semibold } from "../../../../globals/style";
+import {
+  globalContainer,
+  submitBtn,
+  addButton,
+  addButtonText,
+  removeButton,
+  removeButtonText,
+  semibold,
+} from "../../../../globals/style";
 import {
   getWorkDetailById,
   updateWorkDetailsById,
@@ -219,13 +227,16 @@ const FieldWorkerDetailUpdate = ({ route, navigation }) => {
 
   const getWorkDetail = async () => {
     try {
+      setLoading(true);
       const response = await getWorkDetailById(id);
       if (response.success === true) {
         console.log("getWorkDetail-resp", JSON.stringify(response, null, 2));
         setApiWorkData(response.data);
       }
     } catch (error) {
-      console.log("getWorkDetail-err", error);
+      console.log("getWorkDetail-err", error.response.data);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -279,6 +290,14 @@ const FieldWorkerDetailUpdate = ({ route, navigation }) => {
   }, [apiWorkData]);
 
   console.log("input-supplied-forworkerdetailsupdate", inputSupplied);
+
+  if (loading) {
+    return (
+      <View style={styles.loaderContainer}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    );
+  }
 
   return (
     <SafeAreaView style={globalContainer}>
@@ -623,7 +642,7 @@ const FieldWorkerDetailUpdate = ({ route, navigation }) => {
                   <View style={removeButton}>
                     <TouchableOpacity
                       onPress={() => handleRemoveInputSupplied(index)}
-                      style={{flexDirection:"row"}}
+                      style={{ flexDirection: "row" }}
                     >
                       <Ionicons name="close" size={23} color={"red"} />
                       <Text style={removeButtonText}>Remove</Text>
@@ -633,12 +652,14 @@ const FieldWorkerDetailUpdate = ({ route, navigation }) => {
               </View>
             ))}
             <View>
-              <Text style={[semibold,{alignSelf:"center",fontSize:16}]}>Total Cost : {totalcostinputsuplied}</Text>
+              <Text style={[semibold, { alignSelf: "center", fontSize: 16 }]}>
+                Total Cost : {totalcostinputsuplied}
+              </Text>
             </View>
 
             <TouchableOpacity
               onPress={handleAddInputSupplied}
-              style={[addButton,{flexDirection:"row"}]}
+              style={[addButton, { flexDirection: "row" }]}
             >
               <Ionicons name="add" size={23} color={"#fff"} />
               <Text style={addButtonText}>Add more</Text>
@@ -647,7 +668,7 @@ const FieldWorkerDetailUpdate = ({ route, navigation }) => {
 
           <View style={styles.btnContainer}>
             <TouchableOpacity style={submitBtn} onPress={handleSubmit}>
-              <Text style={styles.inpText}>Submit</Text>
+              <Text style={[styles.inpText, semibold]}>Update</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -669,6 +690,12 @@ const styles = StyleSheet.create({
     flex: 1,
     // paddingHorizontal : '3%'
   },
+  loaderContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#f5f5f5",
+  },
   bgContianer: {
     width: "100%",
     height: "18%",
@@ -686,7 +713,7 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   formContainer: {
-    marginBottom: 20,
+    marginBottom: "40%",
   },
   img: {
     height: 130,

@@ -30,21 +30,17 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
     borderRadius: 10,
-    marginVertical: 6,
-    margin: "auto",
     marginBottom: 20,
     backgroundColor: "#d7e6f4",
-    borderRadius: 10,
-
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
-      height: 1,
+      height: 2,
     },
-    shadowOpacity: 0.6,
-    shadowRadius: 10,
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
 
-    elevation: 7,
+    // elevation: 3,
   },
   title: {
     fontFamily: "Poppins-SemiBold",

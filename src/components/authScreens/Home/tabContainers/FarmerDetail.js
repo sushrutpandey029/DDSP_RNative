@@ -309,12 +309,15 @@ const FarmerDetail = ({ route, navigation }) => {
 
   const getFarmerDetails = async () => {
     try {
+      setLoading(true)
       const response = await getFarmerById(id);
       console.log("farmer-details", JSON.stringify(response, null, 2));
       setFarmerData(response.data);
       // setFarmerData({ ...farmerData, cropsSown: payload.cropsSown }); // last added
     } catch (error) {
       console.log("farmer-detail-err", error);
+    }finally{
+      setLoading(false)
     }
   };
 
@@ -381,10 +384,10 @@ const FarmerDetail = ({ route, navigation }) => {
     }
   }, [farmerData]);
 
-  if (farmerData.length < 1) {
+  if (loading) {
     return (
       <SafeAreaView style={styles.loaderContainer}>
-        <ActivityIndicator size={50} />
+       <ActivityIndicator size="large" color="#0000ff" />
       </SafeAreaView>
     );
   }
@@ -929,7 +932,7 @@ const FarmerDetail = ({ route, navigation }) => {
                 onPress={handleCropSelection}
                 disabled={loading}
               >
-                <Text style={styles.inpText}>Update</Text>
+                <Text style={[styles.inpText,semibold]}>Update</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -954,7 +957,7 @@ const styles = StyleSheet.create({
   //   paddingBottom: 30,
   // },
   formContainer: {
-    marginBottom: 30,
+    marginBottom: "40%",
   },
   loaderContainer: {
     flex: 1,

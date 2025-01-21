@@ -81,7 +81,7 @@ const FarmerInteractionList = ({ navigation }) => {
   if (loading) {
     return (
       <View style={styles.loaderConatiner}>
-        <ActivityIndicator size={50} />
+        <ActivityIndicator size="large" color="#0000ff" />
       </View>
     );
   }

@@ -82,7 +82,7 @@ const AttendanceList = () => {
   if (loading) {
     return (
       <SafeAreaView style={styles.loaderConatiner}>
-        <ActivityIndicator size={50} />
+        <ActivityIndicator size="large" color="#0000ff" />
       </SafeAreaView>
     );
   }

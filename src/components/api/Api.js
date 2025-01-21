@@ -1,4 +1,4 @@
-export const BaseUrl = "https://3ad5-2401-4900-8844-fee8-c9c3-7217-a15c-3c5c.ngrok-free.app";
+export const BaseUrl = "https://4b3b-2401-4900-8846-e296-4107-2a81-5662-a25a.ngrok-free.app";
 // export const BaseUrl = "https://ddsp-backend.onrender.com";
 
 

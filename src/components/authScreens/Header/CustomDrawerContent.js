@@ -5,6 +5,7 @@ import Icon from "react-native-vector-icons/Ionicons";
 import { useSelector, useDispatch } from "react-redux";
 import { BaseUrl } from "../../api/Api";
 import { logoutUser } from "../../redux/slices/AuthSlice";
+import profilepic from "../.../../../../../assets/images/profile.png"
 
 const CustomDrawerContent = (props) => {
   const dispatch = useDispatch();
@@ -31,6 +32,7 @@ const CustomDrawerContent = (props) => {
               uri: `${BaseUrl}/profile-images/${user.profileimage}`,
             }}
             style={styles.profileImage}
+            defaultSource={profilepic}
           />
         </View>
         <View style={styles.nameContainer}>

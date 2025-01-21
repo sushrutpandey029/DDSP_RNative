@@ -176,11 +176,7 @@ const FieldsWorkerDetails = ({ navigation }) => {
       };
 
       console.log("requested-data", JSON.stringify(requestData, null, 2));
-      // console.log(
-      //   "requested-data-addform-inputsupplied",
-      //   JSON.stringify(requestData.inputSupplied, null, 2)
-      // );
-
+  
       try {
         setLoading(true);
 
@@ -629,7 +625,7 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   formContainer: {
-    marginBottom: "25%",
+    marginBottom: "40%",
   },
   img: {
     height: 130,

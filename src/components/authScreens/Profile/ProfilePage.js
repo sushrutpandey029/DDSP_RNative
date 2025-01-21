@@ -22,12 +22,14 @@ import {
   closeButton,
   semibold,
   globalContainer,
+  regular
 } from "../../../globals/style";
 import { useSelector, useDispatch } from "react-redux";
 import { BaseUrl } from "../../api/Api";
 import { adminUserUpdate } from "../../services/ApiFile";
 import { updateUser } from "../../redux/slices/AuthSlice";
 import DatePicker from "react-native-ui-datepicker";
+import profilepic from "../../../../assets/images/profile.png"
 
 const ProfilePage = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -130,9 +132,10 @@ const ProfilePage = ({ navigation }) => {
               uri: `${BaseUrl}/profile-images/${userData.profileimage}`,
             }}
             style={styles.img}
+            defaultSource={profilepic}
           />
           <Text style={styles.dText}>{userData.fullname}</Text>
-          <Text>{userData.emailid}</Text>
+          <Text style={regular} >{userData.emailid}</Text>
         </View>
         <View style={styles.fieldContainer}>
           <View>
@@ -147,7 +150,7 @@ const ProfilePage = ({ navigation }) => {
             />
           </View>
           <View>
-            <Text style={styles.label}>Email Address</Text>
+            <Text style={styles.label}>Email</Text>
             <TextInput
               style={styles.input}
               value={inputValue.emailid}
@@ -158,7 +161,7 @@ const ProfilePage = ({ navigation }) => {
             />
           </View>
           <View>
-            <Text style={styles.label}>Phone Number</Text>
+            <Text style={styles.label}>Phone</Text>
             <TextInput
               style={styles.input2}
               value={inputValue.phonenumber}
@@ -229,11 +232,11 @@ const ProfilePage = ({ navigation }) => {
           </View>
           <View style={styles.btnContainer}>
             <TouchableOpacity
-              style={[submitBtn, { marginTop: 60 }]}
+              style={submitBtn}
               onPress={handleSumbit}
               disabled={loading}
             >
-              <Text style={styles.inpText}>Update</Text>
+              <Text style={[styles.inpText,semibold]}>Update</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -257,20 +260,47 @@ const styles = StyleSheet.create({
   imgContainer: {
     alignItems: "center",
     marginBottom: 20,
-  },
-  img: {
+    //  backgroundColor:"#d8f5f4",
+     padding:10
+},
+
+img: {
     width: 130,
     height: 130,
-    borderRadius: 100,
-    alignSelf: "center",
+    borderRadius: 65, // Half of width/height for a perfect circle
+    // alignSelf: "center",
     marginBottom: 10,
-    shadowColor: "rgba(0,0,0,0.5)",
+    backgroundColor: "#fff", // Neutral background for better contrast
+    borderWidth: 2,
+    borderColor: "#bfb1b1", // Subtle border color
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.5,
-    shadowRadius: 10,
-    elevation: 6,
-    backgroundColor: "rgba(0,0,0,0.5)",
-  },
+    shadowOpacity: 0.25, // Softer shadow
+    shadowRadius: 8, // Slightly softer shadow effect
+    elevation: 5, // Slightly reduced for balance,
+   
+},
+
+  // imgContainer: {
+  //   alignItems: "center",
+  //   marginBottom: 20,
+  // },
+  // img: {
+  //   width: 130,
+  //   height: 130,
+  //   borderRadius: 100,
+  //   alignSelf: "center",
+  //   marginBottom: 10,
+  //   shadowColor: "#000",
+  //   shadowOffset: { width: 0, height: 4 },
+  //   shadowOpacity: 0.5,
+  //   shadowRadius: 10,
+  //   elevation: 6,
+  //   backgroundColor: "#000",
+  //   borderWidth:2,
+  //   borderColor:"#bfb1b1",
+    
+  // },
   label: {
     fontFamily: "Poppins-Medium",
     fontSize: 16,
@@ -315,17 +345,7 @@ const styles = StyleSheet.create({
   },
   btnContainer: {
     alignItems: "center",
-  },
-  twoBtn: {
-    flexDirection: "row",
-    flex: 1,
-    width: "100%",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  inBtn: {
-    flex: 1,
-    marginHorizontal: 4,
+    marginTop:25
   },
   loaderOverlay: {
     ...StyleSheet.absoluteFillObject,

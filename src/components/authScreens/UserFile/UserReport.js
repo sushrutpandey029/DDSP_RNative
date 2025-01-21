@@ -57,7 +57,7 @@ const UserReport = ({ navigation }) => {
   if (loading) {
     return (
       <SafeAreaView style={styles.loaderContainer}>
-        <ActivityIndicator size={50} />
+        <ActivityIndicator size="large" color="#0000ff" />
       </SafeAreaView>
     );
   }
@@ -86,7 +86,7 @@ const UserReport = ({ navigation }) => {
           ))
         ) : (
           <View>
-            <Text>No data available</Text>
+            <Text style={{alignSelf:"center",marginTop:"50%"}}>No data available</Text>
           </View>
         )}
       </ScrollView>

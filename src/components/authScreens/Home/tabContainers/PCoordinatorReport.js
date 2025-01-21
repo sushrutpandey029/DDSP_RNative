@@ -28,7 +28,7 @@ const PCoordinatorReport = () => {
         setApiData(response.data);
       }
     } catch (err) {
-      console.error("Error fetching coordinator details:", err);
+      console.error("Error fetching coordinator details:", err.response.data);
     } finally {
       setLoading(false);
     }
@@ -77,7 +77,6 @@ const PCoordinatorReport = () => {
   );
 
   const renderCoordinator = ({ item }) => (
-    
     <View style={styles.itemContainer}>
       {tabValue === "TP" &&
         renderSubItem({
@@ -158,7 +157,7 @@ const PCoordinatorReport = () => {
         <FlatList
           data={apiData}
           renderItem={renderCoordinator}
-          keyExtractor={(item) => item.id.toString()}
+          keyExtractor={(item) => item.id?.toString()}
           contentContainerStyle={{ paddingBottom: 20 }}
           refreshControl={
             <RefreshControl
@@ -191,7 +190,7 @@ const styles = StyleSheet.create({
   itemContainer: {
     marginBottom: 10,
 
-    padding: 8,
+    padding: 12,
     backgroundColor: "#d7e6f4",
     borderRadius: 10,
   },
@@ -236,7 +235,8 @@ const styles = StyleSheet.create({
     // flex:1,
     flexDirection: "row",
     justifyContent: "space-around",
-    padding: 10,
+    paddingTop: 14,
+    paddingBottom:14
     // backgroundColor:"#000"
   },
   tab: {

@@ -47,25 +47,22 @@ const styles = StyleSheet.create({
     // width: "100%",
   },
   tag: {
-    paddingTop:8,
-    paddingBottom:6,
+    paddingTop:20,
+    paddingBottom:20,
     borderWidth: 2,
     width: "90%",
     // maxHeight: "42%",
     margin: "auto",
-
     marginTop: 30,
     marginBottom:15,
     borderRadius: 10,
     borderColor: "#efefef",
-
     backgroundColor: "#fff",
     borderRadius: 10,
-
     shadowColor: "#000",
     shadowOffset: {
-      width: 10,
-      height: 5,
+      width: 0,
+      height: 1,
     },
     shadowOpacity: 0.6,
     shadowRadius: 10,

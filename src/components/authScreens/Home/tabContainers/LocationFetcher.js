@@ -11,7 +11,7 @@ import {
 import * as Location from "expo-location";
 import { useSelector } from "react-redux";
 import { addUserLocation } from "../../../services/ApiFile";
-import {globalContainer} from "../../../../globals/style"
+import {globalContainer, semibold} from "../../../../globals/style"
 
 const LocationFetcher = () => {
   const { user } = useSelector((state) => state.auth.user);
@@ -168,8 +168,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: "center",
     justifyContent: "center",
-    width: "80%",
-    // marginVertical: 10,
+    width: "50%",
     margin:10,
     shadowColor: "#000",
     shadowOffset: {
@@ -178,12 +177,12 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.6,
     shadowRadius: 10,
-
     elevation: 3,
   },
   buttonText: {
-    color: "#7b576d",
-    fontWeight: "bold",
+    // color: "#7b576d",
+    // fontWeight: "bold",
+    fontFamily:"Poppins-SemiBold",
     fontSize: 14,
   },
   disabledButton: {

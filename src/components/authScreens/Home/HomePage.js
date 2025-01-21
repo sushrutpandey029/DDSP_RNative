@@ -64,7 +64,7 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     flex: 1,
-    marginHorizontal: Dimensions.get("window").width * 0.03,
+    marginHorizontal: Dimensions.get("window").width * 0.04,
   },
   nullData: {
     alignItems: "center",

@@ -10,7 +10,7 @@ import {
   Alert,
   ActivityIndicator,
 } from "react-native";
-import { submitBtn } from "../../../../globals/style";
+import { submitBtn, semibold } from "../../../../globals/style";
 import FormHeader from "../FormHeader";
 import { globalContainer } from "../../../../globals/style";
 import {
@@ -88,7 +88,6 @@ const DetailOfCultivation = ({ route, navigation }) => {
     setData(updatedData);
   };
 
-
   const validateFields = () => {
     let validateErrors = {};
 
@@ -142,7 +141,7 @@ const DetailOfCultivation = ({ route, navigation }) => {
       }, {}),
     };
 
-    console.log("submission-data",JSON.stringify(submissionData,null,2))
+    console.log("submission-data", JSON.stringify(submissionData, null, 2));
 
     try {
       setLoading(true);
@@ -178,7 +177,11 @@ const DetailOfCultivation = ({ route, navigation }) => {
   }, []);
 
   if (!data) {
-    return <ActivityIndicator size={70} style={styles.activity} />; // Loading state
+    return (
+      <View style={styles.loaderContainer}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    ); // Loading state
   }
 
   return (
@@ -216,9 +219,13 @@ const DetailOfCultivation = ({ route, navigation }) => {
                         <View key={index}>
                           <Text style={styles.label}>
                             {" "}
-                            { costField === "landCost" ? "Land Preparation Cost" : costField
-                              .replace(/([a-z])([A-Z])/g, "$1 $2")
-                              .replace(/^./, (str) => str.toUpperCase())}{" "}
+                            {costField === "landCost"
+                              ? "Land Preparation Cost"
+                              : costField
+                                  .replace(/([a-z])([A-Z])/g, "$1 $2")
+                                  .replace(/^./, (str) =>
+                                    str.toUpperCase()
+                                  )}{" "}
                             <Text style={{ fontSize: 12, fontWeight: "bold" }}>
                               (Rs.)
                             </Text>
@@ -270,7 +277,7 @@ const DetailOfCultivation = ({ route, navigation }) => {
               onPress={handleSubmit}
               disabled={loading}
             >
-              <Text style={styles.inpText}>Submit</Text>
+              <Text style={[styles.inpText, semibold]}>Submit</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -289,7 +296,13 @@ export default DetailOfCultivation;
 
 const styles = StyleSheet.create({
   formContainer: {
-    marginBottom: 20,
+    marginBottom: "40%",
+  },
+  loaderContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#f5f5f5",
   },
   label: {
     fontFamily: "Poppins-Regular",
@@ -308,7 +321,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   seasonContainer: {
-    marginVertical: 20,
+    marginTop: 20,
   },
   seasonTitle: {
     fontSize: 20,
@@ -333,14 +346,13 @@ const styles = StyleSheet.create({
   },
   totalCost: {
     fontSize: 16,
-    fontWeight: "bold",
     color: "#4CAF50",
+    fontFamily:"Poppins-Regular",
     marginTop: 10,
   },
   btnContainer: {
     alignItems: "center",
-    marginTop: 20,
-  },
+   },
   inpText: {
     color: "#fff",
     fontSize: 18,

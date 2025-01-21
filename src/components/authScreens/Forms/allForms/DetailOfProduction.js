@@ -10,7 +10,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import React, { useEffect, useState } from "react";
-import { submitBtn } from "../../../../globals/style";
+import { submitBtn, semibold } from "../../../../globals/style";
 import FormHeader from "../FormHeader";
 import { globalContainer } from "../../../../globals/style";
 import {
@@ -31,8 +31,6 @@ const DetailOfProduction = ({ route, navigation }) => {
       const response = await addCultivationCostDetails(farmerId);
       console.log("prod-getcostDetails", response);
 
-      // Parse the crops data which is in stringified JSON format
-      // const cropsData = JSON.parse(response.crops);
       const cropsData = response.crops;
 
       const updatedData = { ...response, crops: cropsData };
@@ -41,10 +39,10 @@ const DetailOfProduction = ({ route, navigation }) => {
       Object.entries(updatedData.crops).forEach(([season, categories]) => {
         Object.entries(categories).forEach(([category, crops]) => {
           updatedData.crops[season][category] = crops.map((crop) => ({
-            cropName: crop.crop, // Use the crop name from the response
-            cropLand: crop.cropLand, // Include the cropLand if needed
+            cropName: crop.crop,
+            cropLand: crop.cropLand,
             costs: costFields.reduce((acc, field) => {
-              acc[field] = null; // Initialize each cost field with "0"
+              acc[field] = null;
               return acc;
             }, {}),
             totalCost: 0, // Initialize total cost
@@ -102,7 +100,6 @@ const DetailOfProduction = ({ route, navigation }) => {
   };
 
   const handleSubmit = async () => {
-
     if (!handleValidation()) {
       Alert.alert("Validation Error", "Please correct the highlighted fields.");
       return;
@@ -145,7 +142,7 @@ const DetailOfProduction = ({ route, navigation }) => {
       ]);
     } catch (error) {
       console.log("addProCostPost-err", error.response);
-      Alert.alert("Error Message","error adding production ");
+      Alert.alert("Error Message", "error adding production ");
     } finally {
       setLoading(false);
     }
@@ -160,9 +157,9 @@ const DetailOfProduction = ({ route, navigation }) => {
       <SafeAreaView
         style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
       >
-        <ActivityIndicator size={50} style={styles.activity} />
+        <ActivityIndicator size="large" color="#0000ff" />
       </SafeAreaView>
-    ); // Loading state
+    );
   }
 
   return (
@@ -295,7 +292,7 @@ const DetailOfProduction = ({ route, navigation }) => {
               onPress={handleSubmit}
               // disabled={loading}
             >
-              <Text style={styles.inpText}>Submit</Text>
+              <Text style={[styles.inpText, semibold]}>Submit</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -317,7 +314,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   formContainer: {
-    marginBottom: 20,
+    marginBottom: "40%",
   },
   label: {
     fontFamily: "Poppins-Regular",
@@ -342,7 +339,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   seasonContainer: {
-    marginVertical: 20,
+    marginTop: 20,
   },
   seasonTitle: {
     fontFamily: "Poppins-Bold",

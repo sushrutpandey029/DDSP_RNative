@@ -13,7 +13,7 @@ import { globalContainer } from "../../../globals/style";
 const FormPage = ({ navigation }) => {
   return (
     <View style={globalContainer}>
-      <FormHeader title={"FORM PAGE"} />
+      <FormHeader title={"FORM"} />
       <ScrollView style={styles.container}>
         <TouchableOpacity
           onPress={() => navigation.navigate("FarmerInformation")}
@@ -34,7 +34,10 @@ const FormPage = ({ navigation }) => {
           />
         </TouchableOpacity>
         <TouchableOpacity onPress={() => navigation.navigate("ProjectWork")}>
-          <FormCard title={"Project Corodination Work"} content="Details of programmes and review of meeting conducted by Project Coordinator." />
+          <FormCard
+            title={"Project Corodination Work"}
+            content="Details of programmes and review of meeting conducted by Project Coordinator."
+          />
         </TouchableOpacity>
       </ScrollView>
     </View>

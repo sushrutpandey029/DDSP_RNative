@@ -16,6 +16,7 @@ import axios from "axios";
 import { useNavigation } from "@react-navigation/native";
 import { useFocusEffect } from "@react-navigation/native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { closeButton, closeButtonText } from "../../../../globals/style";
 
 const FarmerList = () => {
   const [farmerDetails, setFarmerDetails] = useState([]);
@@ -74,7 +75,7 @@ const FarmerList = () => {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size={50} style={{ marginTop: "50%" }} />
+        <ActivityIndicator size="large" color="#0000ff" />
       </View>
     );
   }
@@ -87,69 +88,67 @@ const FarmerList = () => {
           <RefreshControl refreshing={refreshing} onRefresh={handleOnRefresh} />
         }
       >
-        <View style={{marginBottom:40}}>
-        {farmerDetails.length ? (
-          farmerDetails.map((item) => (
-            <View style={styles.container} key={item.id}>
-              <View style={{ marginLeft: 4, flex: 11 }}>
-                <Text style={styles.txtName}>{item.name}</Text>
-                <Text style={styles.txtEmail}>{item.emailID}</Text>
-                <Text style={styles.txtId}>{item.farmerID}</Text>
-              </View>
+        <View style={{ marginBottom: 40 }}>
+          {farmerDetails.length ? (
+            farmerDetails.map((item) => (
               <TouchableOpacity
                 onPress={() => openModal(item.id, item.farmerID)}
-                style={{ alignSelf: "center", flex: 1 }}
+                style={styles.container}
+                key={item.id}
               >
-                <MaterialCommunityIcons name="dots-vertical" size={26} />
+                <View style={{ marginLeft: 4, flex: 11 }}>
+                  <Text style={styles.txtName}>{item.name}</Text>
+                  <Text style={styles.txtEmail}>{item.emailID}</Text>
+                  <Text style={styles.txtId}>{item.farmerID}</Text>
+                </View>
+                <View style={{ alignSelf: "center", flex: 1 }}>
+                  <MaterialCommunityIcons name="dots-vertical" size={26} />
+                </View>
               </TouchableOpacity>
-            </View>
-          ))
-        ) : (
-          <Text style={styles.txtName}>no list available.</Text>
-        )}
-        <Modal
-          transparent={true}
-          visible={modalVisible}
-          animationType="slide"
-          onRequestClose={closeModal}
-        >
-          <View style={styles.centerdView}>
-            <View style={styles.modalView}>
-              <TouchableOpacity onPress={() => handlePress("CropDetail")}>
-                <Text style={styles.txt}> Crop Detail</Text>
-              </TouchableOpacity>
+            ))
+          ) : (
+            <Text style={[styles.txtName, { alignSelf: "center" }]}>
+              no list available.
+            </Text>
+          )}
+          <Modal
+            transparent={true}
+            visible={modalVisible}
+            animationType="slide"
+            onRequestClose={closeModal}
+          >
+            <View style={styles.centerdView}>
+              <View style={styles.modalView}>
+                <TouchableOpacity onPress={() => handlePress("CropDetail")}>
+                  <Text style={styles.txt}> Crop Detail</Text>
+                </TouchableOpacity>
 
-              <TouchableOpacity onPress={() => handlePress("FarmerDetail")}>
-                <Text style={styles.txt}>Farmer Detail</Text>
-              </TouchableOpacity>
+                <TouchableOpacity onPress={() => handlePress("FarmerDetail")}>
+                  <Text style={styles.txt}>Farmer Detail</Text>
+                </TouchableOpacity>
 
-              <TouchableOpacity
-                onPress={() => handlePress("DetailOfCultivation")}
-              >
-                <Text style={styles.txt}> Add Cultivation</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                onPress={() => handlePress("DetailOfProduction")}
-              >
-                <Text style={styles.txt}>Add Production</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity onPress={closeModal} style={styles.closeButton}>
-                <Text
-                  style={[
-                    styles.txt,
-                    { color: "red", fontFamily: "Poppins-SemiBold" },
-                  ]}
+                <TouchableOpacity
+                  onPress={() => handlePress("DetailOfCultivation")}
                 >
-                  Close
-                </Text>
-              </TouchableOpacity>
+                  <Text style={styles.txt}> Add Cultivation</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  onPress={() => handlePress("DetailOfProduction")}
+                >
+                  <Text style={styles.txt}>Add Production</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  onPress={closeModal}
+                  style={styles.closeButton}
+                >
+                  <Text style={styles.closeBtnText}>Close</Text>
+                </TouchableOpacity>
+              </View>
             </View>
-          </View>
-        </Modal>
+          </Modal>
         </View>
-       
       </ScrollView>
     </View>
   );
@@ -187,7 +186,7 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   modalView: {
-    width: "80%",
+    width: "65%",
     backgroundColor: "#ffffff",
     borderRadius: 10,
     padding: 20,
@@ -207,8 +206,16 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     color: "red",
-    fontSize: 16,
-    marginTop: 10,
+    fontSize: 14,
+    // backgroundColor:'#fad7d4',
+    borderRadius: 8,
+  },
+  closeBtnText: {
+    fontSize: 14,
+    fontFamily: "Poppins-Medium",
+    color: "#fc3121",
+    paddingHorizontal: 12,
+    paddingVertical: 4,
   },
   activity: {
     flex: 1,

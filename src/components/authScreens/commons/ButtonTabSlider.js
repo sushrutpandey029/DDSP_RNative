@@ -89,12 +89,16 @@ const styles = StyleSheet.create({
     backgroundColor: "#e7eae1",
     marginLeft: 0,
     width: "100%",
+    paddingTop: 10,
+    paddingBottom: 10,
+    paddingLeft:8,
+    paddingRight:8
   },
   btnContainer: {
-    padding: 10,
+    padding: 8,
   },
   activeButton: {
-     backgroundColor: "#81a989",
+    backgroundColor: "#81a989",
   },
   acBtnText: {
     color: "#fff",

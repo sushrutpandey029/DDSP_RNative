@@ -38,7 +38,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: "3%",
     marginTop: "3%",
-    backgroundColor:"#e7eae1",
+    // backgroundColor:"#e7eae1",
     alignItems:"center"
   },
   img: {

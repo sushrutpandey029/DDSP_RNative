@@ -44,7 +44,7 @@ const CropTab = ({ data, type, refreshing, handleOnRefresh }) => {
 
     return (
       <View style={styles.listItem}>
-        <View>
+        <View style={{ marginBottom: 6 }}>
           <Text style={styles.listText}>Season: {crop.season}</Text>
           <Text style={styles.listText}>
             Category:{" "}
@@ -65,14 +65,14 @@ const CropTab = ({ data, type, refreshing, handleOnRefresh }) => {
               })
             }
           >
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <FontAwesome6 name="edit" size={16} color="blue" />
+            <View style={styles.sBtn}>
+              <FontAwesome6 name="edit" size={16} />
               <Text style={[styles.btnText, { marginLeft: 3 }]}>Edit</Text>
             </View>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => openModal(crop)}>
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <Ionicons name="eye" size={20} color={"blue"} />
+            <View style={styles.sBtn}>
+              <Ionicons name="eye" size={20} />
               <Text style={[styles.btnText, { marginLeft: 3 }]}>View</Text>
             </View>
           </TouchableOpacity>
@@ -106,7 +106,7 @@ const CropTab = ({ data, type, refreshing, handleOnRefresh }) => {
         onRequestClose={closeModal}
       >
         <View style={styles.modalContainer}>
-          <ScrollView style={styles.modalContent}>
+          <View style={styles.modalContent}>
             {selectCrop && (
               <>
                 {type === "cultivationCosts" && (
@@ -158,7 +158,7 @@ const CropTab = ({ data, type, refreshing, handleOnRefresh }) => {
             <TouchableOpacity style={styles.closeButton} onPress={closeModal}>
               <Text style={styles.closeButtonText}>Close</Text>
             </TouchableOpacity>
-          </ScrollView>
+          </View>
         </View>
       </Modal>
     </SafeAreaView>
@@ -201,7 +201,7 @@ const CropDetail = ({ route, navigation }) => {
   if (loading) {
     return (
       <View style={styles.loaderContainer}>
-        <ActivityIndicator size={50} />
+        <ActivityIndicator size="large" color="#0000ff" />
       </View>
     );
   }
@@ -291,36 +291,50 @@ const styles = StyleSheet.create({
   },
   listText: {
     fontSize: 16,
+    fontFamily: "Poppins-Regular",
   },
   modalContainer: {
+    // // flex: 1,
+    // justifyContent: "center",
+    // alignItems: "center",
+    // backgroundColor: "rgba(0,0,0,0.5)",
     flex: 1,
     justifyContent: "center",
-    alignContent:"center",
-    backgroundColor: "rgba(0,0,0,0.5)",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   modalContent: {
-    backgroundColor: "#fff",
-    margin: 20,
-    padding: 20,
+    // backgroundColor: "#fff",
+    // margin: 20,
+    // padding: 20,
+    // borderRadius: 10,
+    // // width: "80%",
+    // padding: 30,
+    width: "65%",
+    backgroundColor: "#ffffff",
     borderRadius: 10,
-    
-    
-    
+    padding: 20,
+    // alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
   },
-  modalTitle: { fontSize: 14, fontFamily:"Poppins-Medium" },
+  modalTitle: { fontSize: 14, fontFamily: "Poppins-Medium" },
   closeButton: {
     marginTop: 20,
     alignSelf: "center",
     paddingHorizontal: 12,
-    paddingVertical:4,
+    paddingVertical: 4,
     backgroundColor: "#f00",
     borderRadius: 5,
     // width:"20%"
   },
   closeButtonText: {
     color: "#fff",
-    fontFamily:"Poppins-Medium",
-    fontSize:16
+    fontFamily: "Poppins-Medium",
+    fontSize: 16,
   },
   noDataText: {
     textAlign: "center",
@@ -333,7 +347,16 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   btnText: {
-    color: "blue",
     fontSize: 15,
+  },
+  sBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#fff",
+    paddingTop: 7,
+    paddingBottom: 7,
+    paddingLeft: 14,
+    paddingRight: 14,
+    borderRadius: 10,
   },
 });

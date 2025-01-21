@@ -110,7 +110,7 @@ const InteractionWithFarmer = ({ navigation }) => {
   return (
     <SafeAreaView style={globalContainer}>
       <FormHeader title="INTERACTION WITH FARMERS" />
-      <ScrollView>
+      <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.formContainer}>
           <View>
             <Text style={styles.label}>User Id </Text>
@@ -255,7 +255,7 @@ export default InteractionWithFarmer;
 
 const styles = StyleSheet.create({
   formContainer: {
-    marginBottom: 30,
+    marginBottom: "40%",
   },
   label: {
     fontFamily: "Poppins-Medium",

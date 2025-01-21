@@ -22,15 +22,15 @@ module.exports = {
     alignItems: "center",
     justifyContent: "center",
     padding: 1,
-    backgroundColor: "#efefef",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 0,
-    },
-    shadowOpacity: 0.5,
-    shadowRadius: 20,
-    elevation:10
+    backgroundColor: "#fff",
+    // shadowColor: "#000",
+    // shadowOffset: {
+    //   width: 0,
+    //   height: 0,
+    // },
+    // shadowOpacity: 0.5,
+    // shadowRadius: 20,
+    // elevation:10
   },
   submitBtn: {
     height: 49,
@@ -39,7 +39,7 @@ module.exports = {
     borderRadius: 10,
     alignItems: "center",
     justifyContent: "center",
-    marginTop: 14,
+    // marginTop: 14,
   },
   globalContainer: {
     flex: 1,

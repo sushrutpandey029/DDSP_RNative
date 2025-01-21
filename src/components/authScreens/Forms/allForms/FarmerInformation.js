@@ -838,7 +838,7 @@ const styles = StyleSheet.create({
     fontFamily: "Poppins-SemiBold",
   },
   formContainer: {
-    marginBottom: "60%",
+    marginBottom: "40%",
   },
   label: {
     fontFamily: "Poppins-Medium",

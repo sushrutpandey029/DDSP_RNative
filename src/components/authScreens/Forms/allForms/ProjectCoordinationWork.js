@@ -176,27 +176,6 @@ const APCItems = useMemo(() => {
   return [];
 }, [APClist?.data?.data]);
 
-// const FOlistData = useMemo(() => FOlist?.data?.data || [], [FOlist?.data?.data]);
-// const FOItems = useMemo(() => {
-//     return FOlistData.map((item) => ({
-//         label: item.fullname,
-//         value: item.fullname,
-//     }));
-// }, [FOlistData]);
-
-// const APClistData = useMemo(() => APClist?.data?.data || [], [APClist?.data?.data]);
-// const APCItems = useMemo(() => {
-//     return APClistData.map((item) => ({
-//         label: item.fullname,
-//         value: item.fullname,
-//     }));
-// }, [APClistData]);
-
-
-
-  console.log("FOItems", FOItems);
-  console.log("APCItems", APCItems);
-
   return (
     <SafeAreaView style={globalContainer}>
       <FormHeader title={"PROJECT COORDINATION WORK"} />
@@ -636,7 +615,7 @@ const APCItems = useMemo(() => {
 
 const styles = StyleSheet.create({
   formContainer: {
-    marginBottom: 40,
+    marginBottom: "40%",
   },
   title: {
     fontSize: 18,
@@ -652,11 +631,6 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   input: {
-    // borderWidth: 1,
-    // borderColor: "#ccc",
-    // borderRadius: 10,
-    // padding: 8,
-    // marginBottom: 10,
     height: 49,
     borderWidth: 1,
     borderColor: "#CBD5E1",
@@ -737,8 +711,7 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   btnContainer: {
-    marginTop: 30,
-    alignItems: "center",
+     alignItems: "center",
   },
   submitText: {
     color: "#fff",
